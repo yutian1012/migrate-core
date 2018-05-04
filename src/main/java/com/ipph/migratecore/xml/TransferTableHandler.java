@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.enumeration.FieldConditionTypeEnum;
-import com.ipph.migratecore.enumeration.FieldDataTypeEnum;
-import com.ipph.migratecore.enumeration.FieldRestrictEnum;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.enumeration.TableOperationEnum;
 import com.ipph.migratecore.model.ConditionModel;
@@ -235,8 +233,8 @@ public class TransferTableHandler extends DefaultHandler {
     		if(null!=attributes.getValue("type")&&!"".equals(attributes.getValue("type"))){
     			conditionModel.setType(FieldConditionTypeEnum.valueOf(attributes.getValue("type")));
     		}
-    		if(null!=attributes.getValue("appyType")&&!"".equals(attributes.getValue("appyType"))){
-    			conditionModel.setAppyType(ApplyTypeEnum.valueOf(attributes.getValue("appyType")));
+    		if(null!=attributes.getValue("applyType")&&!"".equals(attributes.getValue("applyType"))){
+    			conditionModel.setApplyType(ApplyTypeEnum.valueOf(attributes.getValue("applyType")));
     		}
     	}else{//condition标签处于where标签内
     		if(null!=whereModel){

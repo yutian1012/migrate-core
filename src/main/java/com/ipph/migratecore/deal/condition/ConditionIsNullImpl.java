@@ -1,19 +1,32 @@
 package com.ipph.migratecore.deal.condition;
 
-import com.ipph.migratecore.model.FieldConditionModel;
+import com.ipph.migratecore.model.ConditionModel;
 
 public class ConditionIsNullImpl implements Condition{
-
-	@Override
-	public String getConditionParam(FieldConditionModel fieldConditionModel) {
-		if(null==fieldConditionModel||null==fieldConditionModel.getConditionType())
-			return null;
+	
+	private static Condition instance;
+	
+	private ConditionIsNullImpl() {
 		
-		return fieldConditionModel.getConditionType().getName();
+	}
+	
+	public static synchronized Condition getInstance() {
+		if(null==instance) {
+			instance=new ConditionIsNullImpl();
+		}
+		return instance;
 	}
 
 	@Override
-	public Object getConditionParamValue(FieldConditionModel fieldConditionModel) {
+	public String getConditionParam(ConditionModel fieldConditionModel) {
+		if(null==fieldConditionModel||null==fieldConditionModel.getType())
+			return null;
+		
+		return fieldConditionModel.getType().getName();
+	}
+
+	@Override
+	public Object getConditionParamValue(ConditionModel fieldConditionModel) {
 		return null;
 	}
 

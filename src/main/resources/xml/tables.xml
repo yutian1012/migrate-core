@@ -5,16 +5,20 @@
    <!-- 专利申请数据的更新 -->
    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
-    		<field to="isApply" from="" field_default="1"></field>
-    		<field to="appNumber" from="patentNo">
-    			<format>
-    				<format_class_name>org.ipph.format.PatentNoFormater</format_class_name>
-    			</format>
-    		</field>
-    		<field to="" from="costtype">
-    			<condition type="EQUAL">SQ1</condition>
-    		</field>
+    		<field name="isApply" applyType="TARGET" valueType="FIXED" value="1"></field>
+    		<field name="patentNo" applyType="SOURCE"></field>
     	</fields>
+    	<where>
+    		<condition type="EQUAL" applyType="SOURCE">
+    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ1"></field>
+    		</condition>
+    		<condition type="EQUAL" applyType="TARGET">
+    			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>
+    		</condition>
+    	</where>
+    	<!-- <formats>
+    		<format clazz="" ></format>
+    	</formats> -->
     </table>
    
 	<!-- <table type="UPDATE" to="tcopyrightallo" from="tcopyrightreg">

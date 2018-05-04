@@ -3,7 +3,7 @@ package com.ipph.migratecore.deal.format;
 import java.util.List;
 
 import com.ipph.migratecore.deal.exception.FormatException;
-import com.ipph.migratecore.model.FieldFormatModel;
+import com.ipph.migratecore.model.FormatModel;
 
 public class FormaterContext {
 	
@@ -22,15 +22,15 @@ public class FormaterContext {
 	 * @return
 	 * @throws Exception 
 	 */
-	public Object getFormatedValue(FieldFormatModel fieldFormatModel,Object value ) throws FormatException {
+	public Object getFormatedValue(FormatModel fieldFormatModel,Object value ) throws FormatException {
 		if(null==fieldFormatModel){
 			return value;
 		}
 		
-		Formater formater=getFormater(fieldFormatModel.getClassName());
+		/*Formater formater=getFormater(fieldFormatModel.getClassName());
 		if(null!=formater){
 			value=formater.format(fieldFormatModel.getMethodArgs(), value);
-		}
+		}*/
 		
 		return value;
 	}
