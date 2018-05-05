@@ -78,7 +78,7 @@ public class XmlUtil {
 	}
 	
 	public static void main(String[] args) {
-		//System.out.println(XmlUtil.validateXmlByXSD(XmlUtil.class.getResource("/xml/tables.xml").getPath()));
+		System.out.println(XmlUtil.validateXmlByXSD(XmlUtil.class.getResource("/xml/tables.xml").getPath()));
 		
 		try {
 			List<TableModel> tableList=XmlUtil.parseBySax(XmlUtil.class.getResource("/xml/tables.xml").getPath());

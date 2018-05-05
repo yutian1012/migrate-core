@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tables"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+   xsi:schemaLocation="http://www.migrate.org/schema/tables tables.xsd">
+   
+   <!-- 专利申请数据的更新 -->
+   <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
+    	<fields>
+    		<field name="isApply" applyType="TARGET" valueType="FIXED" value="1"></field>
+    		<field name="patentNo" applyType="SOURCE"></field>
+    	</fields>
+    	<where>
+    		<condition type="EQUAL" applyType="SOURCE">
+    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ1"></field>
+    		</condition>
+    		<condition type="EQUAL" applyType="TARGET">
+    			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>
+    		</condition>
+    	</where>
+    	<!-- <formats>
+    		<format clazz="" ></format>
+    	</formats> -->
+    </table>
+</tables>

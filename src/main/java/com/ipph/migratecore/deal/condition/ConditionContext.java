@@ -1,8 +1,11 @@
 package com.ipph.migratecore.deal.condition;
 
+import org.springframework.stereotype.Component;
+
 import com.ipph.migratecore.enumeration.FieldConditionTypeEnum;
 import com.ipph.migratecore.model.ConditionModel;
 
+@Component
 public class ConditionContext {
 	
 	/**

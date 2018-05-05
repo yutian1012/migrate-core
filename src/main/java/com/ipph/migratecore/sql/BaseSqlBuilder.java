@@ -158,27 +158,4 @@ public class BaseSqlBuilder {
 		}
 		return sbuilder.toString();
 	}
-	/**
-	 * 获取sql语句的where条件
-	 * 使用field字段获取条件
-	 * @param conditionList
-	 * @return
-	 *//*
-	protected String getWhereByField(List<String> conditionList){
-		StringBuilder sbuilder=new StringBuilder();
-		//where条件构造
-		if(null!=conditionList&&conditionList.size()>0){
-			
-			sbuilder.append(" where 1=1 ");
-			
-			for(String field:conditionList){
-				
-				
-				if(null!=field&&!"".equals(field)){
-					sbuilder.append(" and ").append(field).append(" = ? ");
-				}
-			}
-		}
-		return sbuilder.toString();
-	}*/
 }
