@@ -1,8 +1,10 @@
 package com.ipph.migratecore.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class WhereModel implements Cloneable{
+public class WhereModel implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private List<ConditionModel> conditionList;
 	
 	public List<ConditionModel> getConditionList() {
@@ -12,14 +14,4 @@ public class WhereModel implements Cloneable{
 	public void setConditionList(List<ConditionModel> conditionList) {
 		this.conditionList = conditionList;
 	}
-
-	public WhereModel copyWhereModel(){
-		try {
-			return (WhereModel) this.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 }

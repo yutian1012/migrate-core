@@ -11,39 +11,44 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.ipph.migratecore.enumeration.BatchStatusEnum;
-import com.ipph.migratecore.model.BatchModel;
+import com.ipph.migratecore.enumeration.LogStatusEnum;
+import com.ipph.migratecore.model.LogModel;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class BatchDaoTest {
+public class LogDaoTest {
 	
 	@Resource
-	private BatchDao batchDao;
+	private LogDao logDao;
 
 	@Test
-	public void testAdd() {
-		
+	public void test() {
 		Long id=0L;
 		
-		BatchModel model=new BatchModel();
-		model.setSize(100);
-		model.setStatus(BatchStatusEnum.FAIL);
+		LogModel model=new LogModel();
+		model.setBatchId(0L);
+		model.setParentBatchId(0L);
 		model.setCreateDate(new Date());
-		model=batchDao.save(model);
+		model.setDataId(0L);
+		model.setDealData("test");
+		model.setStatus(LogStatusEnum.SUCCESS);
+		model.setTableId(0L);
+		model.setTableName("tablename");
+		model=logDao.save(model);
 		
 		assertNotNull(model.getId());
 		
 		id=model.getId();
 		
 		//从数据库中检索
-		BatchModel model2=batchDao.findById(id).get();
+		LogModel model2=logDao.findById(id).get();
 		
 		assertNotNull(model2);
 		
 		//从数据库中删除
-		/*batchDao.delete(model2);
+		logDao.delete(model2);
 		
-		assertFalse(batchDao.existsById(id));*/
+		assertFalse(logDao.existsById(id));
 	}
+
 }

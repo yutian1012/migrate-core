@@ -1,9 +1,12 @@
 package com.ipph.migratecore.model;
 
+import java.io.Serializable;
+
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.enumeration.FieldConditionTypeEnum;
 
-public class ConditionModel implements Cloneable {
+public class ConditionModel implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private FieldConditionTypeEnum type;
 	private FieldModel field;
 	private ApplyTypeEnum applyType;
@@ -24,13 +27,5 @@ public class ConditionModel implements Cloneable {
 	}
 	public void setApplyType(ApplyTypeEnum applyType) {
 		this.applyType = applyType;
-	}
-	public ConditionModel copyConditionModel(){
-		try {
-			return (ConditionModel) this.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

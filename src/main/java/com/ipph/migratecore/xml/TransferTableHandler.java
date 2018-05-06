@@ -125,7 +125,7 @@ public class TransferTableHandler extends DefaultHandler {
     		table.setFormatFieldList(new ArrayList<FormatModel>());
     	}else{
     		if(null!=table){
-    			tableList.add(table.copyTableModel());
+    			tableList.add(table);
     		}
     	}
     }

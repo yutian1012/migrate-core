@@ -1,10 +1,13 @@
 package com.ipph.migratecore.model;
 
+import java.io.Serializable;
+
 /**
  * 对象xml的format信息，记录格式化信息设置
  * 一般出现在迁移的目标Table设置中，放到源table无效
  */
-public class FormatModel implements Cloneable{
+public class FormatModel implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private Class<?> clazz;
 	private String formatParameter;
 	private String filedName;
@@ -31,14 +34,5 @@ public class FormatModel implements Cloneable{
 
 	public void setFiledName(String filedName) {
 		this.filedName = filedName;
-	}
-
-	public FormatModel copyFormatModel(){
-		try {
-			return (FormatModel) this.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

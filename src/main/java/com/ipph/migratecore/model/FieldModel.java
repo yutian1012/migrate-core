@@ -1,5 +1,7 @@
 package com.ipph.migratecore.model;
 
+import java.io.Serializable;
+
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.enumeration.FieldDataTypeEnum;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
@@ -7,7 +9,8 @@ import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 /**
  * 该类对象xml的field标签
  */
-public class FieldModel implements Cloneable{
+public class FieldModel implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String value;
 	private FieldDataTypeEnum fieldType;
@@ -43,13 +46,5 @@ public class FieldModel implements Cloneable{
 	}
 	public void setValueType(FieldValueTypeEnum valueType) {
 		this.valueType = valueType;
-	}
-	public FieldModel copyFieldModel(){
-		try {
-			return (FieldModel) this.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }
