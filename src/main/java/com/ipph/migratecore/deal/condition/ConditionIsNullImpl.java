@@ -1,5 +1,7 @@
 package com.ipph.migratecore.deal.condition;
 
+import java.util.Map;
+
 import com.ipph.migratecore.model.ConditionModel;
 
 public class ConditionIsNullImpl implements Condition{
@@ -26,7 +28,7 @@ public class ConditionIsNullImpl implements Condition{
 	}
 
 	@Override
-	public Object getConditionParamValue(ConditionModel fieldConditionModel) {
+	public Object getConditionParamValue(ConditionModel fieldConditionModel,Map<String,Object> rowData) {
 		return null;
 	}
 

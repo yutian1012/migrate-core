@@ -2,9 +2,12 @@ package com.ipph.migratecore.deal.format;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.ipph.migratecore.deal.exception.FormatException;
 import com.ipph.migratecore.model.FormatModel;
 
+@Component
 public class FormaterContext {
 	
 	private List<Formater> formaterList;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
     <!-- 专利申请数据的更新 -->
    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
@@ -15,21 +16,4 @@
     		</condition>
     	</where>
     </table>
-    
-	<!-- <table type="UPDATE" to="tcopyrightallo" from="tcopyrightreg">
-		<fields>
-			<field to="sourceType" from="tmp">
-				<format>
-					<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
-    				<format_class_arg>{'QY':'企业','KYYS':'','GR':'个人','ZCGX':'','SHTT':'','JG':''}</format_class_arg>
-				</format>
-			</field>
-			<field to="" from="workname"></field>
-		</fields>
-		<where>
-			<field to="workname" from="workname">
-				<condition type="EQUAL"/>
-			</field>
-		</where>
-	</table> -->
 </tables>

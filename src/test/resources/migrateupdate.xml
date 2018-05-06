@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tables"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+   xsi:schemaLocation="http://www.migrate.org/schema/tables tables.xsd">
+	<!-- 测试数据更新 -->
+    <table type="UPDATE" to="migratedest" from="migratesource">
+    	<fields>
+    		<!-- 目标表要更新的字段 -->
+    		<field name="useremail" applyType="TARGET" valueType="FIELD" value="email"/>
+    		<!-- 源表要查询获取的字段数据 -->
+    		<field name="name" applyType="SOURCE"/>
+    		<field name="email" applyType="SOURCE"/>
+    	</fields>
+    	<where>
+    		<!-- 目标表更新数据的条件，migratesource表使用name字段，migratedest使用username字段进行关联更新  -->
+    		<condition type="EQUAL" applyType="TARGET">
+    			<field name="username" applyType="TARGET" valueType="FIELD" value="name"/>
+    		</condition>
+    		<!-- 源表获取待更新的数据集条件，这里设置id值<=3 -->
+    		<condition type="LE" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE" valueType="FIXED" value="3" />
+    		</condition>
+    	</where>
+    </table>
+</tables>

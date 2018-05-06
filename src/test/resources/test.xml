@@ -16,8 +16,5 @@
     			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>
     		</condition>
     	</where>
-    	<!-- <formats>
-    		<format clazz="" ></format>
-    	</formats> -->
     </table>
 </tables>

@@ -24,7 +24,7 @@
 					<xsd:complexType>
 						<xsd:sequence>
 							<!-- field标签可以出现多次，至少出现1次 -->
-							<xsd:element ref="field" minOccurs="1"></xsd:element>
+							<xsd:element ref="condition" minOccurs="1"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
@@ -117,7 +117,7 @@
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
-			<xsd:attribute ref="applyType"></xsd:attribute>
+			<xsd:attribute ref="applyType" use="required"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	

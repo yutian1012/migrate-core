@@ -33,7 +33,7 @@ whereModel成员：条件集合（ConditionList）
 //<codition type="" applyType><field></field></condition>
 ConditionModel成员：类型（等于，不等于。。。每个类型都有相应的处理类），field字段（FieldModel），字段应用类型（applyType，表明是源表还是目标表）
 
-//格式化数据模型
+//格式化数据模型--格式化发生在处理目标数据时
 FormatModel成员：格式化处理类（formatClass）,格式化处理参数，格式化处理字段（fieldName）
 
 4) 从源表迁移数据到目标表
@@ -54,7 +54,9 @@ subtableModel成员:
 
 6）结合流程实现自定义流程处理
 
-7）记录信息
+7）记录信息--使用jpa方式实现
+
+create database if not exists `migrate` default charset utf8 collate utf8_general_ci;
 
 记录正确处理的数据，错误无法处理的数据。并提供一个相应的统计功能。--日志模型LogModel
 再处理前，需要将处理相关的结构数据入库保存，方便查看每次正确处理的信息管理的数据结构。一般针对表结构进行单独存储。--tableModel）
@@ -80,3 +82,70 @@ subtableModel成员:
 9）设置多数据源问题
 
 多数据源先在配置文件application.properties中设置，思考如何实现动态设置数据源，并进行相应的匹配和切换。
+
+10）测试更新数据
+
+数据库test1
+create database if not exists `test1` default charset utf8 collate utf8_general_ci;
+原表及数据，
+DROP TABLE IF EXISTS `migratesource`;
+create table migratesource(
+	id bigint(20) not null primary key,
+	name varchar(32) not null comment '用户名',
+	email varchar(32) not null comment '邮箱',
+	createtime date not null
+);
+insert into migratesource(id,name,email,createtime) values(1,'zhangsan1','zhangsan1@qq.com','2018-05-05');
+insert into migratesource(id,name,email,createtime) values(2,'zhangsan2','zhangsan2@qq.com','2018-05-05');
+insert into migratesource(id,name,email,createtime) values(3,'zhangsan3','zhangsan3@qq.com','2018-05-05');
+insert into migratesource(id,name,email,createtime) values(4,'zhangsan4','zhangsan4@qq.com','2018-05-05');
+insert into migratesource(id,name,email,createtime) values(5,'zhangsan5','zhangsan5@qq.com','2018-05-05');
+
+数据库test2
+create database if not exists `test2` default charset utf8 collate utf8_general_ci;
+目标表及数据(新应用的数据表字段与原数据表是不同的)，
+DROP TABLE IF EXISTS `migratedest`;
+create table migratedest(
+	id bigint(20) not null primary key,
+	username varchar(32) not null comment '用户名',
+	useremail varchar(32) comment '邮箱',
+	createtime date not null
+);
+insert into migratedest(id,username,useremail,createtime) values(1,'zhangsan1','','2018-05-05');
+insert into migratedest(id,username,useremail,createtime) values(2,'zhangsan2','','2018-05-05');
+insert into migratedest(id,username,useremail,createtime) values(3,'zhangsan3','','2018-05-05');
+
+实现数据的更新，将migratesource表中email信息更新到目标表migratedest的useremail字段中。两表的关联字段：migratesource表使用name字段，migratedest使用username字段进行关联更新。
+
+应用中数据源配置在application.properties文件中
+
+数据源配置类查看com.ipph.migratecore.config.DataSourceConfig类
+
+在xml中配置更新信息
+<table type="UPDATE" to="migratedest" from="migratesource">
+	<fields>
+		<!-- 目标表要更新的字段 -->
+		<field name="useremail" applyType="TARGET" valueType="FIELD" value="email"/>
+		<!-- 源表要查询获取的字段数据 -->
+		<field name="name" applyType="SOURCE"/>
+		<field name="email" applyType="SOURCE"/>
+	</fields>
+	<where>
+		<!-- 目标表更新数据的条件，migratesource表使用name字段，migratedest使用username字段进行关联更新  -->
+		<condition type="EQUAL" applyType="TARGET">
+			<field name="username" applyType="TARGET" valueType="FIELD" value="name"/>
+		</condition>
+		<!-- 源表获取待更新的数据集条件，这里设置id值<=3 -->
+		<condition type="LE" applyType="SOURCE">
+			<field name="id" applyType="SOURCE" valueType="FIXED" value="3" />
+		</condition>
+	</where>
+</table>
+
+update更新数据流程：
+获取待更新的数据，判断目标表中待更新的记录是否存在，如果不存在则抛出异常并记录，如果存在则进行更新
+
+insert迁移数据流程
+获取待迁移的数据，判断目标表汇总该记录是否已经存在（已经迁移过了，或者唯一键问题），如果存在则给出提示，如果不存在则执行插入操作
+
+11）在应用中添加缓存，表结构信息的缓存--防止每次处理都从新创建相应的sql，where字段等。

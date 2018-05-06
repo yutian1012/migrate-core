@@ -38,10 +38,10 @@ public class BaseSqlBuilder {
 		StringBuilder sbuilder=new StringBuilder();
 		sbuilder.append("select ");
 		for(String field:selectFieldList){
-			sbuilder.append(field).append(",");
+			sbuilder.append(field.toUpperCase()).append(",");
 		}
 		sbuilder.setLength(sbuilder.length()-1);//去掉末尾的逗号
-		sbuilder.append(" from ").append(tableName);
+		sbuilder.append(" from ").append(tableName.toUpperCase());
 		
 		return sbuilder.toString();
 	}
@@ -57,7 +57,7 @@ public class BaseSqlBuilder {
 		StringBuilder sbuilder=new StringBuilder();
 		sbuilder.append("insert into ").append(tableName).append(" (");
 		for(String field:insertFieldList){
-			sbuilder.append(field).append(",");
+			sbuilder.append(field.toUpperCase()).append(",");
 		}
 		sbuilder.setLength(sbuilder.length()-1);
 		sbuilder.append(" )").append(" VALUES (");
@@ -77,11 +77,11 @@ public class BaseSqlBuilder {
 	protected String getUpdateSql(String tableName,List<String> updateFieldList){
 		
 		StringBuilder sbuilder=new StringBuilder();
-		sbuilder.append("update ").append(tableName).append(" set ");
+		sbuilder.append("update ").append(tableName.toUpperCase()).append(" set ");
 		
 		//to有值，from无值作为待更新的字段
 		for(String field:updateFieldList){
-			sbuilder.append(field).append(" = ? ").append(",");
+			sbuilder.append(field.toUpperCase()).append(" = ? ").append(",");
 		}
 		sbuilder.setLength(sbuilder.length()-1);
 
@@ -152,7 +152,7 @@ public class BaseSqlBuilder {
 				FieldModel field=condition.getField();
 				
 				if(null!=v&&null!=field){
-					sbuilder.append(" and ").append(field.getName()).append(" ").append(v);
+					sbuilder.append(" and ").append(field.getName().toUpperCase()).append(" ").append(v);
 				}
 			}
 		}

@@ -1,5 +1,7 @@
 package com.ipph.migratecore.deal.condition;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 
 import com.ipph.migratecore.enumeration.FieldConditionTypeEnum;
@@ -37,7 +39,7 @@ public class ConditionContext {
 	 * @throws ConditionException 
 	 */
 	public Object getConditionParam(ConditionModel conditionModel){
-		return getCondition(conditionModel,true);
+		return getCondition(conditionModel,null,true);
 	}
 	/**
 	 * 获取条件的数据，替换sql中的占位符
@@ -45,8 +47,8 @@ public class ConditionContext {
 	 * @return
 	 * @throws ConditionException 
 	 */
-	public Object getConditionParamValue(ConditionModel conditionModel){
-		return getCondition(conditionModel, false);
+	public Object getConditionParamValue(ConditionModel conditionModel,Map<String,Object> rowData){
+		return getCondition(conditionModel, rowData,false);
 	}
 	/**
 	 * 获取参数信息，
@@ -55,7 +57,7 @@ public class ConditionContext {
 	 * @return
 	 * @throws ConditionException 
 	 */
-	private Object getCondition(ConditionModel conditionModel,boolean isParam){
+	private Object getCondition(ConditionModel conditionModel,Map<String,Object> rowData,boolean isParameter){
 		
 		if(null==conditionModel) return null;
 		
@@ -70,10 +72,10 @@ public class ConditionContext {
 		Condition condition=conditionType.getConditionHandler();
 		
 		if(null!=condition){
-			if(isParam){
+			if(isParameter){
 				return condition.getConditionParam(conditionModel);
 			}else{
-				return condition.getConditionParamValue(conditionModel);
+				return condition.getConditionParamValue(conditionModel,rowData);
 			}
 		}
 		

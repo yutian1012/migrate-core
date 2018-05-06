@@ -1,6 +1,10 @@
 package com.ipph.migratecore.deal.condition;
 
+import java.util.Map;
+
+import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.ConditionModel;
+import com.ipph.migratecore.model.FieldModel;
 
 public class ConditionDefaultImpl implements Condition{
 	
@@ -25,12 +29,17 @@ public class ConditionDefaultImpl implements Condition{
 	}
 
 	@Override
-	public Object getConditionParamValue(ConditionModel fieldConditionModel) {
-		if(null==fieldConditionModel||null==fieldConditionModel.getType())
+	public Object getConditionParamValue(ConditionModel fieldConditionModel,Map<String,Object> rowData) {
+		if(null==fieldConditionModel||null==fieldConditionModel.getField())
 			return null;
 		
-		//return fieldConditionModel.getValue();
-		return null;
+		FieldModel field=fieldConditionModel.getField();
+		
+		if(field.getValueType()==FieldValueTypeEnum.FIXED) {
+			return field.getValue();
+		}else {
+			return rowData.get(field.getValue().toUpperCase());
+		}
 	}
 
 	@Override
