@@ -26,8 +26,6 @@ public class LogDaoTest {
 		Long id=0L;
 		
 		LogModel model=new LogModel();
-		model.setBatchId(0L);
-		model.setParentBatchId(0L);
 		model.setCreateDate(new Date());
 		model.setDataId(0L);
 		model.setDealData("test");

@@ -1,7 +1,9 @@
 package com.ipph.migratecore.util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -13,6 +15,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -20,6 +23,19 @@ import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.xml.TransferTableHandler;
 
 public class XmlUtil {
+	
+	public static String getFilePath(){
+		String path=XmlUtil.class.getResource("/").getPath();
+		
+		File filePath=new File(path+"attachment");
+		
+		if(!filePath.exists()){
+			filePath.mkdirs();
+		}
+		
+		return filePath.getPath()+File.separator;
+	}
+	
 	/**
 	 * 解析xml
 	 * @param path
@@ -32,6 +48,16 @@ public class XmlUtil {
 		
 		//if(! validateXmlByXSD(path)) return null;
 		
+		InputStream in=new FileInputStream(path);
+		
+		return parseBySax(in);
+	}
+	
+	
+	public static List<TableModel> parseBySax(InputStream in) throws ParserConfigurationException, SAXException, IOException{
+		
+		//if(! validateXmlByXSD(path)) return null;
+		
 		// 创建解析工厂  
         SAXParserFactory factory = SAXParserFactory.newInstance();  
         // 创建解析器  
@@ -40,9 +66,12 @@ public class XmlUtil {
         XMLReader reader = parser.getXMLReader();
         //设置内容处理器
         TransferTableHandler handler=new TransferTableHandler();
+        
         reader.setContentHandler(handler);
         //读取xml文档
-        reader.parse(path);
+        //reader.parse(path);
+        
+        reader.parse(new InputSource(in));
         
         return handler.getResult();
 	}
@@ -78,8 +107,6 @@ public class XmlUtil {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(XmlUtil.validateXmlByXSD(XmlUtil.class.getResource("/xml/tables.xml").getPath()));
-		
 		try {
 			List<TableModel> tableList=XmlUtil.parseBySax(XmlUtil.class.getResource("/xml/tables.xml").getPath());
 			System.out.println(tableList.size());

@@ -15,7 +15,11 @@ import com.ipph.migratecore.deal.exception.FormatException;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.sql.SqlBuilder;
 import com.ipph.migratecore.sql.SqlOperation;
+import com.ipph.migratecore.util.MapUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class MigrateDao {
 	
@@ -36,6 +40,7 @@ public class MigrateDao {
 	 * @throws ConfigException 
 	 */
 	public void update(TableModel table) throws ConfigException {
+		
 		//判断是否忽略该表的迁移操作
 		if(null==table|| table.isSkip()) return;
 		
@@ -71,11 +76,11 @@ public class MigrateDao {
 					int upd=sqlOperation.executeDest(update, migrateRowDataHandler.handleMigrateField(row,table));
 					//第六步：记录日志--用于跟踪数据操作审计
 					if(upd>0){
-						/*if(log.isDebugEnabled()){
+						if(log.isDebugEnabled()){
 							log.debug("update the data success!");
-						}*/
+						}
 					}else{
-						//log.error("更新失败"+MapUtil.outMapData(row));
+						log.error("更新失败"+MapUtil.outMapData(row));
 					}
 				}catch(FormatException e){
 					migrateExceptionHandler.formatExceptionHandler(e, row, table,true);

@@ -22,19 +22,19 @@ public class TableModel implements Serializable{
 	private Long id;
 	@Column
 	private TableOperationEnum type;
-	@Column
+	@Column(length=2048)
 	private String fieldListJson;
 	@Transient
 	private List<FieldModel> filedList;
-	@Column
+	@Column(length=2048)
 	private String subTableListJson;
 	@Transient
 	private List<SubtableModel> subTableList;
-	@Column
+	@Column(length=2048)
 	private String formatFieldListJson;
 	@Transient
 	private List<FormatModel> formatFieldList;
-	@Column
+	@Column(length=2048)
 	private String whereJson;
 	@Transient
 	private WhereModel whereModel;

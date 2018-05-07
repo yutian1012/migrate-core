@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>表设置列表项</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
+	<script type="text/javascript">
+		function uploadXml(){
+			window.location.href='/tables/toUploadXml';
+		}	
+	</script>
+  </head>
+  
+  <body>
+  	<div>
+  		<input type="button" onclick="uploadXml();" value="上传xml文档">
+  	</div>
+    <table style="width:80%;text-align:center;" border="1px">
+	    <tr>
+	      <th>源表</th>
+	      <th>目标表</th>
+	      <th>操作类型</th>
+	      <th>操作</th>
+	    </tr>
+	    <tr th:each="table : ${tableList}">
+	      <td th:text="${table.from}"></td>
+	      <td th:text="${table.to}"></td>
+	      <td th:text="${table.type}"></td>
+	      <td><span><a th:href="@{'/tables/migrate/'+${table.id}}"></a></span>|<span><a th:href="@{'/tables/log/'+${table.id}}"></a></span></td>
+	    </tr>
+	  </table>
+  </body>
+</html>

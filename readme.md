@@ -66,11 +66,13 @@ create database if not exists `migrate` default charset utf8 collate utf8_genera
 
 提炼领域对象
 
-日志记录对象LogModel，批次ID，父批次ID（再处理），业务数据主键（DataId，针对业务表中存在有主键的数据），处理情况（status），关键展示数据（dealData varchar），表配置信息（tableId），处理表名（tableName）
-
 表设置信息TableModel，需要对上面的信息进行扩展，相关的字段信息可存储成json信息，直接保存到TableModel字段中。（即只有TableModel需要序列化到数据库中，其他的字段如FieldModel，WhereModel等无须序列化到数据库表中，只需将相应的json数据保存到TableModel对应的序列化记录的字段中）。
 
-批次信息BatchModel，批次ID,批次处理时间，批次处理量，成功量，批次状态（是否正确处理完了该批次，默认为false，处理完成后更新该字段）
+批次信息BatchModel，批次ID,父批次ID，批次名称，批次表集合（子表信息），批次创建时间（是否正确处理完了该批次，默认为false，处理完成后更新该字段），处理量，成功量
+
+注：子批次只针对单张表进行再出来
+
+日志记录对象LogModel，日志id（id），业务数据主键（DataId，针对业务表中存在有主键的数据），处理情况（status），关键展示数据（dealData varchar），表配置信息（tableId），处理表名（tableName）,消息信息（message）
 
 8）错误信息处理思路
 
@@ -82,6 +84,8 @@ create database if not exists `migrate` default charset utf8 collate utf8_genera
 9）设置多数据源问题
 
 多数据源先在配置文件application.properties中设置，思考如何实现动态设置数据源，并进行相应的匹配和切换。
+
+使用一个配置类，来配置datasource以及与之相关的jdbcTemplate对象。从而注入到dao层
 
 10）测试更新数据
 
@@ -149,3 +153,8 @@ insert迁移数据流程
 获取待迁移的数据，判断目标表汇总该记录是否已经存在（已经迁移过了，或者唯一键问题），如果存在则给出提示，如果不存在则执行插入操作
 
 11）在应用中添加缓存，表结构信息的缓存--防止每次处理都从新创建相应的sql，where字段等。
+
+12）通过上传xml文档获取table的表配置信息
+
+13）添加网页模板
+
