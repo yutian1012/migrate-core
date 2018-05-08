@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>批次置列表项</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
+	<script type="text/javascript">
+		function add(){
+			window.location.href='/batches/toAdd';
+		}	
+	</script>
+  </head>
+  
+  <body>
+  	<div>
+  		<input type="button" onclick="add();" value="新建批次">
+  	</div>
+    <table style="width:80%;text-align:center;" border="1px">
+	    <tr>
+	      <th>批次名</th>
+	      <th>批次创建时间</th>
+	      <th>批次处理状态</th>
+	      <th>操作</th>
+	    </tr>
+	    <tr th:each="batch : ${batchList}">
+	      <td th:text="${batch.batchName}"></td>
+	      <td th:text="${batch.createDate}"></td>
+	      <td th:text="${batch.status}"></td>
+	      <td><span><a th:href="@{'/batches/migrate/'+${batch.id}}">执行批次</a></span>|<span><a th:href="@{'/batches/info/'+${batch.id}}">查看批次</a></span></td>
+	    </tr>
+	  </table>
+  </body>
+</html>

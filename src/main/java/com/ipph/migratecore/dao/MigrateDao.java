@@ -13,6 +13,7 @@ import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
 import com.ipph.migratecore.model.TableModel;
+import com.ipph.migratecore.service.LogService;
 import com.ipph.migratecore.sql.SqlBuilder;
 import com.ipph.migratecore.sql.SqlOperation;
 import com.ipph.migratecore.util.MapUtil;
@@ -34,6 +35,8 @@ public class MigrateDao {
 	@Resource
 	private MigrateExceptionHandler migrateExceptionHandler;
 	
+	@Resource
+	private  LogService logService;
 	/**
 	 * 数据表更新操作
 	 * @param table
@@ -65,6 +68,8 @@ public class MigrateDao {
 		
 		if(result!=null){
 			for(Map<String,Object> row:result){
+				//记录数据
+				logService.log(table);
 				try{
 					if(null!=targetSelect){
 						//判断待更新的数据是否存在

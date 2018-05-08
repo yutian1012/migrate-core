@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>添加批次</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+    <script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
+    
+	<script th:inline="javascript">
+		function addTables(){
+			//显示一个选择对话框
+			var url=/*[[@{/tables/selectTables}]]*/ '';
+			$.post(url,function(data){
+				if(data&&data.length>0){
+					
+					$("#tables").show();//显示表格
+					
+					//设置表格内容
+					for (var i=0;i<data.length;i++){
+						var tr=$("[name='table_tr']").clone().removeAttr("name");
+						tr.find("td:nth-child(1)").html('<input type="checkbox" name="tableId" value="'+data[i]["id"]+'">');
+						tr.find("td:nth-child(2)").html(data[i]["from"]);
+						tr.find("td:nth-child(3)").html(data[i]["to"]);
+						tr.find("td:nth-child(4)").html(data[i]["type"]);
+						
+						tr.insertBefore("#tables tr:last");
+					}
+				}
+			});
+		}
+		
+		function selectTables(){
+			
+			var tableIds="";
+			
+			var tableNames="";
+			$("[name='tableId']:checked").each(function(){
+				tableIds+=$(this).val()+";";
+				tableNames+=$(this).closest("tr").find("td:nth-child(2)").text()+";";
+			});
+			
+			$("#tableList").text(tableNames);
+			$("[name='tables']").val(tableIds);
+			
+			$("#tables tr").each(function(i){
+				if(i!=0){
+					if($(this).attr("name")!='last'){
+						$(this).remove();
+					}
+				}
+			});
+			$("#tables").hide();
+		}
+	</script>
+
+  </head>
+  
+  <body>
+    <form th:action="@{/batches/add}" method="post">
+    
+    	<label>批次名：</label><input type="text" name="batchName"><br/>
+    	<label>迁移表集合：</label><span id="tableList"></span><input type="button" value="选择" onclick="addTables()">
+    	<input type="submit" value="提交">
+
+    	<input type="hidden" name="tables"><br/>
+    </form>
+    
+    
+    <div id="tables" style="display:none;">
+    	<table>
+    		<tr name="table_tr">
+    			<td></td>
+    			<td>源表</td>
+    			<td>目标表</td>
+    			<td>操作类型</td>
+    		</tr>
+    		<tr name="last">
+    			<td colspan="4"><input type="button" value="选择" onclick="selectTables()"></td>
+    		</tr>
+    	</table>
+    </div>
+  </body>
+</html>

@@ -2,6 +2,7 @@ package com.ipph.migratecore.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import com.ipph.migratecore.enumeration.BatchStatusEnum;
 
@@ -34,6 +36,9 @@ public class BatchModel implements Serializable{
 	@Column
 	private Date createDate;
 	@Column
-	@Enumerated(EnumType.STRING)  
+	@Enumerated(EnumType.STRING)
 	private BatchStatusEnum status;
+	
+	@Transient//多对多的情况
+	private List<TableModel> tableList;
 }
