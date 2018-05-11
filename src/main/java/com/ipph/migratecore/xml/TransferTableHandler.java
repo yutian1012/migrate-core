@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.enumeration.FieldConditionTypeEnum;
+import com.ipph.migratecore.enumeration.FieldConstraintEnum;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.enumeration.TableOperationEnum;
 import com.ipph.migratecore.model.ConditionModel;
+import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
 import com.ipph.migratecore.model.SubtableModel;
@@ -42,6 +44,7 @@ public class TransferTableHandler extends DefaultHandler {
     private ConditionModel conditionModel=null;
     private SubtableModel subTableModel=null;
     private WhereModel whereModel=null;
+    private ConstraintModel constraintModel=null;
     private StringBuffer temp=new StringBuffer();
     
     @Override
@@ -103,6 +106,8 @@ public class TransferTableHandler extends DefaultHandler {
         	processFormatElement(attributes,isEnd,text);
         }else if(XmlElement.field_condition.equals(qName)){//条件
         	processConditionElement(attributes,isEnd,text);
+        }else if(XmlElement.constraint.equals(qName)) {//字段限定
+        	processConstraintElement(attributes,isEnd,text);
         }
     }
   
@@ -123,6 +128,7 @@ public class TransferTableHandler extends DefaultHandler {
     		table.setFiledList(new ArrayList<FieldModel>());
     		table.setSubTableList(new ArrayList<SubtableModel>());
     		table.setFormatFieldList(new ArrayList<FormatModel>());
+    		table.setConstraintList(new ArrayList<ConstraintModel>());
     	}else{
     		if(null!=table){
     			tableList.add(table);
@@ -144,6 +150,8 @@ public class TransferTableHandler extends DefaultHandler {
     			subTableModel.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
     		}
     		subTableModel.setFiledList(new ArrayList<FieldModel>());
+    		table.setFormatFieldList(new ArrayList<FormatModel>());
+    		table.setConstraintList(new ArrayList<ConstraintModel>());
     	}else{
     		if(null!=subTableModel){
     			if(null!=table){
@@ -163,16 +171,23 @@ public class TransferTableHandler extends DefaultHandler {
     		
     		fieldModel.setValue(null!=attributes.getValue("value")?attributes.getValue("value"):"");
     		
+    		fieldModel.setDesc(null!=attributes.getValue("desc")?attributes.getValue("desc"):"");
+    		
     		if(null!=attributes.getValue("applyType")&&!"".equals(attributes.getValue("applyType"))){
     			fieldModel.setApplyType(ApplyTypeEnum.valueOf(attributes.getValue("applyType")));
     		}
     		if(null!=attributes.getValue("valueType")&&!"".equals(attributes.getValue("valueType"))){
     			fieldModel.setValueType(FieldValueTypeEnum.valueOf(attributes.getValue("valueType")));
     		}
+    		if(null!=attributes.getValue("forLog")&&!"".equals(attributes.getValue("forLog"))){
+    			fieldModel.setForLog(Boolean.parseBoolean(attributes.getValue("forLog")));
+    		}
     	}else{//field标签可能处于condition标签，subtable标签或table标签内
     		if(null!=fieldModel){
     			if(conditionModel!=null){
     				conditionModel.setField(fieldModel);
+    			}else if(constraintModel!=null){
+    				constraintModel.setField(fieldModel);
     			}else if(subTableModel!=null){
     				subTableModel.getFiledList().add(fieldModel);
     			}else if(table!=null){
@@ -242,6 +257,26 @@ public class TransferTableHandler extends DefaultHandler {
     		}
     	}
     	
+    }
+    
+    private void processConstraintElement(Attributes attributes,boolean isEnd,String text) {
+    	if(!isEnd){
+    		constraintModel=new ConstraintModel();
+    		if(null!=attributes.getValue("type")&&!"".equals(attributes.getValue("type"))){
+    			constraintModel.setType(FieldConstraintEnum.valueOf(attributes.getValue("type")));
+    		}
+    		if(null!=attributes.getValue("applyType")&&!"".equals(attributes.getValue("applyType"))){
+    			constraintModel.setApplyType(ApplyTypeEnum.valueOf(attributes.getValue("applyType")));
+    		}
+    	}else{//constraint标签处于table或subtable标签内
+    		if(null!=constraintModel){
+    			if(null!=subTableModel){
+    				subTableModel.getConstraintList().add(constraintModel);
+    			}else if(null!=table){
+    				table.getConstraintList().add(constraintModel);
+    			}
+    		}
+    	}
     }
     
 }

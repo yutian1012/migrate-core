@@ -1,6 +1,7 @@
 package com.ipph.migratecore.service;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -20,10 +21,10 @@ public class LogService {
 	 * @param table
 	 * @return
 	 */
-	public Long log(TableModel table) {
+	public Long log(TableModel table,Map<String,Object> data) {
 		LogModel log=new LogModel();
 		log.setCreateDate(new Date());
-		log.setDataId(0L);
+		//log.setDataId(Long.parseLong(pkValue.toString()));
 		log.setDealData("");
 		log.setStatus(LogStatusEnum.FAIL);
 		log.setTableId(table.getId());

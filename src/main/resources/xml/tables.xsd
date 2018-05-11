@@ -81,7 +81,13 @@
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
+			<xsd:attribute name="desc"></xsd:attribute>
 			<xsd:attribute name="value"></xsd:attribute>
+			<xsd:attribute name="forLog">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:boolean"></xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -114,6 +120,22 @@
 						<xsd:enumeration value="NOTIN"></xsd:enumeration>
 						<xsd:enumeration value="EQUAL"></xsd:enumeration>
 						<xsd:enumeration value="NEQUAL"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute ref="applyType" use="required"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="constraint">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="field" minOccurs="1" maxOccurs="1"></xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="type" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="PRIMARY"></xsd:enumeration>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>

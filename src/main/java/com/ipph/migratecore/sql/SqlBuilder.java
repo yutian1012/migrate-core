@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
+import com.ipph.migratecore.enumeration.FieldConstraintEnum;
+import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.TableModel;
 
@@ -34,6 +36,12 @@ public class SqlBuilder extends BaseSqlBuilder{
 			}
 			
 			fieldList.add(field.getName());
+		}
+		
+		//设置主键字段
+		String pkName=getPkFieldName(tableModel);
+		if(null!=pkName&&!fieldList.contains(pkName)) {
+			fieldList.add(pkName);
 		}
 		
 		String sql=null;
@@ -172,6 +180,35 @@ public class SqlBuilder extends BaseSqlBuilder{
 			return sbuilder.toString();
 		}
 		return null;
+	}
+	/**
+	 * 获取源表的主键字段名
+	 * @return
+	 */
+	private String getPkFieldName(TableModel tableModel) {
 		
+		if(null==tableModel.getSourcePkName()) {
+			List<ConstraintModel> constraintList=tableModel.getConstraintList();
+			
+			for(ConstraintModel constraintModel:constraintList) {
+				if(constraintModel.getApplyType()==ApplyTypeEnum.SOURCE
+						&&FieldConstraintEnum.PRIMARY==constraintModel.getType()&&null!=constraintModel.getField()) {
+					tableModel.setSourcePkName(constraintModel.getField().getName());
+				}
+			}
+			
+		}
+		
+		return tableModel.getSourcePkName();
+	}
+	
+	/**
+	 * 判断源表中是否设置了主键字段
+	 * @param tableModel
+	 * @return
+	 */
+	public boolean hasPrimaryKey(TableModel tableModel) {
+		
+		return null!=getPkFieldName(tableModel)?true:false;
 	}
 }

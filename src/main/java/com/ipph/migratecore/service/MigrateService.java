@@ -1,5 +1,7 @@
 package com.ipph.migratecore.service;
 
+import java.sql.SQLException;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ public class MigrateService {
 	private void update(TableModel table){
 		try {
 			migrateDao.update(table);
-		} catch (ConfigException e) {
+		} catch (ConfigException |SQLException e) {
 			e.printStackTrace();
 		}
 	}

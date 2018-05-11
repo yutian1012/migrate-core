@@ -1,5 +1,9 @@
 package com.ipph.migratecore.sql;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +40,6 @@ public class SqlOperation {
 	 */
 	public boolean isDestExists(String destSelect,Object[] params){
 		if(destSelect!=null){
-			
 			return getTotal(destJdbcTemplate, destSelect, params)>0L;
 		}
 		return false;
@@ -90,5 +93,25 @@ public class SqlOperation {
 		
 		return destJdbcTemplate.batchUpdate(sql,batchDataList);
 	}
-	
+	/**
+	 * 获取源表的主键字段
+	 * @param tableName
+	 * @return
+	 * @throws SQLException 
+	 */
+	public String getPrimaryKey(String tableName) throws SQLException {
+		Connection connection=sourceJdbcTemplate.getDataSource().getConnection();
+		
+		DatabaseMetaData dbMetaData = connection.getMetaData();
+		ResultSet pkSet = dbMetaData.getPrimaryKeys(null, null,tableName);
+		
+		String pkName=null;
+		
+		while( pkSet.next() ) {
+		    pkName=(null!=pkSet.getObject(4))?pkSet.getObject(4).toString():null;
+		    break;
+		}
+		
+		return pkName;
+	}
 }

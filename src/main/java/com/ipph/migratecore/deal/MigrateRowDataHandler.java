@@ -1,6 +1,7 @@
 package com.ipph.migratecore.deal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -192,6 +193,17 @@ public class MigrateRowDataHandler {
 		}
 		
 		return result.toArray();
+	}
+	/**
+	 * 处理日志字段
+	 * @param row
+	 * @param table
+	 * @return
+	 */
+	public Map<String,Object> handleForLog(TableModel table,Map<String,Object> row){
+		Map<String,Object> data=new HashMap<String,Object>();
+		
+		return data;
 	}
 	
 }
