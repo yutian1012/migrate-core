@@ -15,5 +15,10 @@
     			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>
     		</condition>
     	</where>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    	</constraints>
     </table>
 </tables>

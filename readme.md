@@ -72,7 +72,13 @@ create database if not exists `migrate` default charset utf8 collate utf8_genera
 
 注：子批次只针对单张表进行再出来
 
-日志记录对象LogModel，日志id（id），业务数据主键（DataId，针对业务表中存在有主键的数据），处理情况（status），关键展示数据（dealData varchar），表配置信息（tableId），处理表名（tableName）,消息信息（message）
+执行一个批次，需要记录这个批次的执行日志，查看批次的执行日志等信息。
+BatchLogModel记录批次执行日志，查看执行日志时显示的是批次执行记录，即某一时刻执行的批次记录，查看批次执行记录出现批次中每个表的一个详细执行列表。包括统计信息等。
+BatchLogModel对象包括id，批次名称，批次执行日期，批次执行量，成功数量
+
+子执行批次，是在查看表的详细执行记录列表时，该页面提供了一个继续执行修正错误的按钮。点击该按钮，会对执行错误的记录进行从新执行，会跳过正确执行完成的记录。
+
+日志记录对象LogModel，日志id（id），业务数据主键（DataId，针对业务表中存在有主键的数据），处理情况（status），关键展示数据（dealData varchar），表配置信息（tableId），处理表名（tableName，冗余字段展示使用）,消息信息（message）,batchId
 
 8）错误信息处理思路
 
@@ -167,4 +173,13 @@ insert迁移数据流程
 17）动态数据源配置，装载和卸载
 
 18）使用消息实现异步操作，或使用线程实现异步
+
+19）清空数据表结构
+-- DROP TABLE IF EXISTS `batch_model`;
+-- DROP TABLE IF EXISTS `batch_table_model`;
+-- DROP TABLE IF EXISTS `table_model`; 
+DROP TABLE IF EXISTS `log_model`;
+
+20）查看原表信息
+
 

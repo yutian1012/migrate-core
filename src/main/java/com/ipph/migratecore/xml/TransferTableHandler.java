@@ -184,10 +184,11 @@ public class TransferTableHandler extends DefaultHandler {
     		}
     	}else{//field标签可能处于condition标签，subtable标签或table标签内
     		if(null!=fieldModel){
-    			if(conditionModel!=null){
-    				conditionModel.setField(fieldModel);
-    			}else if(constraintModel!=null){
+    			if(constraintModel!=null){
     				constraintModel.setField(fieldModel);
+    			}
+    			else if(conditionModel!=null){
+    				conditionModel.setField(fieldModel);
     			}else if(subTableModel!=null){
     				subTableModel.getFiledList().add(fieldModel);
     			}else if(table!=null){

@@ -4,7 +4,7 @@
 	<xsd:element name="tables">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element ref="table" minOccurs="1"></xsd:element>
+				<xsd:element ref="table" minOccurs="1" maxOccurs="1"></xsd:element>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
@@ -33,6 +33,14 @@
 						<xsd:sequence>
 							<!-- format标签可以出现多次，至少出现1次 -->
 							<xsd:element ref="format" minOccurs="1"></xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="constraints" minOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<!-- constraint标签可以出现多次，至少出现1次 -->
+							<xsd:element ref="constraint" minOccurs="1"></xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>

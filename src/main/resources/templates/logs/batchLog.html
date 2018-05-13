@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <title>批次置列表项</title>
+    <title>批次执行日志</title>
 	
     <meta name="keywords" content="keyword1,keyword2,keyword3">
     <meta name="description" content="this is my page">
@@ -13,23 +13,20 @@
   </head>
   
   <body>
-  	<div>
-  		批次信息：<span th:text="${batch.batchName}"></span>
-  	</div>
-    <table style="width:80%;text-align:center;" border="1px">
+    <table style="width:80%;text-align:center;border:1px;">
 	    <tr>
 	      <th>序号</th>
-	      <th>源表</th>
-	      <th>目标表</th>
+	      <th>批次号</th>
+	      <th>批次执行时间</th>
 	      <th>状态</th>
 	      <td>操作</td>
 	    </tr>
-	    <tr th:each="table,index : ${batch.tableList}">
+	    <tr th:each="tableLog,index : ${batchLogList}">
 	      <td th:text="${index.count}"></td>
-	      <td th:text="${table.from}"></td>
-	      <td th:text="${table.to}"></td>
-	      <td ></td>
-	      <td><span><a th:href="@{'/logs/table/'+${table.id}}">执行日志</a></span></td>
+	      <td th:text="${tableLog.batchNo}"></td>
+	      <td th:text="${tableLog.createDate}"></td>
+	      <td th:text="${tableLog.status}"></td>
+	      <td><span><a th:href="@{'/logs/tables/'+${tableLog.id}}">执行日志</a></span></td>
 	    </tr>
 	  </table>
   </body>

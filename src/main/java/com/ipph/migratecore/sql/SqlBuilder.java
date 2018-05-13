@@ -193,10 +193,9 @@ public class SqlBuilder extends BaseSqlBuilder{
 			for(ConstraintModel constraintModel:constraintList) {
 				if(constraintModel.getApplyType()==ApplyTypeEnum.SOURCE
 						&&FieldConstraintEnum.PRIMARY==constraintModel.getType()&&null!=constraintModel.getField()) {
-					tableModel.setSourcePkName(constraintModel.getField().getName());
+					tableModel.setSourcePkName(constraintModel.getField().getName().toUpperCase());
 				}
 			}
-			
 		}
 		
 		return tableModel.getSourcePkName();
@@ -210,5 +209,24 @@ public class SqlBuilder extends BaseSqlBuilder{
 	public boolean hasPrimaryKey(TableModel tableModel) {
 		
 		return null!=getPkFieldName(tableModel)?true:false;
+	}
+	/**
+	 * 获取所有字段的查询数据
+	 * @param tableModel
+	 * @return
+	 */
+	public String getAllFieldSelectWithPK(TableModel tableModel) {
+		if(tableModel.getFiledList().size()==0){//查询或迁移的数据表列字段
+			return null;
+		}
+		
+		StringBuilder sbuilder=new StringBuilder();
+		
+		//设置主键字段
+		String pkName=getPkFieldName(tableModel);
+		
+		sbuilder.append("select * from ").append(tableModel.getFrom()).append(" where ").append(pkName).append("=?");
+		
+		return sbuilder.toString();
 	}
 }

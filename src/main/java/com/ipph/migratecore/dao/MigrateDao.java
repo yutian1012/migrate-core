@@ -41,7 +41,7 @@ public class MigrateDao {
 	 * @throws ConfigException 
 	 * @throws SQLException 
 	 */
-	public void update(TableModel table) throws ConfigException, SQLException {
+	public void update(TableModel table,Long batchLogId,Long parentLogId) throws ConfigException, SQLException {
 		
 		//判断是否忽略该表的迁移操作
 		if(null==table|| table.isSkip()) return;
@@ -73,7 +73,10 @@ public class MigrateDao {
 		//第五步：执行更新数据--遍历集合执行相关操作
 		if(result!=null){
 			for(Map<String,Object> row:result){
-				dealData(table, row, targetSelect, update);
+				//在存在父批次时，判断改记录是否已经成功执行过了
+				if(null==parentLogId||!logService.isLogSuccess((Long)row.get(table.getSourcePkName()),parentLogId)) {
+					dealData(table, row, targetSelect, update,batchLogId);
+				}
 			}
 		}
 	}
@@ -85,13 +88,14 @@ public class MigrateDao {
 	 * @param targetSelect
 	 * @param executeSql
 	 */
-	private void dealData(TableModel table,Map<String,Object> row,String targetSelect,String executeSql) {
+	private void dealData(TableModel table,Map<String,Object> row,String targetSelect,String executeSql,Long batchLogId) {
+		
 		
 		LogStatusEnum status=LogStatusEnum.SUCCESS;
 		String message="操作成功";
 		
 		//记录每一行数据的操作日志
-		Long logId=logService.log(table,migrateRowDataHandler.handleForLog(table,row));
+		Long logId=logService.log(table,migrateRowDataHandler.handleForLog(table,row),batchLogId);
 		
 		try {
 			deal(table, row, targetSelect, executeSql);
@@ -131,5 +135,21 @@ public class MigrateDao {
 		}else{
 			log.error("更新失败"+MapUtil.outMapData(row));
 		}*/
+	}
+	/**
+	 * 获取记录信息
+	 * @param table
+	 * @param dataId
+	 * @return
+	 */
+	public Map<String,Object> getRecord(TableModel table,Object dataId){
+		String sql=sqlBuilder.getAllFieldSelectWithPK(table);
+		
+		List<Map<String,Object>> result=sqlOperation.getSourceData(sql, new Object[] {dataId});
+		
+		if(null!=result&&result.size()>0) {
+			return result.get(0);
+		}
+		return null;
 	}
 }

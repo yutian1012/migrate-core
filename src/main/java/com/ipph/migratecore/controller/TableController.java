@@ -3,6 +3,7 @@ package com.ipph.migratecore.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -21,8 +22,6 @@ import com.ipph.migratecore.util.XmlUtil;
 @Controller
 @RequestMapping("/tables")
 public class TableController {
-	
-	
 	
 	@Resource
 	private TableService tableService;
@@ -62,19 +61,30 @@ public class TableController {
 		return "redirect:/tables/list";
 	}
 	
-	@RequestMapping("/migrate/{tableId}")
+	/*@RequestMapping("/migrate/{tableId}")
+	@ResponseBody
 	public boolean migrate(@PathVariable("tableId")Long tableId){
 		
 		if(null!=tableId){
-			return tableService.migrateTable(tableId);
+			return tableService.migrateTable(tableId,0L);
+			
 		}
 		
 		return false;
-	}
+	}*/
 	
 	@RequestMapping("/selectTables")
 	@ResponseBody
 	public List<TableModel> selectTables(){
 		return tableService.getList();
+	}
+	
+	@RequestMapping("/record/{tableId}/{dataId}")
+	@ResponseBody
+	public Map<String,Object> getRecord(@PathVariable("tableId")Long tableId,@PathVariable("dataId")Long dataId){
+		if(null!=dataId&&dataId!=0L) {
+			return tableService.getRecord(tableId,dataId);
+		}
+		return null;
 	}
 }

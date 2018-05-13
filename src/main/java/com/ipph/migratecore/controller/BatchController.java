@@ -53,20 +53,30 @@ public class BatchController {
 		
 		return mv;
 	}
+	
 	/**
 	 * 执行批次
 	 * @param batchId
 	 * @return
 	 */
 	@RequestMapping("/migrate/{batchId}")
-	public ModelAndView migrate(@PathVariable("batchId")Long batchId) {
+	public String migrate(@PathVariable("batchId")Long batchId) {
 		
-		ModelAndView mv=new ModelAndView("forward:/batches/info");
-			
 		batchService.migrate(batchId);
 		
-		mv.addObject("batchId",batchId);
+		return "redirect:/batches/info/"+batchId;
+	}
+	
+	/**
+	 * 执行批次
+	 * @param batchId
+	 * @return
+	 */
+	@RequestMapping("/migrate/{batchId}/{parentId}/{tableId}")
+	public String migrateTable(@PathVariable("batchId")Long batchId,@PathVariable("parentId")Long parentId,@PathVariable("tableId")Long tableId) {
 		
-		return mv;
+		batchService.migrate(batchId,parentId,tableId);
+		
+		return "redirect:/batches/info/"+batchId;
 	}
 }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>表执行日志</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
+	<script th:inline="javascript">
+		function migrate(){
+			var tableId=/*[[${tableId}]]*/ '';
+			var parentId=/*[[${batchLog.id}]]*/ '';
+			var batchId=/*[[${batchLog.batchId}]]*/ '';
+			
+			window.location.href='/batches/migrate/'+batchId+'/'+parentId+'/'+tableId;
+		}
+	</script>
+  </head>
+  
+  <body>
+  	<div>
+  		<input type="button" value="错误信息更正" onclick="migrate()">
+  		<input type="button" value="查看子批次" onclick="subBatch()">
+  	</div>
+	<!-- 执行日志 -->
+    <table style="width:80%;text-align:center;" border="1px">
+	    <tr>
+	      <th>序号</th>
+	      <th>源表</th>
+	      <th>执行状态</th>
+	      <th>数据</th>
+	      <th>描述</th>
+	      <td>操作</td>
+	    </tr>
+	    <tr th:each="log,index : ${tableLogList}">
+	      <td th:text="${index.count}"></td>
+	      <td th:text="${log.tableName}"></td>
+	      <td th:text="${log.status}"></td>
+	      <td th:text="${log.dealData}"></td>
+	      <td th:text="${log.message}"></td>
+	      <td><span><a th:href="@{'/tables/record/'+${log.tableId}+'/'+${log.dataId}}">原表记录信息</a></span></td>
+	    </tr>
+	  </table>
+  </body>
+</html>

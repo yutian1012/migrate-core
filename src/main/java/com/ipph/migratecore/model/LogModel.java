@@ -38,5 +38,6 @@ public class LogModel implements Serializable{
 	private Date createDate;
 	@Column
 	private String message;
-	
+	@Column
+	private Long batchLogId;
 }

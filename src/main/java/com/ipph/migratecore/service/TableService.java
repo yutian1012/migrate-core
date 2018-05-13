@@ -3,6 +3,7 @@ package com.ipph.migratecore.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,6 +13,7 @@ import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
 import com.ipph.migratecore.dao.TableDao;
+import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
 import com.ipph.migratecore.model.SubtableModel;
@@ -64,6 +66,9 @@ public class TableService {
 		if(null!=table.getWhereModel()&&null!=table.getWhereModel().getConditionList()&&table.getWhereModel().getConditionList().size()>0) {
 			table.setWhereJson(JSON.toJSONString(table.getWhereModel()));
 		}
+		if(null!=table.getConstraintList()&&table.getConstraintList().size()>0) {
+			table.setConstraintListJson(JSON.toJSONString(table.getConstraintList()));
+		}
 	}
 	
 	public void setTableFieldFromJson(TableModel table){
@@ -79,12 +84,19 @@ public class TableService {
 		if(null!=table.getWhereJson()) {
 			table.setWhereModel(JSON.parseObject(table.getWhereJson(), WhereModel.class));
 		}
+		if(null!=table.getConstraintListJson()) {
+			table.setConstraintList(JSON.parseArray(table.getConstraintListJson(), ConstraintModel.class));
+		}
 	}
 	
-	public boolean migrateTable(Long tableId){
+	public boolean migrateTable(Long tableId,Long batchLogId){
 		TableModel table=getById(tableId);
+		return migrateTable(table, batchLogId,null);
+	}
+	
+	public boolean migrateTable(TableModel table,Long batchLogId,Long parentLogId){
 		if(null!=table){
-			migrateService.migrateTable(table);
+			migrateService.migrateTable(table,batchLogId,parentLogId);
 			return true;
 		}
 		return false;
@@ -96,5 +108,15 @@ public class TableService {
 			setTableFieldFromJson(table);
 		}
 		return table;
+	}
+	/**
+	 * 获取表记录详细数据
+	 * @param tableId
+	 * @param dataId
+	 * @return
+	 */
+	public Map<String, Object> getRecord(Long tableId,Long dataId){
+		TableModel table=getById(tableId);
+		return migrateService.getRecord(table,dataId);
 	}
 }

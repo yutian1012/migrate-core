@@ -24,6 +24,9 @@ import com.ipph.migratecore.model.TableModel;
  */
 @Component
 public class MigrateRowDataHandler {
+	
+	public static final String pkName="pkName";
+	
 	@Resource
 	private FormaterContext formaterContext;
 	@Resource
@@ -98,6 +101,10 @@ public class MigrateRowDataHandler {
 	 */
 	private Object[] handleFieldCondition(List<ConditionModel> conditionList,Map<String,Object> row) {
 		
+		if(null==conditionList||conditionList.size()==0) {
+			return null;
+		}
+		
 		List<Object> result=new ArrayList<>();
 		
 		for(ConditionModel conditionModel:conditionList) {
@@ -127,6 +134,10 @@ public class MigrateRowDataHandler {
 	 */
 	private void handleFormatRowData(TableModel table,Map<String,Object> rowData) throws FormatException {
 		List<FormatModel> formatList=table.getFormatFieldList();
+		
+		if(null==formatList||formatList.size()==0) {
+			return;
+		}
 		
 		for(FormatModel format:formatList) {
 			Object value=formaterContext.getFormatedValue(format,rowData.get(format.getFiledName().toUpperCase()));
@@ -203,6 +214,15 @@ public class MigrateRowDataHandler {
 	public Map<String,Object> handleForLog(TableModel table,Map<String,Object> row){
 		Map<String,Object> data=new HashMap<String,Object>();
 		
+		data.put(MigrateRowDataHandler.pkName, row.get(table.getSourcePkName().toUpperCase()));
+		
+		List<FieldModel> fieldList=table.getFiledList();
+		
+		for(FieldModel field:fieldList) {
+			if(field.isForLog()) {
+				data.put(field.getName(), row.get(field.getName().toUpperCase()));
+			}
+		}
 		return data;
 	}
 	

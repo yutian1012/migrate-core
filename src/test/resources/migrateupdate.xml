@@ -7,7 +7,7 @@
     		<!-- 目标表要更新的字段 -->
     		<field name="useremail" applyType="TARGET" valueType="FIELD" value="email"/>
     		<!-- 源表要查询获取的字段数据 -->
-    		<field name="name" applyType="SOURCE"/>
+    		<field name="name" applyType="SOURCE" forLog="true"/>
     		<field name="email" applyType="SOURCE"/>
     	</fields>
     	<where>
@@ -16,9 +16,14 @@
     			<field name="username" applyType="TARGET" valueType="FIELD" value="name"/>
     		</condition>
     		<!-- 源表获取待更新的数据集条件，这里设置id值<=3 -->
-    		<condition type="LE" applyType="SOURCE">
+    		<!-- <condition type="LE" applyType="SOURCE">
     			<field name="id" applyType="SOURCE" valueType="FIXED" value="3" />
-    		</condition>
+    		</condition> -->
     	</where>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    	</constraints>
     </table>
 </tables>

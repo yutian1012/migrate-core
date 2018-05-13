@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.ipph.migratecore.enumeration.BatchStatusEnum;
 import com.ipph.migratecore.model.BatchModel;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -27,8 +26,6 @@ public class BatchDaoTest {
 		Long id=0L;
 		
 		BatchModel model=new BatchModel();
-		model.setSize(100);
-		model.setStatus(BatchStatusEnum.FAIL);
 		model.setCreateDate(new Date());
 		model=batchDao.save(model);
 		

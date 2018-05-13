@@ -1,6 +1,7 @@
 package com.ipph.migratecore.service;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -17,7 +18,7 @@ public class MigrateService {
 	@Resource
 	private MigrateDao migrateDao;
 	
-	public void migrateTable(TableModel table){
+	public void migrateTable(TableModel table,Long batchLogId,Long parentLogId){
 		
 		TableOperationEnum type=table.getType();
 		switch (type){
@@ -25,7 +26,7 @@ public class MigrateService {
 				migrate(table);
 				break;
 			case UPDATE :
-				update(table);
+				update(table,batchLogId,parentLogId);
 				break;
 			default:
 		}
@@ -35,11 +36,20 @@ public class MigrateService {
 		
 	}
 	
-	private void update(TableModel table){
+	private void update(TableModel table,Long batchLogId,Long parentLogId){
 		try {
-			migrateDao.update(table);
+			migrateDao.update(table,batchLogId,parentLogId);
 		} catch (ConfigException |SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	/**
+	 * 获取主键指定的记录
+	 * @param table
+	 * @param dataId
+	 * @return
+	 */
+	public Map<String,Object> getRecord(TableModel table,Object dataId){
+		return migrateDao.getRecord(table,dataId);
 	}
 }

@@ -45,7 +45,7 @@ public class MigrateDaoTest {
 			TableModel table=tableList.get(0);
 			
 			//执行更新操作
-			migrateDao.update(table); 
+			migrateDao.update(table,null,null); 
 			
 			//判断目标数据表的字段是否更新
 			String sql="select useremail from migratedest";

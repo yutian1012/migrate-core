@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.BatchDao;
 import com.ipph.migratecore.dao.BatchTableDao;
-import com.ipph.migratecore.dao.TableDao;
 import com.ipph.migratecore.model.BatchModel;
 import com.ipph.migratecore.model.BatchTableModel;
 import com.ipph.migratecore.model.TableModel;
@@ -24,6 +23,8 @@ public class BatchService {
 	private BatchTableDao batchTableDao;
 	@Resource
 	private TableService tableService;
+	@Resource
+	private BatchLogService batchLogService;
 	
 	public List<BatchModel> getList(){
 		return batchDao.findAll();
@@ -72,17 +73,32 @@ public class BatchService {
 	 * @param batchId
 	 */
 	public void migrate(Long batchId) {
+		migrate(batchId,null,null);
+	}
+	
+	/**
+	 * 执行批次
+	 * @param batchId
+	 */
+	public void migrate(Long batchId,Long parentId,Long tableId) {
 		BatchModel batch=getBatch(batchId);
 		
 		if(null!=batch) {
 			//执行批次前记录日志
+			Long batchLogId=batchLogService.save(batch,parentId);
+			
 			List<TableModel> tableList=batch.getTableList();
 			
 			if(null!=tableList&&tableList.size()>0) {
 				for(TableModel table:tableList) {
-					tableService.migrateTable(table.getId());
+					if(null==tableId||table.getId().longValue()==tableId) {
+						tableService.migrateTable(table,batchLogId,parentId);
+					}
 				}
 			}
+			
+			//执行批次后更新记录
+			batchLogService.update(batchLogId);
 		}
 	}
 }
