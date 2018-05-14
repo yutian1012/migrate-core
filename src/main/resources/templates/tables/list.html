@@ -30,7 +30,7 @@
 	      <td th:text="${table.from}"></td>
 	      <td th:text="${table.to}"></td>
 	      <td th:text="${table.type}"></td>
-	      <td><span><a th:href="@{'/tables/migrate/'+${table.id}}"></a></span>|<span><a th:href="@{'/tables/log/'+${table.id}}"></a></span></td>
+	      <td><span><a th:href="@{'/tables/info/'+${table.id}}">查看</a></span>|<span><a th:href="@{'/tables/del/'+${table.id}}">删除</a></span></td>
 	    </tr>
 	  </table>
   </body>

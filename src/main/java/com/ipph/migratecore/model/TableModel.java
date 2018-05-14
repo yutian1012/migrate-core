@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ipph.migratecore.enumeration.TableOperationEnum;
 
 import lombok.Getter;
@@ -20,6 +21,7 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
+@JsonIgnoreProperties(value={"handler","hibernateLazyInitializer"})
 public class TableModel implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@Id

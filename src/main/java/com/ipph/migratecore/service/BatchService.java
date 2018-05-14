@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import com.ipph.migratecore.model.BatchTableModel;
 import com.ipph.migratecore.model.TableModel;
 
 @Service
+@Transactional
 public class BatchService {
 	
 	@Resource
@@ -47,7 +49,7 @@ public class BatchService {
 			batchTableDao.save(batchTableModel);
 		}
 	}
-	
+	@Transactional
 	public BatchModel getBatch(Long batchId) {
 		
 		BatchModel batchModel=batchDao.getOne(batchId);
@@ -100,5 +102,14 @@ public class BatchService {
 			//执行批次后更新记录
 			batchLogService.update(batchLogId);
 		}
+	}
+	/**
+	 * 删除
+	 * @param batchId
+	 */
+	public void del(Long batchId) {
+		//中间数据删除
+		batchTableDao.deleteByBatchId(batchId);
+		batchDao.deleteById(batchId);
 	}
 }

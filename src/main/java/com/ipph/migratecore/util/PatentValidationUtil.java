@@ -51,7 +51,7 @@ public class PatentValidationUtil {
 	
 	private static String[] getZlNumber(String appNumber){
 		String[] zlNumber=new String[2];//第1个位置存放专利号，第二个wiz存放校验位
-		if(StringUtils.isEmpty(appNumber)){
+		if(!StringUtils.isEmpty(appNumber)){
 			appNumber=appNumber.trim();
 			Pattern p=Pattern.compile("^([a-zA-Z]{2})?+\\d{8}(\\d{4})?+(\\.[\\d|X|x])?+");
 			Matcher m=p.matcher(appNumber);

@@ -79,4 +79,14 @@ public class BatchController {
 		
 		return "redirect:/batches/info/"+batchId;
 	}
+	/**
+	 * 删除
+	 * @param batchId
+	 * @return
+	 */
+	@RequestMapping("/del/{batchId}")
+	public String del(@PathVariable("batchId")Long batchId) {
+		batchService.del(batchId);
+		return "redirect:/batches/list";
+	}
 }

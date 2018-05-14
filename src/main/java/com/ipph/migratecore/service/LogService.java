@@ -6,7 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.LogDao;
@@ -17,6 +20,7 @@ import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.util.MapUtil;
 
 @Service
+@Transactional
 public class LogService {
 	@Resource
 	private LogDao logDao;
@@ -78,8 +82,8 @@ public class LogService {
 	 * @param tableId
 	 * @return
 	 */
-	public List<LogModel> getLogs(Long batchLogId,Long tableId) {
-		return logDao.getListByBatchLogIdAndTableId(batchLogId,tableId);
+	public List<LogModel> getLogs(Long batchLogId,Long tableId,Pageable pageable) {
+		return logDao.getListByBatchLogIdAndTableId(batchLogId,tableId,pageable);
 	}
 	/**
 	 * 判断日志记录是否成功

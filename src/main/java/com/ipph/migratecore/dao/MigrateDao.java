@@ -18,8 +18,12 @@ import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.LogService;
 import com.ipph.migratecore.sql.SqlBuilder;
 import com.ipph.migratecore.sql.SqlOperation;
+import com.ipph.migratecore.util.MapUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
+@Slf4j
 public class MigrateDao {
 	
 	@Resource
@@ -67,6 +71,10 @@ public class MigrateDao {
 		//第三步：获取更新操作记录是否存在的select语句--使用该语句判断待更新的数据是否存在
 		String targetSelect=sqlBuilder.getTargetSelectSql(table);
 		
+		if(log.isDebugEnabled()) {
+			log.debug("get source data from "+table.getFrom());
+		}
+		
 		//第四步：获取数据源的查询结果集--该数据集用于更新目标数据
 		List<Map<String,Object>> result=sqlOperation.getSourceData(select,migrateRowDataHandler.handleSourceFieldCondition(table));
 		
@@ -90,6 +98,9 @@ public class MigrateDao {
 	 */
 	private void dealData(TableModel table,Map<String,Object> row,String targetSelect,String executeSql,Long batchLogId) {
 		
+		if(log.isDebugEnabled()) {
+			log.debug("migrate data "+MapUtil.outMapData(row));
+		}
 		
 		LogStatusEnum status=LogStatusEnum.SUCCESS;
 		String message="操作成功";

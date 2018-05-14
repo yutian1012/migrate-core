@@ -16,6 +16,30 @@
 			
 			window.location.href='/batches/migrate/'+batchId+'/'+parentId+'/'+tableId;
 		}
+		
+		function next(){
+			var pageNum=/*[[${pageable.next().getPageNumber()}]]*/ '';
+			var pageSize=/*[[${pageable.next().getPageSize()}]]*/ '';
+			
+			if(''!=pageNum&&''!=pageSize){
+				page(pageNum,pageSize);
+			}
+		}
+		
+		function prev(){
+			var pageNum=/*[[${pageable.previousOrFirst().getPageNumber()}]]*/ '';
+			var pageSize=/*[[${pageable.previousOrFirst().getPageSize()}]]*/ '';
+			
+			if(''!=pageNum&&''!=pageSize){
+				page(pageNum,pageSize);
+			}
+		}
+		
+		function page(pageNum,size){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			window.location.href='/logs/table/'+batchLogId+'/'+tableId+'?page='+pageNum+'&size='+size;
+		}
 	</script>
   </head>
   
@@ -43,5 +67,11 @@
 	      <td><span><a th:href="@{'/tables/record/'+${log.tableId}+'/'+${log.dataId}}">原表记录信息</a></span></td>
 	    </tr>
 	  </table>
+	  
+  	<!-- Pagination Bar -->
+	<div>
+		<input type="button" th:if="${pageable.previousOrFirst()!=null}" value="prev" onclick="prev()">
+		<input type="button" th:if="${pageable.next()!=null}" value="next" onclick="next()">
+	</div>
   </body>
 </html>

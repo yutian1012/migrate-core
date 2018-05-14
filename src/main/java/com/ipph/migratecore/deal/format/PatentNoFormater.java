@@ -39,7 +39,7 @@ public class PatentNoFormater implements Formater{
 	public static void main(String[] args) {
 		PatentNoFormater patentNoFormater=new PatentNoFormater();
 		try {
-			System.out.println(patentNoFormater.format(null, "CN201410833785.0 "));
+			System.out.println(patentNoFormater.format(null, "201010525698.0 "));
 		} catch (FormatException e) {
 			e.printStackTrace();
 		}

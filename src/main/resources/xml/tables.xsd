@@ -102,8 +102,8 @@
 	<xsd:element name="format">
 		<xsd:complexType>
 			<xsd:attribute name="clazz"></xsd:attribute>
-			<xsd:attribute name="formatParameter"></xsd:attribute>
-			<xsd:attribute name="filedName"></xsd:attribute>
+			<!-- <xsd:attribute name="formatParameter"></xsd:attribute> -->
+			<xsd:attribute name="fieldName"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	

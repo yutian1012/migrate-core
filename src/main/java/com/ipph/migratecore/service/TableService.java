@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
+import com.ipph.migratecore.dao.BatchTableDao;
 import com.ipph.migratecore.dao.TableDao;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
@@ -21,13 +23,19 @@ import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.model.WhereModel;
 import com.ipph.migratecore.util.XmlUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
+@Transactional
 public class TableService {
 
 	@Resource
 	private TableDao tableDao;
 	@Resource
 	private MigrateService migrateService;
+	@Resource
+	private BatchTableDao batchTableDao;
 	
 	public List<TableModel> getList(){
 		return tableDao.findAll();
@@ -95,6 +103,11 @@ public class TableService {
 	}
 	
 	public boolean migrateTable(TableModel table,Long batchLogId,Long parentLogId){
+		
+		if(log.isDebugEnabled()) {
+			log.debug("migrate table "+table.getFrom());
+		}
+		
 		if(null!=table){
 			migrateService.migrateTable(table,batchLogId,parentLogId);
 			return true;
@@ -103,7 +116,7 @@ public class TableService {
 	}
 	
 	public TableModel getById(Long tableId){
-		TableModel table=tableDao.getOne(tableId);
+		TableModel table=tableDao.findById(tableId).get();//getOne(tableId);
 		if(null!=table){
 			setTableFieldFromJson(table);
 		}
@@ -118,5 +131,14 @@ public class TableService {
 	public Map<String, Object> getRecord(Long tableId,Long dataId){
 		TableModel table=getById(tableId);
 		return migrateService.getRecord(table,dataId);
+	}
+	/**
+	 * 删除
+	 * @param tableId
+	 */
+	public void del(Long tableId) {
+		//先删除中间表数据
+		batchTableDao.deleteByTableId(tableId);
+		tableDao.deleteById(tableId);
 	}
 }

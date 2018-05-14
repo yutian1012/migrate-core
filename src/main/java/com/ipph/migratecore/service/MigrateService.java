@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import com.ipph.migratecore.enumeration.TableOperationEnum;
 import com.ipph.migratecore.model.TableModel;
 
 @Service
+@Transactional
 public class MigrateService {
 
 	@Resource

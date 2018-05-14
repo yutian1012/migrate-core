@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
 
 @Service
+@Transactional
 public class BatchLogService {
 	
 	@Resource
@@ -39,6 +41,7 @@ public class BatchLogService {
 		BatchLogModel batchLogModel=batchLogDao.getOne(batchLogId);
 		
 		batchLogModel.setStatus(BatchStatusEnum.SUCCESS);
+		
 		
 		batchLogDao.save(batchLogModel);
 	}

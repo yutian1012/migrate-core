@@ -78,7 +78,12 @@ public class TableController {
 	public List<TableModel> selectTables(){
 		return tableService.getList();
 	}
-	
+	/**
+	 * 查看记录数据
+	 * @param tableId
+	 * @param dataId
+	 * @return
+	 */
 	@RequestMapping("/record/{tableId}/{dataId}")
 	@ResponseBody
 	public Map<String,Object> getRecord(@PathVariable("tableId")Long tableId,@PathVariable("dataId")Long dataId){
@@ -86,5 +91,30 @@ public class TableController {
 			return tableService.getRecord(tableId,dataId);
 		}
 		return null;
+	}
+	/**
+	 * 删除
+	 * @param tableId
+	 * @return
+	 */
+	@RequestMapping("/del/{tableId}")
+	public String del(@PathVariable("tableId")Long tableId) {
+		if(null!=tableId&&tableId!=0L) {
+			tableService.del(tableId);
+		}
+		return "redirect:/tables/list";
+	}
+	/**
+	 * 查看table定义信息
+	 * @param tableId
+	 * @return
+	 */
+	@RequestMapping("/info/{tableId}")
+	@ResponseBody
+	public TableModel info(@PathVariable("tableId")Long tableId) {
+		
+		TableModel tableModel=tableService.getById(tableId);
+		
+		return tableModel;
 	}
 }

@@ -1,5 +1,6 @@
 package com.ipph.migratecore.deal.format;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -10,7 +11,7 @@ import com.ipph.migratecore.model.FormatModel;
 @Component
 public class FormaterContext {
 	
-	private List<Formater> formaterList;
+	private List<Formater> formaterList=new ArrayList<>();
 	
 	public List<Formater> getFormaterList() {
 		return formaterList;
@@ -30,10 +31,15 @@ public class FormaterContext {
 			return value;
 		}
 		
-		/*Formater formater=getFormater(fieldFormatModel.getClassName());
-		if(null!=formater){
-			value=formater.format(fieldFormatModel.getMethodArgs(), value);
-		}*/
+		Formater formater=null;
+		try {
+			formater = getFormater(fieldFormatModel.getClazz());
+			if(null!=formater){
+				value=formater.format(fieldFormatModel.getFormatParameter(), value);
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new FormatException("format class not exists!!!");
+		}
 		
 		return value;
 	}
@@ -41,18 +47,27 @@ public class FormaterContext {
 	 * 获取格式化处理类
 	 * @param formater
 	 * @return
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	private Formater getFormater(String formater){
-		if(null==formaterList) return null;
-
-		if(null==formater||"".equals(formater)) return null;
+	private synchronized Formater getFormater(Class<?> clazz) throws InstantiationException, IllegalAccessException{
 		
-		for(Formater f:formaterList){
-			if(f.getClass().getName().equals(formater)){
-				return f;
+		Formater formater=null;
+		
+		for(Formater temp:formaterList) {
+			if(temp.getClass().getName()==clazz.getName()) {
+				formater=temp;
 			}
 		}
-		return null;
+		
+		if(formater==null) {
+			formater=(Formater) clazz.newInstance();
+			if(null!=formater) {
+				formaterList.add(formater);
+			}
+		}
+		
+		return formater;
 	}
 	
 }

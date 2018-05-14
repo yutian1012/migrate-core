@@ -106,16 +106,4 @@ public class XmlUtil {
         return result;
 	}
 	
-	public static void main(String[] args) {
-		try {
-			List<TableModel> tableList=XmlUtil.parseBySax(XmlUtil.class.getResource("/xml/tables.xml").getPath());
-			System.out.println(tableList.size());
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }

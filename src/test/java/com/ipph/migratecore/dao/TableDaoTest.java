@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Test;
@@ -87,6 +88,15 @@ public class TableDaoTest {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	@Test
+	@Transactional
+	public void testGetOne() {
+		Long id=1L;//数据库中真实存在
+		TableModel table=tableDao.getOne(id);
+		
+		System.out.println(table.getFrom());
 	}
 
 }

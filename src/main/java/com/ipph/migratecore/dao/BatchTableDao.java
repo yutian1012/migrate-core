@@ -9,4 +9,8 @@ import com.ipph.migratecore.model.BatchTableModel;
 public interface BatchTableDao extends JpaRepository<BatchTableModel, Long>{
 
 	public List<BatchTableModel> getListByBatchId(Long batchId);
+	
+	public int deleteByTableId(Long tableId);
+	
+	public int deleteByBatchId(Long batchId);
 }

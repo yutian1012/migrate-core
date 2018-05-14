@@ -18,5 +18,5 @@ public class BatchTableModel {
 	@Column(nullable=false)
 	private Long batchId;
 	@Column(nullable=false)
-	private Long TableId;
+	private Long tableId;
 }
