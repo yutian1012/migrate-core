@@ -10,11 +10,11 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.LogDao;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
+import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.TableModel;
@@ -43,6 +43,26 @@ public class LogService {
 		return log.getId();
 	}
 	/**
+	 * 获取数据
+	 * @param status
+	 * @param table
+	 * @param batchLogId
+	 * @param data
+	 * @return
+	 */
+	public LogModel getLogModel(LogStatusEnum status,LogMessageEnum messageType,String message,TableModel table,Long batchLogId,Map<String,Object> data) {
+		LogModel log=new LogModel();
+		log.setCreateDate(new Date());
+		log.setStatus(status);
+		log.setMessageType(messageType);
+		log.setTableId(table.getId());
+		log.setTableName(table.getFrom());
+		log.setBatchLogId(batchLogId);
+		log.setMessage(message);
+		parseData(log, data);
+		return log;
+	}
+	/**
 	 * 解析获取模型数据
 	 * @param log
 	 * @param data
@@ -66,7 +86,7 @@ public class LogService {
 	 * @param status
 	 * @param message
 	 */
-	public void updateLog(Long logId,LogStatusEnum status,String message) {
+	public void updateLog(Long logId,LogStatusEnum status,String message,LogMessageEnum messageType) {
 		Optional<LogModel> optionalLog=logDao.findById(logId);//getOne(logId);
 				
 		LogModel log=optionalLog.get();
@@ -74,8 +94,19 @@ public class LogService {
 		if(null!=log) {
 			log.setStatus(status);
 			log.setMessage(message);
+			log.setMessageType(messageType);
 			logDao.save(log);
 		}
+	}
+	
+	/**
+	 * 获取表的执行日志
+	 * @param batchLogId
+	 * @param tableId
+	 * @return
+	 */
+	public List<LogModel> getLogs(Long batchLogId,Long tableId) {
+		return logDao.getListByBatchLogIdAndTableId(batchLogId,tableId);
 	}
 	/**
 	 * 获取表的执行日志
@@ -95,9 +126,11 @@ public class LogService {
 	 * @param pageable
 	 * @return
 	 */
-	public List<LogModel> getLogs(Long batchLogId,Long tableId,LogStatusEnum status,String message,Pageable pageable){
+	public List<LogModel> getLogs(Long batchLogId,Long tableId,LogStatusEnum status,LogMessageEnum messageType,Pageable pageable){
 		if(null!=status) {
 			return logDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId,tableId,status,pageable);
+		}else if(null!=messageType){
+			return logDao.getListByBatchLogIdAndTableIdAndMessageType(batchLogId, tableId, messageType, pageable);
 		}
 		return logDao.getListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
 	}
@@ -134,5 +167,12 @@ public class LogService {
 		}
 		
 		return map;
+	}
+	/**
+	 * 批量保存
+	 * @param list
+	 */
+	public void insert(List<LogModel> list) {
+		logDao.saveAll(list);
 	}
 }

@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 
 @Entity
@@ -40,4 +41,7 @@ public class LogModel implements Serializable{
 	private String message;
 	@Column
 	private Long batchLogId;
+	@Column
+	@Enumerated(EnumType.STRING)
+	private LogMessageEnum messageType;
 }

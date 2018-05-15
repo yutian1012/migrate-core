@@ -1,6 +1,7 @@
 package com.ipph.migratecore.dao;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,9 @@ import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
+import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
+import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.LogService;
 import com.ipph.migratecore.sql.SqlBuilder;
@@ -25,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Repository
 @Slf4j
 public class MigrateDao {
+	
+	private static final int NUM=50;
 	
 	@Resource
 	private SqlOperation sqlOperation;
@@ -45,7 +50,7 @@ public class MigrateDao {
 	 * @throws ConfigException 
 	 * @throws SQLException 
 	 */
-	public void update(TableModel table,Long batchLogId,Long parentLogId,int start,int size) throws ConfigException, SQLException {
+	public void update(TableModel table,Long batchLogId,Long parentLogId,int start,int total) throws ConfigException, SQLException {
 		
 		//判断是否忽略该表的迁移操作
 		if(null==table|| table.isSkip()) return;
@@ -76,21 +81,71 @@ public class MigrateDao {
 		}
 		
 		//第四步：获取数据源的查询结果集--该数据集用于更新目标数据
+		int size=MigrateDao.NUM;
+		for(int index=start;index<total;index+=MigrateDao.NUM){
+			if(index+MigrateDao.NUM>=total) {
+				size=total-index;
+			}
+			String limit=" limit "+index+","+size;
+			
+			List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
+			
+			//第五步：执行更新数据--遍历集合执行相关操作
+			dealResult(table, result, targetSelect, update, batchLogId, parentLogId);
+		}
 		
-		String limit=" limit "+start+","+size;
+	}
+	/**
+	 * 处理查询结果集
+	 * @param table
+	 * @param result
+	 * @param targetSelect
+	 * @param executeSql
+	 * @param batchLogId
+	 */
+	private void dealResult(TableModel table,List<Map<String,Object>> result,String targetSelect,String executeSql,Long batchLogId,Long parentLogId) {
 		
-		List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
+		List<Object[]> batchDataList=new ArrayList<>(result.size());
 		
-		//第五步：执行更新数据--遍历集合执行相关操作
+		List<LogModel> logModelList=new ArrayList<>(result.size());
+		
 		if(result!=null){
 			for(Map<String,Object> row:result){
 				//在存在父批次时，判断改记录是否已经成功执行过了
 				if(null==parentLogId||!logService.isLogSuccess((Long)row.get(table.getSourcePkName()),parentLogId)) {
-					dealData(table, row, targetSelect, update,batchLogId);
+					LogStatusEnum status=LogStatusEnum.SUCCESS;
+					String message="操作成功";
+					LogMessageEnum messageType=LogMessageEnum.SUCCESS;
+					
+					try {
+						Object[] data=processRowData(table, row, targetSelect);
+						batchDataList.add(data);
+					} catch (DataNotFoundException | FormatException e) {
+						if(e instanceof DataNotFoundException){
+							messageType=LogMessageEnum.NOFOUND_EXCEPTION;
+						}else {
+							messageType=LogMessageEnum.FORMART_EXCEPTION;
+						}
+						status=LogStatusEnum.FAIL;
+						message=e.getMessage();
+					}
+					
+					logModelList.add(logService.getLogModel(status,messageType,message, table, batchLogId, migrateRowDataHandler.handleForLog(table,row)));
 				}
 			}
+			
+			//保存数据
+			if(batchDataList.size()>0){
+				sqlOperation.executeBatchDest(executeSql, batchDataList);
+			}
+			//记录日志
+			if(logModelList.size()>0) {
+				logService.insert(logModelList);
+			}
 		}
+		
 	}
+	
 	/**
 	 * 获取待处理的结果集数量
 	 * @param table
@@ -117,6 +172,7 @@ public class MigrateDao {
 		
 		LogStatusEnum status=LogStatusEnum.SUCCESS;
 		String message="操作成功";
+		LogMessageEnum messageType=LogMessageEnum.SUCCESS;
 		
 		//记录每一行数据的操作日志
 		Long logId=logService.log(table,migrateRowDataHandler.handleForLog(table,row),batchLogId);
@@ -125,11 +181,16 @@ public class MigrateDao {
 			deal(table, row, targetSelect, executeSql);
 		} catch (DataNotFoundException | FormatException e) {
 			//e.printStackTrace();
+			if(e instanceof DataNotFoundException){
+				messageType=LogMessageEnum.NOFOUND_EXCEPTION;
+			}else {
+				messageType=LogMessageEnum.FORMART_EXCEPTION;
+			}
 			status=LogStatusEnum.FAIL;
 			message=e.getMessage();
 		}
 		
-		logService.updateLog(logId, status, message);
+		logService.updateLog(logId, status, message,messageType);
 	}
 	
 	/**
@@ -142,7 +203,19 @@ public class MigrateDao {
 	 * @throws FormatException 
 	 */
 	private void deal(TableModel table,Map<String,Object> row,String targetSelect,String executeSql) throws DataNotFoundException, FormatException {
-		
+		Object[] data=processRowData(table, row, targetSelect);
+		sqlOperation.executeDest(executeSql,data);
+	}
+	/**
+	 * 处理行数据
+	 * @param table
+	 * @param row
+	 * @param targetSelect
+	 * @return
+	 * @throws FormatException 
+	 * @throws DataNotFoundException 
+	 */
+	private Object[] processRowData(TableModel table,Map<String,Object> row,String targetSelect) throws FormatException, DataNotFoundException {
 		//格式化数据
 		migrateRowDataHandler.handleFormatRowData(table, row);
 		
@@ -152,8 +225,11 @@ public class MigrateDao {
 				throw new DataNotFoundException("未找到更新记录");
 			}
 		}
-		sqlOperation.executeDest(executeSql, migrateRowDataHandler.handleMigrateField(row,table));
+		
+		return migrateRowDataHandler.handleMigrateField(row,table);
 	}
+	
+	
 	/**
 	 * 获取记录信息
 	 * @param table

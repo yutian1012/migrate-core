@@ -71,8 +71,8 @@
   	
   	<div>
   		<form th:action="@{'/logs/table/'+${batchLog.id}+'/'+${tableId}}" th:method="post">
-	  		执行状态:<select name="status"><option value="SUCCESS">成功</option><option value="FAIL">失败</option></select>
-	  		错误分类：<select name="message"></select>
+	  		执行状态:<select name="status"><option value="">请选择</option><option value="SUCCESS">成功</option><option value="FAIL">失败</option></select>
+	  		错误分类：<select name="messageType" ><option value="">请选择</option><option value="SUCCESS">操作成功</option><option value="FORMART_EXCEPTION">数据格式化错误</option><option value="NOFOUND_EXCEPTION">数据未检索到</option></select>
 	  		<input type="submit" value="提交">
   		</form>
   	</div>

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
@@ -77,18 +78,27 @@ public class LogController {
 	 */
 	@RequestMapping("/table/{batchLogId}/{tableId}")
 	public ModelAndView getTableLog(@PathVariable("batchLogId")Long batchLogId,
-			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="1")int page,
+			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
 			HttpServletRequest request) {
 		
 		ModelAndView mv=new ModelAndView("logs/log");
 		
 		String status=request.getParameter("status");
-		String message=request.getParameter("message");
+		if("".equals(status)) {
+			status=null;
+		}
+		String messageType=request.getParameter("messageType");
+		if("".equals(messageType)) {
+			messageType=null;
+		}
 		
 		Pageable pageable=PageRequest.of(page, size);
 		
 		BatchLogModel batchLogModel=batchLogService.getById(batchLogId);
-		List<LogModel> tableLogList=logService.getLogs(batchLogId, tableId,null!=status?LogStatusEnum.valueOf(status):null,message,pageable);
+		
+		List<LogModel> tableLogList=logService.getLogs(batchLogId, tableId,
+				null!=status?LogStatusEnum.valueOf(status):null,
+				null!=messageType?LogMessageEnum.valueOf(messageType):null,pageable);
 		
 		mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
 			.addObject("tableId",tableId).addObject("pageable",pageable);

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.LogModel;
 
@@ -18,7 +19,7 @@ public interface LogDao extends JpaRepository<LogModel,Long>{
 	
 	public List<LogModel> getListByBatchLogIdAndTableIdAndStatus(Long batchLogId,Long tableId,LogStatusEnum status,Pageable pageable);
 	
-	public List<LogModel> getListByBatchLogIdAndTableIdAndMessage(Long batchLogId,Long tableId,String message,Pageable pageable);
+	public List<LogModel> getListByBatchLogIdAndTableIdAndMessageType(Long batchLogId,Long tableId,LogMessageEnum messageType,Pageable pageable);
 	
 	public LogModel getByDataIdAndBatchLogId(Long dataId,Long batchLogId);
 	
