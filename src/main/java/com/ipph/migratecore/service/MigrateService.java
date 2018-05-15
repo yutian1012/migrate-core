@@ -1,6 +1,5 @@
 package com.ipph.migratecore.service;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -9,40 +8,40 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.MigrateDao;
-import com.ipph.migratecore.deal.exception.ConfigException;
-import com.ipph.migratecore.enumeration.TableOperationEnum;
+import com.ipph.migratecore.jms.JmsSender;
+import com.ipph.migratecore.model.MigrateMessageModel;
 import com.ipph.migratecore.model.TableModel;
 
 @Service
 @Transactional
 public class MigrateService {
+	
+	private final static int SIZE=3000;
 
+	@Resource
+	private JmsSender jmsSender;
 	@Resource
 	private MigrateDao migrateDao;
 	
 	public void migrateTable(TableModel table,Long batchLogId,Long parentLogId){
 		
-		TableOperationEnum type=table.getType();
-		switch (type){
-			case MIGRATE :
-				migrate(table);
-				break;
-			case UPDATE :
-				update(table,batchLogId,parentLogId);
-				break;
-			default:
-		}
-	}
-	
-	private void migrate(TableModel table){
+		assert(null!=table);
 		
-	}
-	
-	private void update(TableModel table,Long batchLogId,Long parentLogId){
-		try {
-			migrateDao.update(table,batchLogId,parentLogId);
-		} catch (ConfigException |SQLException e) {
-			e.printStackTrace();
+		long total=migrateDao.getTotal(table);
+		
+		//发送消息实现异步处理
+		for(int index=0;index<total;index+=MigrateService.SIZE){
+			
+			MigrateMessageModel messageModel=new MigrateMessageModel();
+			messageModel.setType(table.getType());
+			messageModel.setTableId(table.getId());
+			messageModel.setBatchLogId(batchLogId);
+			messageModel.setParentLogId(parentLogId);
+			messageModel.setTotal(total);
+			messageModel.setStart(index);
+			messageModel.setSize(MigrateService.SIZE);
+			
+			jmsSender.sendMessageModelByQueue(messageModel);
 		}
 	}
 	/**

@@ -40,6 +40,21 @@
 			var tableId=/*[[${tableId}]]*/ '';
 			window.location.href='/logs/table/'+batchLogId+'/'+tableId+'?page='+pageNum+'&size='+size;
 		}
+		
+		$(function(){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			var url='/logs/statistic/';
+			
+			var data={'batchLogId':batchLogId,'tableId':tableId};
+			
+			$.post(url,data,function(result){
+				if(result){
+					$("#batchNum").text(result["FAIL"]+result["SUCCESS"]);
+					$("#sucNum").text(result["SUCCESS"]);
+				}
+			})
+		});
 	</script>
   </head>
   
@@ -47,6 +62,19 @@
   	<div>
   		<input type="button" value="错误信息更正" onclick="migrate()">
   		<input type="button" value="查看子批次" onclick="subBatch()">
+  	</div>
+  	<div>
+  		<label>统计信息：</label>
+  		批次处理量：<span id="batchNum"></span>
+  		成功数量：<span id="sucNum"></span>
+  	</div>
+  	
+  	<div>
+  		<form th:action="@{'/logs/table/'+${batchLog.id}+'/'+${tableId}}" th:method="post">
+	  		执行状态:<select name="status"><option value="SUCCESS">成功</option><option value="FAIL">失败</option></select>
+	  		错误分类：<select name="message"></select>
+	  		<input type="submit" value="提交">
+  		</form>
   	</div>
 	<!-- 执行日志 -->
     <table style="width:80%;text-align:center;" border="1px">

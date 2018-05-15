@@ -1,18 +1,21 @@
 package com.ipph.migratecore.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
 import com.ipph.migratecore.model.LogModel;
@@ -74,18 +77,32 @@ public class LogController {
 	 */
 	@RequestMapping("/table/{batchLogId}/{tableId}")
 	public ModelAndView getTableLog(@PathVariable("batchLogId")Long batchLogId,
-			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="1")int page) {
+			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="1")int page,
+			HttpServletRequest request) {
 		
 		ModelAndView mv=new ModelAndView("logs/log");
+		
+		String status=request.getParameter("status");
+		String message=request.getParameter("message");
 		
 		Pageable pageable=PageRequest.of(page, size);
 		
 		BatchLogModel batchLogModel=batchLogService.getById(batchLogId);
-		List<LogModel> tableLogList=logService.getLogs(batchLogId, tableId,pageable);
+		List<LogModel> tableLogList=logService.getLogs(batchLogId, tableId,null!=status?LogStatusEnum.valueOf(status):null,message,pageable);
 		
 		mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
 			.addObject("tableId",tableId).addObject("pageable",pageable);
 		
 		return mv;
+	}
+	/**
+	 * 获取统计信息
+	 * @return
+	 */
+	@RequestMapping("/statistic")
+	@ResponseBody
+	public Map<String,Object> statistic(@RequestParam("batchLogId")Long batchLogId,@RequestParam("tableId")Long tableId){
+		Map<String,Object> result=logService.statistic(batchLogId,tableId);
+		return result;
 	}
 }

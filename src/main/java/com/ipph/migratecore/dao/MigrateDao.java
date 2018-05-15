@@ -45,7 +45,7 @@ public class MigrateDao {
 	 * @throws ConfigException 
 	 * @throws SQLException 
 	 */
-	public void update(TableModel table,Long batchLogId,Long parentLogId) throws ConfigException, SQLException {
+	public void update(TableModel table,Long batchLogId,Long parentLogId,int start,int size) throws ConfigException, SQLException {
 		
 		//判断是否忽略该表的迁移操作
 		if(null==table|| table.isSkip()) return;
@@ -76,7 +76,10 @@ public class MigrateDao {
 		}
 		
 		//第四步：获取数据源的查询结果集--该数据集用于更新目标数据
-		List<Map<String,Object>> result=sqlOperation.getSourceData(select,migrateRowDataHandler.handleSourceFieldCondition(table));
+		
+		String limit=" limit "+start+","+size;
+		
+		List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
 		
 		//第五步：执行更新数据--遍历集合执行相关操作
 		if(result!=null){
@@ -87,6 +90,16 @@ public class MigrateDao {
 				}
 			}
 		}
+	}
+	/**
+	 * 获取待处理的结果集数量
+	 * @param table
+	 * @return
+	 */
+	public long getTotal(TableModel table){
+		//获取记录数量
+		String selectCount=sqlBuilder.getSelectCountSql(table);
+		return sqlOperation.getSourceTotal(selectCount, migrateRowDataHandler.handleSourceFieldCondition(table));
 	}
 	
 	/**
@@ -130,6 +143,9 @@ public class MigrateDao {
 	 */
 	private void deal(TableModel table,Map<String,Object> row,String targetSelect,String executeSql) throws DataNotFoundException, FormatException {
 		
+		//格式化数据
+		migrateRowDataHandler.handleFormatRowData(table, row);
+		
 		if(null!=targetSelect){
 			//判断待更新的数据是否存在
 			if(!sqlOperation.isDestExists(targetSelect, migrateRowDataHandler.handleTargetFieldCondtion(row,table))){
@@ -137,15 +153,6 @@ public class MigrateDao {
 			}
 		}
 		sqlOperation.executeDest(executeSql, migrateRowDataHandler.handleMigrateField(row,table));
-		
-		//int upd=sqlOperation.executeDest(executeSql, migrateRowDataHandler.handleMigrateField(row,table));
-		/*if(upd>0){
-			if(log.isDebugEnabled()){
-				log.debug("update the data success!");
-			}
-		}else{
-			log.error("更新失败"+MapUtil.outMapData(row));
-		}*/
 	}
 	/**
 	 * 获取记录信息

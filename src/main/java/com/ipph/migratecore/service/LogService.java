@@ -1,6 +1,7 @@
 package com.ipph.migratecore.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,6 +87,22 @@ public class LogService {
 		return logDao.getListByBatchLogIdAndTableId(batchLogId,tableId,pageable);
 	}
 	/**
+	 * 查询数据
+	 * @param batchLogId
+	 * @param tableId
+	 * @param status
+	 * @param message
+	 * @param pageable
+	 * @return
+	 */
+	public List<LogModel> getLogs(Long batchLogId,Long tableId,LogStatusEnum status,String message,Pageable pageable){
+		if(null!=status) {
+			return logDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId,tableId,status,pageable);
+		}
+		return logDao.getListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
+	}
+	
+	/**
 	 * 判断日志记录是否成功
 	 * @param dataId
 	 * @param batchLogId
@@ -97,5 +114,25 @@ public class LogService {
 			return true;
 		}
 		return false;
+	}
+	/**
+	 * 统计信息
+	 * @param batchLogId
+	 * @param tableId
+	 * @return
+	 */
+	public Map<String,Object> statistic(Long batchLogId,Long tableId){
+		
+		Map<String,Object> map=null;
+		
+		List<Map<String,Object>> result=logDao.statistic(batchLogId, tableId);
+		if(null!=result&&result.size()>0) {
+			map=new HashMap<>();
+			for(Map<String,Object> temp:result) {
+				map.put(temp.get("status").toString(), temp.get("num"));
+			}
+		}
+		
+		return map;
 	}
 }

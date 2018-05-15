@@ -2,13 +2,11 @@ package com.ipph.migratecore.dao;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.xml.sax.SAXException;
 
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.util.XmlUtil;
@@ -48,7 +45,7 @@ public class MigrateDaoTest {
 			TableModel table=tableList.get(0);
 			
 			//执行更新操作
-			migrateDao.update(table,null,null); 
+			migrateDao.update(table,null,null,0,100); 
 			
 			//判断目标数据表的字段是否更新
 			String sql="select useremail from migratedest";
@@ -79,7 +76,7 @@ public class MigrateDaoTest {
 			TableModel table=tableList.get(0);
 			
 			//执行更新操作
-			migrateDao.update(table,null,null); 
+			migrateDao.update(table,null,null,0,100); 
 			
 			//判断目标数据表的字段是否更新
 			String sql="select isApply from z_patent_dest";

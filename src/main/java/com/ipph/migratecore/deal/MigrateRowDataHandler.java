@@ -69,7 +69,7 @@ public class MigrateRowDataHandler {
 	public Object[] handleTargetFieldCondtion(Map<String,Object> row,TableModel table)throws FormatException{
 		
 		//先进行一步格式化操作
-		handleFormatRowData(table, row);
+		//handleFormatRowData(table, row);
 		
 		if(null!=table.getWhereModel()){
 			
@@ -132,7 +132,7 @@ public class MigrateRowDataHandler {
 	 * @param rowData
 	 * @throws FormatException 
 	 */
-	private void handleFormatRowData(TableModel table,Map<String,Object> rowData) throws FormatException {
+	public void handleFormatRowData(TableModel table,Map<String,Object> rowData) throws FormatException {
 		List<FormatModel> formatList=table.getFormatFieldList();
 		
 		if(null==formatList||formatList.size()==0) {
@@ -155,7 +155,7 @@ public class MigrateRowDataHandler {
 	 */
 	public Object[] handleMigrateField(Map<String,Object> row,TableModel table)throws FormatException{
 		//先对数据进行格式化操作
-		handleFormatRowData(table, row);
+		//handleFormatRowData(table, row);
 		
 		Object[] field=handleTargetField(row,table);
 	
