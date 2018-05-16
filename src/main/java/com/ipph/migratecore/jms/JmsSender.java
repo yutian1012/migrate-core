@@ -4,7 +4,7 @@ package com.ipph.migratecore.jms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ipph.migratecore.model.MigrateMessageModel;
+import com.ipph.migratecore.model.MigrateModel;
 
 @Component
 public class JmsSender {

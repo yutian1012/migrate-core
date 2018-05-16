@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.ipph.migratecore.config.JmsConfirguration;
 import com.ipph.migratecore.dao.MigrateDao;
 import com.ipph.migratecore.deal.exception.ConfigException;
-import com.ipph.migratecore.model.MigrateMessageModel;
+import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.TableService;
 import com.ipph.migratecore.thread.MigrationTask;
