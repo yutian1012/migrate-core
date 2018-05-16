@@ -1,12 +1,14 @@
 package com.ipph.migratecore.service;
 
 import java.util.Map;
+import java.util.MissingFormatArgumentException;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.MigrateDao;
+import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.jms.JmsSender;
 import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
@@ -26,9 +28,13 @@ public class MigrateService {
 	@Resource
 	private ThreadPool ThreadPool;
 	
-	public void migrateTable(TableModel table,Long batchLogId,Long parentLogId){
+	public void migrateTable(TableModel table,Long batchLogId,Long parentLogId) throws ConfigException{
 		
 		assert(null!=table);
+		//校验
+		if(!migrateDao.validateTableModel(table)) {
+			return;
+		}
 		
 		long total=migrateDao.getTotal(table);
 		
