@@ -17,6 +17,7 @@ import com.ipph.migratecore.deal.exception.FormatException;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.LogModel;
+import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.LogService;
 import com.ipph.migratecore.sql.SqlBuilder;
@@ -27,26 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
-public class MigrateDao {
+public class MigrateDao extends BaseMigrateDao{
 	
-	private static final int NUM=50;
-	
-	@Resource
-	private SqlOperation sqlOperation;
-	@Resource
-	private SqlBuilder sqlBuilder;
-	
-	@Resource
-	private MigrateRowDataHandler migrateRowDataHandler;
-	
-	@Resource
-	private MigrateExceptionHandler migrateExceptionHandler;
-	
-	@Resource
-	private  LogService logService;
 	/**
 	 * 数据表更新操作
 	 * @param table
+	 * @param total 待处理的数据量
 	 * @throws ConfigException 
 	 * @throws SQLException 
 	 */
@@ -82,9 +69,10 @@ public class MigrateDao {
 		
 		//第四步：获取数据源的查询结果集--该数据集用于更新目标数据
 		int size=MigrateDao.NUM;
-		for(int index=start;index<total;index+=MigrateDao.NUM){
-			if(index+MigrateDao.NUM>=total) {
-				size=total-index;
+		
+		for(int index=start;index<(total+start);index+=size){
+			if(index+size>=total) {
+				size=total+start-index;
 			}
 			String limit=" limit "+index+","+size;
 			
@@ -92,6 +80,8 @@ public class MigrateDao {
 			
 			//第五步：执行更新数据--遍历集合执行相关操作
 			dealResult(table, result, targetSelect, update, batchLogId, parentLogId);
+			
+			result.clear();
 		}
 		
 	}
@@ -142,20 +132,15 @@ public class MigrateDao {
 			if(logModelList.size()>0) {
 				logService.insert(logModelList);
 			}
+			
 		}
+		batchDataList.clear();
+		
+		logModelList.clear();
 		
 	}
 	
-	/**
-	 * 获取待处理的结果集数量
-	 * @param table
-	 * @return
-	 */
-	public long getTotal(TableModel table){
-		//获取记录数量
-		String selectCount=sqlBuilder.getSelectCountSql(table);
-		return sqlOperation.getSourceTotal(selectCount, migrateRowDataHandler.handleSourceFieldCondition(table));
-	}
+	
 	
 	/**
 	 * 处理数据并捕获相应异常从而记录日志
@@ -228,7 +213,6 @@ public class MigrateDao {
 		
 		return migrateRowDataHandler.handleMigrateField(row,table);
 	}
-	
 	
 	/**
 	 * 获取记录信息

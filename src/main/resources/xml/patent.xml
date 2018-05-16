@@ -11,6 +11,9 @@
     		<condition type="EQUAL" applyType="SOURCE">
     			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ1"></field>
     		</condition>
+    		<condition type="LE" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE" valueType="FIXED" value="13197"/>
+    		</condition>
     		<condition type="EQUAL" applyType="TARGET">
     			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>
     		</condition>

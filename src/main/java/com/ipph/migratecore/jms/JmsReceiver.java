@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import javax.annotation.Resource;
 
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.ipph.migratecore.config.JmsConfirguration;
@@ -18,15 +17,15 @@ import com.ipph.migratecore.thread.ThreadPool;
 
 @Component
 public class JmsReceiver {
-	@Resource
+	/*@Resource
 	private MigrateDao migrateDao;
 	@Resource
 	private TableService tableService;
 	@Resource
 	private ThreadPool ThreadPool;
-	/**
+	*//**
 	 * @param messageModel
-	 */
+	 *//*
     @JmsListener(destination =JmsConfirguration.QUEUE_MESSAGEMODEL)
     public void receiveMessageModelByQueue(MigrateMessageModel messageModel) {
     	if(null!=messageModel) {
@@ -48,6 +47,6 @@ public class JmsReceiver {
     		
     		ThreadPool.addTask(task);
     	}
-    }
+    }*/
     
 }

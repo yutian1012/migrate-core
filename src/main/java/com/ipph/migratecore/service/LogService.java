@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -12,7 +11,7 @@ import javax.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.ipph.migratecore.dao.LogDao;
+import com.ipph.migratecore.dao.LogJdbcDao;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
@@ -21,10 +20,10 @@ import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.util.MapUtil;
 
 @Service
-@Transactional
 public class LogService {
 	@Resource
-	private LogDao logDao;
+	//private LogDao logDao;
+	private LogJdbcDao logJdbcDao;
 	/**
 	 * 记录日志
 	 * @param table
@@ -38,7 +37,7 @@ public class LogService {
 		log.setTableId(table.getId());
 		log.setTableName(table.getFrom());
 		log.setBatchLogId(batchLogId);
-		logDao.save(log);
+		logJdbcDao.save(log);
 		
 		return log.getId();
 	}
@@ -87,15 +86,16 @@ public class LogService {
 	 * @param message
 	 */
 	public void updateLog(Long logId,LogStatusEnum status,String message,LogMessageEnum messageType) {
-		Optional<LogModel> optionalLog=logDao.findById(logId);//getOne(logId);
-				
-		LogModel log=optionalLog.get();
+		//Optional<LogModel> optionalLog=logDao.findById(logId);//getOne(logId);
+		//LogModel log=optionalLog.get();
+		
+		LogModel log=logJdbcDao.findById(logId);
 		
 		if(null!=log) {
 			log.setStatus(status);
 			log.setMessage(message);
 			log.setMessageType(messageType);
-			logDao.save(log);
+			logJdbcDao.save(log);
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class LogService {
 	 * @return
 	 */
 	public List<LogModel> getLogs(Long batchLogId,Long tableId) {
-		return logDao.getListByBatchLogIdAndTableId(batchLogId,tableId);
+		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId,tableId);
 	}
 	/**
 	 * 获取表的执行日志
@@ -115,7 +115,7 @@ public class LogService {
 	 * @return
 	 */
 	public List<LogModel> getLogs(Long batchLogId,Long tableId,Pageable pageable) {
-		return logDao.getListByBatchLogIdAndTableId(batchLogId,tableId,pageable);
+		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId,tableId,pageable);
 	}
 	/**
 	 * 查询数据
@@ -128,11 +128,11 @@ public class LogService {
 	 */
 	public List<LogModel> getLogs(Long batchLogId,Long tableId,LogStatusEnum status,LogMessageEnum messageType,Pageable pageable){
 		if(null!=status) {
-			return logDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId,tableId,status,pageable);
+			return logJdbcDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId,tableId,status,pageable);
 		}else if(null!=messageType){
-			return logDao.getListByBatchLogIdAndTableIdAndMessageType(batchLogId, tableId, messageType, pageable);
+			return logJdbcDao.getListByBatchLogIdAndTableIdAndMessageType(batchLogId, tableId, messageType, pageable);
 		}
-		return logDao.getListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
+		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ public class LogService {
 	 * @return
 	 */
 	public boolean isLogSuccess(Long dataId,Long batchLogId) {
-		LogModel log=logDao.getByDataIdAndBatchLogId(dataId,batchLogId);
+		LogModel log=logJdbcDao.getByDataIdAndBatchLogId(dataId,batchLogId);
 		if(null!=log&&LogStatusEnum.SUCCESS==log.getStatus()) {
 			return true;
 		}
@@ -158,7 +158,7 @@ public class LogService {
 		
 		Map<String,Object> map=null;
 		
-		List<Map<String,Object>> result=logDao.statistic(batchLogId, tableId);
+		List<Map<String,Object>> result=logJdbcDao.statistic(batchLogId, tableId);
 		if(null!=result&&result.size()>0) {
 			map=new HashMap<>();
 			for(Map<String,Object> temp:result) {
@@ -173,6 +173,6 @@ public class LogService {
 	 * @param list
 	 */
 	public void insert(List<LogModel> list) {
-		logDao.saveAll(list);
+		logJdbcDao.saveAll(list);
 	}
 }

@@ -11,6 +11,7 @@ import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.LogModel;
 
+@Deprecated
 public interface LogDao extends JpaRepository<LogModel,Long>{
 
 	public List<LogModel> getListByBatchLogIdAndTableId(Long batchLogId,Long tableId);

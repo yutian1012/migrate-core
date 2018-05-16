@@ -2,7 +2,9 @@ package com.ipph.migratecore.dao;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -19,7 +21,8 @@ import com.ipph.migratecore.model.LogModel;
 public class LogDaoTest {
 	
 	@Resource
-	private LogDao logDao;
+	//private LogDao logDao;
+	private LogJdbcDao logJdbcDao;
 
 	@Test
 	public void test() {
@@ -32,21 +35,48 @@ public class LogDaoTest {
 		model.setStatus(LogStatusEnum.SUCCESS);
 		model.setTableId(0L);
 		model.setTableName("tablename");
-		model=logDao.save(model);
+		model=logJdbcDao.save(model);
 		
 		assertNotNull(model.getId());
 		
 		id=model.getId();
 		
 		//从数据库中检索
-		LogModel model2=logDao.findById(id).get();
+		LogModel model2=logJdbcDao.findById(id);//logDao.findById(id).get();
 		
 		assertNotNull(model2);
 		
 		//从数据库中删除
-		logDao.delete(model2);
+		/*logDao.delete(model2);
 		
-		assertFalse(logDao.existsById(id));
+		assertFalse(logDao.existsById(id));*/
+	}
+	
+	@Test
+	public void testBatch() {
+		
+		List<LogModel> list=new ArrayList<>();
+		
+		LogModel model=new LogModel();
+		model.setCreateDate(new Date());
+		model.setDataId(0L);
+		model.setDealData("test");
+		model.setStatus(LogStatusEnum.SUCCESS);
+		model.setTableId(0L);
+		model.setTableName("tablename");
+		list.add(model);
+		
+		LogModel model2=new LogModel();
+		model.setCreateDate(new Date());
+		model.setDataId(0L);
+		model.setDealData("test");
+		model.setStatus(LogStatusEnum.SUCCESS);
+		model.setTableId(0L);
+		model.setTableName("tablename");
+		
+		list.add(model2);
+		
+		logJdbcDao.saveAll(list);
 	}
 
 }

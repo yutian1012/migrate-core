@@ -40,7 +40,11 @@ public class TableService {
 	public List<TableModel> getList(){
 		return tableDao.findAll();
 	}
-	
+	/**
+	 * 上传table定义的xml文档
+	 * @param in
+	 * @return
+	 */
 	public boolean uploadXml(InputStream in){
 		try {
 			List<TableModel> tableList=XmlUtil.parseBySax(in);
@@ -57,8 +61,16 @@ public class TableService {
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			return false;
 		}
-		
 		return true;
+	}
+	
+	/**
+	 * 校验Table的配置信息
+	 * @param table
+	 */
+	private boolean validateTableModel(TableModel table) {
+		
+		return false;
 	}
 	
 	public void setTableJsonData(TableModel table){
@@ -97,11 +109,23 @@ public class TableService {
 		}
 	}
 	
+	/**
+	 * 执行迁移操作
+	 * @param tableId
+	 * @param batchLogId
+	 * @return
+	 */
+	@Deprecated
 	public boolean migrateTable(Long tableId,Long batchLogId){
 		TableModel table=getById(tableId);
 		return migrateTable(table, batchLogId,null);
 	}
-	
+	/**
+	 * 执行迁移操作
+	 * @param tableId
+	 * @param batchLogId
+	 * @return
+	 */
 	public boolean migrateTable(TableModel table,Long batchLogId,Long parentLogId){
 		
 		if(log.isDebugEnabled()) {
@@ -114,7 +138,11 @@ public class TableService {
 		}
 		return false;
 	}
-	
+	/**
+	 * 获取TableModel定义信息
+	 * @param tableId
+	 * @return
+	 */
 	public TableModel getById(Long tableId){
 		TableModel table=tableDao.findById(tableId).get();//getOne(tableId);
 		if(null!=table){

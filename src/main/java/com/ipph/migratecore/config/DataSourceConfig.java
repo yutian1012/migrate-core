@@ -46,4 +46,9 @@ public class DataSourceConfig {
     public JdbcTemplate secondaryJdbcTemplate(@Qualifier("destDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
+    
+    @Bean(name="migrateJdbcTemplate")
+    public JdbcTemplate migrateJdbcTemplate(@Qualifier("migrateDataSource")DataSource dataSource) {
+    	return new JdbcTemplate(dataSource);
+    }
 }

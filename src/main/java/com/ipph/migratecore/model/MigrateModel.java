@@ -12,10 +12,10 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MigrateMessageModel implements Serializable{
+public class MigrateModel implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private TableOperationEnum type;
-	private Long tableId;
+	private TableModel tableModel;
 	private Long batchLogId;
 	private Long parentLogId;
 	private Long total;

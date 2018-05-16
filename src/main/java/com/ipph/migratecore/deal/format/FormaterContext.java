@@ -61,13 +61,24 @@ public class FormaterContext {
 		}
 		
 		if(formater==null) {
-			formater=(Formater) clazz.newInstance();
+			formater=getFormaterInstance(clazz);
 			if(null!=formater) {
 				formaterList.add(formater);
 			}
 		}
 		
 		return formater;
+	}
+	/**
+	 * 获取对象
+	 * @param clazz
+	 * @return
+	 */
+	private Formater getFormaterInstance(Class<?> clazz) {
+		if(clazz.getName()==PatentNoFormater.class.getName()) {
+			return new PatentNoFormater();
+		}
+		return null;
 	}
 	
 }
