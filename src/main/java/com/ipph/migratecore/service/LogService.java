@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.LogModel;
+import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.util.MapUtil;
 
@@ -41,6 +41,15 @@ public class LogService {
 		
 		return log.getId();
 	}
+	
+	public LogModel getLogModel(MigrateModel migrateModel,LogMessageEnum messageType,Map<String,Object> data) {
+		
+		LogStatusEnum status=messageType==LogMessageEnum.SUCCESS?LogStatusEnum.SUCCESS:LogStatusEnum.FAIL;
+		
+		return getLogModel(status, messageType, messageType.getValue(), migrateModel.getTableModel(), migrateModel.getBatchLogId(), data);
+		
+	}
+	
 	/**
 	 * 获取数据
 	 * @param status
@@ -134,6 +143,28 @@ public class LogService {
 		}
 		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
 	}
+	/**
+	 * 获取批次处理的正确数据（包括子批次的处理数据）
+	 * @param batchLogId
+	 * @param tableId
+	 * @param pageable
+	 * @return
+	 */
+	public List<LogModel> getSuccessLogs(Long batchId,Long tableId,Pageable pageable){
+		return logJdbcDao.getSuccessListByBatchIdAndTableId(batchId, tableId,pageable);
+	}
+	
+	/**
+	 * 获取批次处理的正确数据（包括子批次的处理数据）
+	 * @param batchLogId
+	 * @param tableId
+	 * @param pageable
+	 * @return
+	 */
+	public List<LogModel> getFailLogs(Long batchId,Long tableId,Pageable pageable){
+		return logJdbcDao.getFailListByBatchIdAndTableId(batchId, tableId,pageable);
+	}
+	
 	
 	/**
 	 * 判断日志记录是否成功
@@ -156,9 +187,31 @@ public class LogService {
 	 */
 	public Map<String,Object> statistic(Long batchLogId,Long tableId){
 		
+		List<Map<String,Object>> result=logJdbcDao.statistic(batchLogId, tableId);
+		
+		return processStatisticResult(result);
+		
+	}
+	/**
+	 * 获取子批次的执行结果
+	 * @param parentBatchLogId
+	 * @param tableId
+	 * @return
+	 */
+	public Map<String,Object> statisticByParentBatchLog(Long parentBatchLogId,Long tableId){
+		List<Map<String,Object>> result=logJdbcDao.statisticByParentBatchLog(parentBatchLogId, tableId);
+		
+		return processStatisticResult(result);
+	}
+	/**
+	 * 处理统计数据
+	 * @param result
+	 * @return
+	 */
+	private Map<String,Object> processStatisticResult(List<Map<String,Object>> result) {
+		
 		Map<String,Object> map=null;
 		
-		List<Map<String,Object>> result=logJdbcDao.statistic(batchLogId, tableId);
 		if(null!=result&&result.size()>0) {
 			map=new HashMap<>();
 			for(Map<String,Object> temp:result) {

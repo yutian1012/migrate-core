@@ -3,12 +3,13 @@ package com.ipph.migratecore.thread;
 import java.sql.SQLException;
 
 import com.ipph.migratecore.dao.MigrateDao;
+import com.ipph.migratecore.dao.MigrationDao;
 import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.model.TableModel;
 
 public class MigrationTask implements Runnable{
 	
-	private MigrateDao migrateDao;
+	private MigrationDao migrationDao;
 	
 	private TableModel table;
 	
@@ -20,8 +21,8 @@ public class MigrationTask implements Runnable{
 	
 	private int size;
 	
-	public MigrationTask(MigrateDao migrateDao,TableModel table,Long batchLogId,Long parentLogId,int start,int size){
-		this.migrateDao=migrateDao;
+	public MigrationTask(MigrationDao migrationDao,TableModel table,Long batchLogId,Long parentLogId,int start,int size){
+		this.migrationDao=migrationDao;
 		this.table=table;
 		this.start=start;
 		this.size=size;
@@ -49,7 +50,7 @@ public class MigrationTask implements Runnable{
 	
 	private void update() {
 		try {
-			migrateDao.update(table, batchLogId, parentLogId,start,size);
+			migrationDao.update(table, batchLogId, parentLogId,start,size);
 		} catch (ConfigException | SQLException e) {
 			e.printStackTrace();
 		}

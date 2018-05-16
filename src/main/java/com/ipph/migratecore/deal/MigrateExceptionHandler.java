@@ -6,14 +6,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.Resource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import com.ipph.migratecore.deal.exception.DataExistsException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
+import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.model.TableModel;
 
 @Component
@@ -24,6 +22,27 @@ public class MigrateExceptionHandler {
 	private RowDataHandler rowDataHandler;
 	@Resource
 	private SqlBuilder sqlBuilder;*/
+	/**
+	 * 获取异常信息
+	 * @param e
+	 * @return
+	 */
+	public LogMessageEnum handle(Exception e) {
+		
+		LogMessageEnum messageType=LogMessageEnum.SUCCESS;
+		if(null!=e) {
+			if(e instanceof FormatException) {
+				messageType=LogMessageEnum.FORMART_EXCEPTION;
+			}else if(e instanceof DataNotFoundException) {
+				messageType=LogMessageEnum.NOFOUND_EXCEPTION;
+			}else {
+				messageType=LogMessageEnum.OTHERS;
+			}
+		}
+		
+		return messageType;
+	}
+	
 	
 	private ConcurrentMap<String, Set<Long>> concurrentMap=new ConcurrentHashMap<>();
 	

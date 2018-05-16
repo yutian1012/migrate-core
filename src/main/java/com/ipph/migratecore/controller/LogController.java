@@ -106,6 +106,60 @@ public class LogController {
 		return mv;
 	}
 	/**
+	 * 查看成功的数据
+	 * @param batchLogId
+	 * @param tableId
+	 * @param size
+	 * @param page
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/table/success/{batchId}/{batchLogId}/{tableId}")
+	public ModelAndView getTableSuccessLog(@PathVariable("batchId")Long batchId,@PathVariable("batchLogId")Long batchLogId,
+			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
+			HttpServletRequest request) {
+		
+		ModelAndView mv=new ModelAndView("logs/log");
+		
+		Pageable pageable=PageRequest.of(page, size);
+		
+		BatchLogModel batchLogModel=batchLogService.getById(batchLogId);
+		
+		List<LogModel> tableLogList=logService.getSuccessLogs(batchId, tableId,pageable);
+		
+		mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
+			.addObject("tableId",tableId).addObject("pageable",pageable);
+		
+		return mv;
+	}
+	/**
+	 * 查看错误的数据
+	 * @param batchLogId
+	 * @param tableId
+	 * @param size
+	 * @param page
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/table/fail/{batchId}/{batchLogId}/{tableId}")
+	public ModelAndView getTableFailLog(@PathVariable("batchId")Long batchId,@PathVariable("batchLogId")Long batchLogId,
+			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
+			HttpServletRequest request) {
+		
+		ModelAndView mv=new ModelAndView("logs/log");
+		
+		Pageable pageable=PageRequest.of(page, size);
+		
+		BatchLogModel batchLogModel=batchLogService.getById(batchLogId);
+		
+		List<LogModel> tableLogList=logService.getFailLogs(batchId, tableId,pageable);
+		
+		mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
+			.addObject("tableId",tableId).addObject("pageable",pageable);
+		
+		return mv;
+	}
+	/**
 	 * 获取统计信息
 	 * @return
 	 */
@@ -113,6 +167,11 @@ public class LogController {
 	@ResponseBody
 	public Map<String,Object> statistic(@RequestParam("batchLogId")Long batchLogId,@RequestParam("tableId")Long tableId){
 		Map<String,Object> result=logService.statistic(batchLogId,tableId);
+		Map<String,Object> subResult=logService.statisticByParentBatchLog(batchLogId, tableId);
+		if(null!=subResult&&subResult.size()>0) {
+			result.put("SUBSUCCESS",subResult.get("SUCCESS"));
+		}
+		
 		return result;
 	}
 }

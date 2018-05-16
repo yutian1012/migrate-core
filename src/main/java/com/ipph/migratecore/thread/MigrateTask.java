@@ -10,7 +10,6 @@ public class MigrateTask implements Runnable{
 	private MigrateDao migrateDao;
 	
 	public MigrateTask(MigrateDao migrateDao,MigrateModel migrateModel) {
-		// TODO Auto-generated constructor stub
 		this.migrateDao=migrateDao;
 		this.migrateModel=migrateModel;
 	}

@@ -26,6 +26,22 @@
 			}
 		}
 		
+		function migrateSuccess(){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var batchId=/*[[${batchLog.batchId}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			
+			window.location.href='/logs/table/success/'+batchId+'/'+batchLogId+'/'+tableId;
+		}
+		
+		function migrateFail(){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var batchId=/*[[${batchLog.batchId}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			
+			window.location.href='/logs/table/fail/'+batchId+'/'+batchLogId+'/'+tableId;
+		}
+		
 		function prev(){
 			var pageNum=/*[[${pageable.previousOrFirst().getPageNumber()}]]*/ '';
 			var pageSize=/*[[${pageable.previousOrFirst().getPageSize()}]]*/ '';
@@ -51,7 +67,12 @@
 			$.post(url,data,function(result){
 				if(result){
 					$("#batchNum").text(result["FAIL"]+result["SUCCESS"]);
-					$("#sucNum").text(result["SUCCESS"]);
+					
+					if(result["SUBSUCCESS"]){
+						$("#sucNum").text(result["SUCCESS"]+result["SUBSUCCESS"]);
+					}else{
+						$("#sucNum").text(result["SUCCESS"]);
+					}
 				}
 			})
 		});
@@ -61,7 +82,8 @@
   <body>
   	<div>
   		<input type="button" value="错误信息更正" onclick="migrate()">
-  		<input type="button" value="查看子批次" onclick="subBatch()">
+  		<input type="button" value="查看正确处理的数据" onclick="migrateSuccess()">
+  		<input type="button" value="查看处理错误数据" onclick="migrateFail()">
   	</div>
   	<div>
   		<label>统计信息：</label>

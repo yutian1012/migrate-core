@@ -24,7 +24,7 @@ import com.ipph.migratecore.util.XmlUtil;
 public class MigrateDaoTest {
 	
 	@Resource
-	private MigrateDao migrateDao;
+	private MigrationDao migrationDao;
 	
 	@Resource(name="destJdbcTemplate")
 	private JdbcTemplate destJdbcTemplate;
@@ -45,7 +45,7 @@ public class MigrateDaoTest {
 			TableModel table=tableList.get(0);
 			
 			//执行更新操作
-			migrateDao.update(table,null,null,0,100); 
+			migrationDao.update(table,null,null,0,100); 
 			
 			//判断目标数据表的字段是否更新
 			String sql="select useremail from migratedest";
@@ -76,7 +76,7 @@ public class MigrateDaoTest {
 			TableModel table=tableList.get(0);
 			
 			//执行更新操作
-			migrateDao.update(table,null,null,0,100); 
+			migrationDao.update(table,null,null,0,100); 
 			
 			//判断目标数据表的字段是否更新
 			String sql="select isApply from z_patent_dest";

@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 import com.alibaba.fastjson.JSON;
 import com.ipph.migratecore.dao.BatchTableDao;
 import com.ipph.migratecore.dao.TableDao;
+import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
@@ -132,11 +133,15 @@ public class TableService {
 			log.debug("migrate table "+table.getFrom());
 		}
 		
+		boolean flag=true;
 		if(null!=table){
-			migrateService.migrateTable(table,batchLogId,parentLogId);
-			return true;
+			try {
+				migrateService.migrateTable(table,batchLogId,parentLogId);
+			} catch (ConfigException e) {
+				flag=false;
+			}
 		}
-		return false;
+		return flag;
 	}
 	/**
 	 * 获取TableModel定义信息

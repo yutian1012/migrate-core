@@ -39,6 +39,23 @@ public class LogJdbcDao {
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId},new LogModelRowMapper());
 	}
 	
+	public List<LogModel> getSuccessListByBatchIdAndTableId(Long batchId,Long tableId,Pageable pageable){
+		String sql="select a.* from log_model a,batch_log_model b "
+				+ "where a.batch_log_id =b.id and batch_id=? and a.table_id=? and a.status=? "
+				+ "limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
+		
+		return migrateJdbcTemplate.query(sql, new Object[] {batchId,tableId,LogStatusEnum.SUCCESS.name()},new LogModelRowMapper());
+	}
+	
+	public List<LogModel> getFailListByBatchIdAndTableId(Long batchId,Long tableId,Pageable pageable){
+		String sql="select a.* from log_model a,batch_log_model b "
+				+ "where a.batch_log_id =b.id and batch_id=? and a.table_id=? and a.status=? "
+				+ "limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
+		
+		return migrateJdbcTemplate.query(sql, new Object[] {batchId,tableId,LogStatusEnum.FAIL.name()},new LogModelRowMapper());
+	}
+	
+	
 	public List<LogModel> getListByBatchLogIdAndTableIdAndStatus(Long batchLogId,Long tableId,LogStatusEnum status,Pageable pageable){
 		
 		String sql="select id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name "
@@ -69,6 +86,14 @@ public class LogJdbcDao {
 				+ "where batch_log_id=? and table_id=? group by status ";
 		
 		return migrateJdbcTemplate.queryForList(sql,new Object[] {batchLogId,tableId});
+	}
+	
+	public List<Map<String,Object>> statisticByParentBatchLog(Long parentBatchLogId,Long tableId){
+		String sql="select count(a.id) as num,a.status "
+				+ "from log_model as a, batch_log_model as b "
+				+ "where b.id=a.batch_log_id and b.parent_id=? and a.table_id=? group by a.status ";
+		
+		return migrateJdbcTemplate.queryForList(sql,new Object[] {parentBatchLogId,tableId});
 	}
 	
 	public LogModel save(LogModel log) {
