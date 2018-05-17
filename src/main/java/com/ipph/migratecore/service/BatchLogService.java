@@ -54,6 +54,10 @@ public class BatchLogService {
 		return batchLogDao.getListByBatchId(batchId);
 	}
 	
+	public List<BatchLogModel> getBatchLogByparentIdIsNull(Long batchId){
+		return batchLogDao.getBatchLogByBatchIdAndParentIdIsNull(batchId);
+	}
+	
 	public BatchLogModel getById(Long id) {
 		return batchLogDao.getOne(id);
 	}

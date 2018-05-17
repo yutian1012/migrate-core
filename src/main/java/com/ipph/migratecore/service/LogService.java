@@ -10,10 +10,12 @@ import javax.annotation.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.ipph.migratecore.dao.BatchLogDao;
 import com.ipph.migratecore.dao.LogJdbcDao;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
+import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
@@ -24,6 +26,8 @@ public class LogService {
 	@Resource
 	//private LogDao logDao;
 	private LogJdbcDao logJdbcDao;
+	@Resource
+	private BatchLogDao batchLogDao;
 	/**
 	 * 记录日志
 	 * @param table
@@ -150,8 +154,18 @@ public class LogService {
 	 * @param pageable
 	 * @return
 	 */
-	public List<LogModel> getSuccessLogs(Long batchId,Long tableId,Pageable pageable){
-		return logJdbcDao.getSuccessListByBatchIdAndTableId(batchId, tableId,pageable);
+	public List<LogModel> getSuccessLogs(Long batchLogId,Long tableId,Pageable pageable){
+		Long[] subBatchLogIdArr=getSubBatchLogIdArr(batchLogId);
+		
+		List<LogModel> list=null;
+		if(null!=subBatchLogIdArr&&subBatchLogIdArr.length>0) {
+			Long[] batchLogIdArr=new Long[subBatchLogIdArr.length+1];
+			batchLogIdArr[0]=batchLogId;
+			System.arraycopy(subBatchLogIdArr, 0, batchLogIdArr, 1, subBatchLogIdArr.length);
+			list=logJdbcDao.getSuccessListByTableIdAndBatchLogIdIn(tableId,batchLogIdArr, pageable);
+		}
+		
+		return list;
 	}
 	
 	/**
@@ -161,8 +175,14 @@ public class LogService {
 	 * @param pageable
 	 * @return
 	 */
-	public List<LogModel> getFailLogs(Long batchId,Long tableId,Pageable pageable){
-		return logJdbcDao.getFailListByBatchIdAndTableId(batchId, tableId,pageable);
+	public List<LogModel> getFailLogs(Long parentBatchLogId,Long tableId,Pageable pageable){
+		//获取最新的子批次
+		BatchLogModel subBatchLogModel=batchLogDao.findFirstByParentIdOrderByIdDesc(parentBatchLogId);
+		Long batchLogId=parentBatchLogId;
+		if(null!=subBatchLogModel) {
+			batchLogId=subBatchLogModel.getId();
+		}
+		return logJdbcDao.getFailListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
 	}
 	
 	
@@ -193,16 +213,63 @@ public class LogService {
 		
 	}
 	/**
+	 * 获取错误批次统计信息
+	 * @param batchLogId
+	 * @param tableId
+	 * @return
+	 */
+	public Map<String,Object> errorstatistic(Long batchLogId,Long tableId){
+		//获取最新的子批次
+		BatchLogModel subBatchLogModel=batchLogDao.findFirstByParentIdOrderByIdDesc(batchLogId);
+		Long batchLogIdForSearch=batchLogId;
+		if(null!=subBatchLogModel) {
+			batchLogIdForSearch=subBatchLogModel.getId();
+		}
+		
+		List<Map<String,Object>> result=logJdbcDao.statisticError(batchLogIdForSearch, tableId);
+		
+		return processStatisticResult(result);
+	}
+	
+	/**
 	 * 获取子批次的执行结果
 	 * @param parentBatchLogId
 	 * @param tableId
 	 * @return
 	 */
 	public Map<String,Object> statisticByParentBatchLog(Long parentBatchLogId,Long tableId){
-		List<Map<String,Object>> result=logJdbcDao.statisticByParentBatchLog(parentBatchLogId, tableId);
 		
-		return processStatisticResult(result);
+		Long[] batchLogIdArr=getSubBatchLogIdArr(parentBatchLogId);
+		
+		if(null!=batchLogIdArr) {
+			List<Map<String,Object>> result=logJdbcDao.getstatisticBybatchLogIdIn(batchLogIdArr);//logJdbcDao.statisticByParentBatchLog(parentBatchLogId, tableId);
+			
+			return processStatisticResult(result);
+		}
+		
+		return null;
 	}
+	/**
+	 * 获取子批次主键数组集合
+	 * @param parentBatchLogId
+	 * @return
+	 */
+	private Long[] getSubBatchLogIdArr(Long parentBatchLogId) {
+		//获取对应的子批次列表
+		List<BatchLogModel> batchLogList=batchLogDao.getListByParentId(parentBatchLogId);
+		
+		Long[] batchLogIdArr=null;
+		if(null!=batchLogList&&batchLogList.size()>0) {
+			batchLogIdArr=new Long[batchLogList.size()];
+			
+			int i=0;
+			for(BatchLogModel batchLog:batchLogList) {
+				batchLogIdArr[i++]=batchLog.getId();
+			}
+		}
+		return batchLogIdArr;
+	}
+	
 	/**
 	 * 处理统计数据
 	 * @param result
@@ -215,7 +282,7 @@ public class LogService {
 		if(null!=result&&result.size()>0) {
 			map=new HashMap<>();
 			for(Map<String,Object> temp:result) {
-				map.put(temp.get("status").toString(), temp.get("num"));
+				map.put(temp.get("category").toString(), temp.get("num"));
 			}
 		}
 		

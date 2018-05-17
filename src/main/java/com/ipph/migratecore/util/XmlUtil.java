@@ -85,7 +85,7 @@ public class XmlUtil {
 		FileInputStream fis=null;
 		boolean result=false;
         try {
-        	SchemaFactory schemaFactory=SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        	SchemaFactory schemaFactory=SchemaFactory.newInstance(XMLConstants.XML_NS_URI);
         	Schema schema=schemaFactory.newSchema(new StreamSource(XmlUtil.class.getResourceAsStream("/xml/tables.xsd")));
         	Validator validator=schema.newValidator();
         	fis=new FileInputStream(xmlPath);

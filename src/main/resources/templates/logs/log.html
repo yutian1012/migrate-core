@@ -28,18 +28,23 @@
 		
 		function migrateSuccess(){
 			var batchLogId=/*[[${batchLog.id}]]*/ '';
-			var batchId=/*[[${batchLog.batchId}]]*/ '';
 			var tableId=/*[[${tableId}]]*/ '';
 			
-			window.location.href='/logs/table/success/'+batchId+'/'+batchLogId+'/'+tableId;
+			window.location.href='/logs/table/success/'+batchLogId+'/'+tableId;
+		}
+		
+		function exportSuccess(){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			
+			window.location.href='/logs/table/success/export/'+batchLogId+'/'+tableId;
 		}
 		
 		function migrateFail(){
 			var batchLogId=/*[[${batchLog.id}]]*/ '';
-			var batchId=/*[[${batchLog.batchId}]]*/ '';
 			var tableId=/*[[${tableId}]]*/ '';
 			
-			window.location.href='/logs/table/fail/'+batchId+'/'+batchLogId+'/'+tableId;
+			window.location.href='/logs/table/fail/'+batchLogId+'/'+tableId;
 		}
 		
 		function prev(){
@@ -58,6 +63,13 @@
 		}
 		
 		$(function(){
+			//统计总信息
+			statistic();
+			//统计错误信息
+			statsticError();
+		});
+		
+		function statistic(){
 			var batchLogId=/*[[${batchLog.id}]]*/ '';
 			var tableId=/*[[${tableId}]]*/ '';
 			var url='/logs/statistic/';
@@ -75,7 +87,29 @@
 					}
 				}
 			})
-		});
+		}
+		function statsticError(){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			var url='/logs/statistic/error/';
+			
+			var data={'batchLogId':batchLogId,'tableId':tableId};
+			
+			$.post(url,data,function(result){
+				if(result){
+					
+					if(result["FORMART_EXCEPTION"]){
+						$("#formatError").text(result["FORMART_EXCEPTION"]);
+					}
+					if(result["NOFOUND_EXCEPTION"]){
+						$("#notFoundError").text(result["NOFOUND_EXCEPTION"]);
+					}
+					if(result["OTHERS"]){
+						$("#otherError").text(result["OTHERS"]);
+					}
+				}
+			})
+		}
 	</script>
   </head>
   
@@ -84,13 +118,8 @@
   		<input type="button" value="错误信息更正" onclick="migrate()">
   		<input type="button" value="查看正确处理的数据" onclick="migrateSuccess()">
   		<input type="button" value="查看处理错误数据" onclick="migrateFail()">
+  		<input type="button" value="导出成功数据" onclick="exportSuccess()">
   	</div>
-  	<div>
-  		<label>统计信息：</label>
-  		批次处理量：<span id="batchNum"></span>
-  		成功数量：<span id="sucNum"></span>
-  	</div>
-  	
   	<div>
   		<form th:action="@{'/logs/table/'+${batchLog.id}+'/'+${tableId}}" th:method="post">
 	  		执行状态:<select name="status"><option value="">请选择</option><option value="SUCCESS">成功</option><option value="FAIL">失败</option></select>
@@ -123,5 +152,17 @@
 		<input type="button" th:if="${pageable.previousOrFirst()!=null}" value="prev" onclick="prev()">
 		<input type="button" th:if="${pageable.next()!=null}" value="next" onclick="next()">
 	</div>
+	<!-- 统计信息 -->
+	<div>
+  		<label>统计信息：</label>
+  		批次处理量：<span id="batchNum"></span>
+  		成功数量：<span id="sucNum"></span>
+  	</div>
+  	<div>
+  		<label>错误信息统计：</label>
+  		数据格式化错误：<span id="formatError"></span>
+  		数据未检索到：<span id="notFoundError"></span>
+  		其他错误：<span id="otherError"></span>
+  	</div>
   </body>
 </html>

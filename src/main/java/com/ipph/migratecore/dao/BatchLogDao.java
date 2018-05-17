@@ -8,4 +8,10 @@ import com.ipph.migratecore.model.BatchLogModel;
 
 public interface BatchLogDao extends JpaRepository<BatchLogModel,Long>{
 	public List<BatchLogModel> getListByBatchId(Long batchId);
+	
+	public List<BatchLogModel> getBatchLogByBatchIdAndParentIdIsNull(Long batchId);
+	
+	public List<BatchLogModel> getListByParentId(Long parentId);
+	
+	public BatchLogModel findFirstByParentIdOrderByIdDesc(Long parentId);
 }

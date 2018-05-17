@@ -39,20 +39,31 @@ public class LogJdbcDao {
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId},new LogModelRowMapper());
 	}
 	
-	public List<LogModel> getSuccessListByBatchIdAndTableId(Long batchId,Long tableId,Pageable pageable){
-		String sql="select a.* from log_model a,batch_log_model b "
-				+ "where a.batch_log_id =b.id and batch_id=? and a.table_id=? and a.status=? "
-				+ "limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
+	public List<LogModel> getSuccessListByTableIdAndBatchLogIdIn(Long tableId,Long[] batchLogIdArr,Pageable pageable){
+		StringBuffer buf= new StringBuffer("select * from log_model where batch_log_id in (");
+		for (int i=0; i< batchLogIdArr.length; i++) {
+			buf.append("?");
+			if(i!=batchLogIdArr.length-1) {
+				buf.append(", ");
+			}
+		}
+		buf.append(") and table_id=? and status=? ");
+		buf.append("limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize());
 		
-		return migrateJdbcTemplate.query(sql, new Object[] {batchId,tableId,LogStatusEnum.SUCCESS.name()},new LogModelRowMapper());
+		Object[] params=new Object[batchLogIdArr.length+2];
+		Object[] otherParams=new Object[]{tableId,LogStatusEnum.SUCCESS.name()};
+		System.arraycopy(batchLogIdArr, 0, params, 0, batchLogIdArr.length);
+		System.arraycopy(otherParams, 0, params, batchLogIdArr.length, otherParams.length);
+		
+		return migrateJdbcTemplate.query(buf.toString(), params,new LogModelRowMapper());
 	}
 	
-	public List<LogModel> getFailListByBatchIdAndTableId(Long batchId,Long tableId,Pageable pageable){
-		String sql="select a.* from log_model a,batch_log_model b "
-				+ "where a.batch_log_id =b.id and batch_id=? and a.table_id=? and a.status=? "
+	public List<LogModel> getFailListByBatchLogIdAndTableId(Long batchLogId,Long tableId,Pageable pageable){
+		String sql="select * from log_model "
+				+ "where batch_log_id=? and table_id=? and status=? "
 				+ "limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
 		
-		return migrateJdbcTemplate.query(sql, new Object[] {batchId,tableId,LogStatusEnum.FAIL.name()},new LogModelRowMapper());
+		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId,LogStatusEnum.FAIL.name()},new LogModelRowMapper());
 	}
 	
 	
@@ -81,19 +92,44 @@ public class LogJdbcDao {
 	//@Query(" select count(1) as num ,log.status as status from LogModel log where log.batchLogId=?1 and log.tableId=?2 group by log.status ")
 	public List<Map<String,Object>> statistic(Long batchLogId,Long tableId){
 		
-		String sql="select count(1) as num,status "
+		String sql="select count(1) as num,status as category "
 				+ "from log_model "
 				+ "where batch_log_id=? and table_id=? group by status ";
 		
 		return migrateJdbcTemplate.queryForList(sql,new Object[] {batchLogId,tableId});
 	}
 	
+	public List<Map<String,Object>> statisticError(Long batchLogId,Long tableId){
+		
+		String sql="select count(1) as num,message_Type as category "
+				+ "from log_model "
+				+ "where batch_log_id=? and table_id=? and status=? group by message_Type ";
+		
+		return migrateJdbcTemplate.queryForList(sql,new Object[] {batchLogId,tableId,LogStatusEnum.FAIL.name()});
+	}
+	
 	public List<Map<String,Object>> statisticByParentBatchLog(Long parentBatchLogId,Long tableId){
-		String sql="select count(a.id) as num,a.status "
+		String sql="select count(a.id) as num,a.status as category "
 				+ "from log_model as a, batch_log_model as b "
 				+ "where b.id=a.batch_log_id and b.parent_id=? and a.table_id=? group by a.status ";
 		
 		return migrateJdbcTemplate.queryForList(sql,new Object[] {parentBatchLogId,tableId});
+	}
+	
+	public List<Map<String,Object>> getstatisticBybatchLogIdIn(Object[] batchLogIdArr){
+		
+		StringBuffer buf= new StringBuffer("select count(1) as num,status as category from log_model where batch_log_id in (");
+		for (int i=0; i< batchLogIdArr.length; i++) {
+			buf.append("?");
+			if(i!=batchLogIdArr.length-1) {
+				buf.append(", ");
+			}
+		}
+		buf.append(") ");
+		
+		buf.append("group by status");
+		
+		return migrateJdbcTemplate.queryForList(buf.toString(), batchLogIdArr); 
 	}
 	
 	public LogModel save(LogModel log) {
