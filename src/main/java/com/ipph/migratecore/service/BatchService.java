@@ -21,6 +21,7 @@ public class BatchService {
 	
 	@Resource
 	private BatchDao batchDao;
+	//中间表
 	@Resource
 	private BatchTableDao batchTableDao;
 	@Resource
@@ -31,7 +32,11 @@ public class BatchService {
 	public List<BatchModel> getList(){
 		return batchDao.findAll();
 	}
-	
+	/**
+	 * 添加批次
+	 * @param batchName
+	 * @param tables
+	 */
 	public void add(String batchName,String[] tables) {
 		//保存对象
 		BatchModel batchModel=new BatchModel();
@@ -42,6 +47,7 @@ public class BatchService {
 		
 		Long batchId=batchModel.getId();
 		
+		//添加数据到中间表
 		for(String tableId:tables) {
 			BatchTableModel batchTableModel =new BatchTableModel();
 			batchTableModel.setBatchId(batchId);
@@ -49,7 +55,11 @@ public class BatchService {
 			batchTableDao.save(batchTableModel);
 		}
 	}
-	@Transactional
+	/**
+	 * 获取批次
+	 * @param batchId
+	 * @return
+	 */
 	public BatchModel getBatch(Long batchId) {
 		
 		BatchModel batchModel=batchDao.getOne(batchId);
@@ -79,7 +89,7 @@ public class BatchService {
 	}
 	
 	/**
-	 * 执行批次
+	 * 执行子批次
 	 * @param batchId
 	 */
 	public void migrate(Long batchId,Long parentId,Long tableId) {

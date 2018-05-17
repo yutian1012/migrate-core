@@ -11,7 +11,6 @@ import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.LogModel;
 
-@Deprecated
 public interface LogDao extends JpaRepository<LogModel,Long>{
 
 	public List<LogModel> getListByBatchLogIdAndTableId(Long batchLogId,Long tableId);
@@ -26,4 +25,7 @@ public interface LogDao extends JpaRepository<LogModel,Long>{
 	
 	@Query(" select count(1) as num ,log.status as status from LogModel log where log.batchLogId=?1 and log.tableId=?2 group by log.status ")
 	public List<Map<String,Object>> statistic(Long batchLogId,Long tableId);
+	
+	public List<LogModel> getListByTableIdAndStatusAndBatchLogIdIn(Long tableId,LogStatusEnum status,Long[] batchLogIdArr,Pageable pageable);
+	
 }

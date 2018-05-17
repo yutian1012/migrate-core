@@ -1,7 +1,6 @@
 package com.ipph.migratecore.service;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +9,7 @@ import javax.annotation.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.ipph.migratecore.dao.BatchLogDao;
+import com.ipph.migratecore.dao.LogDao;
 import com.ipph.migratecore.dao.LogJdbcDao;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
@@ -24,10 +23,115 @@ import com.ipph.migratecore.util.MapUtil;
 @Service
 public class LogService {
 	@Resource
-	//private LogDao logDao;
+	private LogDao logDao;
+	@Resource
 	private LogJdbcDao logJdbcDao;
 	@Resource
-	private BatchLogDao batchLogDao;
+	private BatchLogService batchLogService;
+	
+	/**
+	 * 更新日志
+	 * @param logId
+	 * @param status
+	 * @param message
+	 */
+	public void updateLog(Long logId,LogStatusEnum status,String message,LogMessageEnum messageType) {
+		LogModel log=logDao.findById(logId).get();
+		
+		if(null!=log) {
+			log.setStatus(status);
+			log.setMessage(message);
+			log.setMessageType(messageType);
+			logJdbcDao.save(log);
+		}
+	}
+	
+	/**
+	 * 查询批次中某表的执行日志
+	 * @param batchLogId
+	 * @param tableId
+	 * @param status
+	 * @param message
+	 * @param pageable
+	 * @return
+	 */
+	public List<LogModel> getLogs(Long batchLogId,Long tableId,LogStatusEnum status,LogMessageEnum messageType,Pageable pageable){
+		if(null!=status) {
+			return logDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId, tableId, status, pageable);
+		}else if(null!=messageType){
+			return logDao.getListByBatchLogIdAndTableIdAndMessageType(batchLogId, tableId, messageType, pageable);
+		}
+		return logDao.getListByBatchLogIdAndTableId(batchLogId, tableId, pageable);
+	}
+	
+	/**
+	 * 获取批次处理的正确数据（包括子批次的处理数据）
+	 * @param batchLogId
+	 * @param tableId
+	 * @param pageable
+	 * @return
+	 */
+	public List<LogModel> getSuccessLogs(Long batchLogId,Long tableId,Pageable pageable){
+		Long[] subBatchLogIdArr=batchLogService.getSubBatchLogIdArr(batchLogId);
+		
+		List<LogModel> list=null;
+		
+		//获取所有该批次日志中的所有执行记录（包括该批次的日志已经该批次的子批次日志）
+		if(null!=subBatchLogIdArr&&subBatchLogIdArr.length>0) {
+			Long[] batchLogIdArr=new Long[subBatchLogIdArr.length+1];
+			batchLogIdArr[0]=batchLogId;
+			System.arraycopy(subBatchLogIdArr, 0, batchLogIdArr, 1, subBatchLogIdArr.length);
+			
+			list=logDao.getListByTableIdAndStatusAndBatchLogIdIn(tableId,LogStatusEnum.SUCCESS,batchLogIdArr,pageable);
+		}
+		
+		return list;
+	}
+	
+	/**
+	 * 获取批次处理的错误数据
+	 * （批次是迭代执行的，因此错误记录只需要查看最后一次子批次错误记录即可，如果没有子批次日志，则查看该批次的执行日志）
+	 * @param batchLogId
+	 * @param tableId
+	 * @param pageable
+	 * @return
+	 */
+	public List<LogModel> getFailLogs(Long parentBatchLogId,Long tableId,Pageable pageable){
+		//获取最新的子批次
+		BatchLogModel subBatchLogModel=batchLogService.findFirstByParentIdOrderByIdDesc(parentBatchLogId);
+		Long batchLogId=parentBatchLogId;
+		if(null!=subBatchLogModel) {
+			batchLogId=subBatchLogModel.getId();
+		}
+		return logDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId, tableId,LogStatusEnum.FAIL,pageable);
+	}
+	
+	
+	/**
+	 * 判断日志记录是否成功
+	 * @param dataId
+	 * @param batchLogId
+	 * @return
+	 */
+	public boolean isLogSuccess(Long dataId,Long batchLogId) {
+		LogModel log=logJdbcDao.getByDataIdAndBatchLogId(dataId,batchLogId);
+		if(null!=log&&LogStatusEnum.SUCCESS==log.getStatus()) {
+			return true;
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * 批量保存
+	 * @param list
+	 */
+	public void insert(List<LogModel> list) {
+		logJdbcDao.saveAll(list);
+	}
+	
+	
+	
 	/**
 	 * 记录日志
 	 * @param table
@@ -90,209 +194,5 @@ public class LogService {
 		}else {
 			log.setDealData(MapUtil.outMapData(data));
 		}
-	}
-	
-	/**
-	 * 更新日志
-	 * @param logId
-	 * @param status
-	 * @param message
-	 */
-	public void updateLog(Long logId,LogStatusEnum status,String message,LogMessageEnum messageType) {
-		//Optional<LogModel> optionalLog=logDao.findById(logId);//getOne(logId);
-		//LogModel log=optionalLog.get();
-		
-		LogModel log=logJdbcDao.findById(logId);
-		
-		if(null!=log) {
-			log.setStatus(status);
-			log.setMessage(message);
-			log.setMessageType(messageType);
-			logJdbcDao.save(log);
-		}
-	}
-	
-	/**
-	 * 获取表的执行日志
-	 * @param batchLogId
-	 * @param tableId
-	 * @return
-	 */
-	public List<LogModel> getLogs(Long batchLogId,Long tableId) {
-		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId,tableId);
-	}
-	/**
-	 * 获取表的执行日志
-	 * @param batchLogId
-	 * @param tableId
-	 * @return
-	 */
-	public List<LogModel> getLogs(Long batchLogId,Long tableId,Pageable pageable) {
-		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId,tableId,pageable);
-	}
-	/**
-	 * 查询数据
-	 * @param batchLogId
-	 * @param tableId
-	 * @param status
-	 * @param message
-	 * @param pageable
-	 * @return
-	 */
-	public List<LogModel> getLogs(Long batchLogId,Long tableId,LogStatusEnum status,LogMessageEnum messageType,Pageable pageable){
-		if(null!=status) {
-			return logJdbcDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId,tableId,status,pageable);
-		}else if(null!=messageType){
-			return logJdbcDao.getListByBatchLogIdAndTableIdAndMessageType(batchLogId, tableId, messageType, pageable);
-		}
-		return logJdbcDao.getListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
-	}
-	/**
-	 * 获取批次处理的正确数据（包括子批次的处理数据）
-	 * @param batchLogId
-	 * @param tableId
-	 * @param pageable
-	 * @return
-	 */
-	public List<LogModel> getSuccessLogs(Long batchLogId,Long tableId,Pageable pageable){
-		Long[] subBatchLogIdArr=getSubBatchLogIdArr(batchLogId);
-		
-		List<LogModel> list=null;
-		if(null!=subBatchLogIdArr&&subBatchLogIdArr.length>0) {
-			Long[] batchLogIdArr=new Long[subBatchLogIdArr.length+1];
-			batchLogIdArr[0]=batchLogId;
-			System.arraycopy(subBatchLogIdArr, 0, batchLogIdArr, 1, subBatchLogIdArr.length);
-			list=logJdbcDao.getSuccessListByTableIdAndBatchLogIdIn(tableId,batchLogIdArr, pageable);
-		}
-		
-		return list;
-	}
-	
-	/**
-	 * 获取批次处理的正确数据（包括子批次的处理数据）
-	 * @param batchLogId
-	 * @param tableId
-	 * @param pageable
-	 * @return
-	 */
-	public List<LogModel> getFailLogs(Long parentBatchLogId,Long tableId,Pageable pageable){
-		//获取最新的子批次
-		BatchLogModel subBatchLogModel=batchLogDao.findFirstByParentIdOrderByIdDesc(parentBatchLogId);
-		Long batchLogId=parentBatchLogId;
-		if(null!=subBatchLogModel) {
-			batchLogId=subBatchLogModel.getId();
-		}
-		return logJdbcDao.getFailListByBatchLogIdAndTableId(batchLogId, tableId,pageable);
-	}
-	
-	
-	/**
-	 * 判断日志记录是否成功
-	 * @param dataId
-	 * @param batchLogId
-	 * @return
-	 */
-	public boolean isLogSuccess(Long dataId,Long batchLogId) {
-		LogModel log=logJdbcDao.getByDataIdAndBatchLogId(dataId,batchLogId);
-		if(null!=log&&LogStatusEnum.SUCCESS==log.getStatus()) {
-			return true;
-		}
-		return false;
-	}
-	/**
-	 * 统计信息
-	 * @param batchLogId
-	 * @param tableId
-	 * @return
-	 */
-	public Map<String,Object> statistic(Long batchLogId,Long tableId){
-		
-		List<Map<String,Object>> result=logJdbcDao.statistic(batchLogId, tableId);
-		
-		return processStatisticResult(result);
-		
-	}
-	/**
-	 * 获取错误批次统计信息
-	 * @param batchLogId
-	 * @param tableId
-	 * @return
-	 */
-	public Map<String,Object> errorstatistic(Long batchLogId,Long tableId){
-		//获取最新的子批次
-		BatchLogModel subBatchLogModel=batchLogDao.findFirstByParentIdOrderByIdDesc(batchLogId);
-		Long batchLogIdForSearch=batchLogId;
-		if(null!=subBatchLogModel) {
-			batchLogIdForSearch=subBatchLogModel.getId();
-		}
-		
-		List<Map<String,Object>> result=logJdbcDao.statisticError(batchLogIdForSearch, tableId);
-		
-		return processStatisticResult(result);
-	}
-	
-	/**
-	 * 获取子批次的执行结果
-	 * @param parentBatchLogId
-	 * @param tableId
-	 * @return
-	 */
-	public Map<String,Object> statisticByParentBatchLog(Long parentBatchLogId,Long tableId){
-		
-		Long[] batchLogIdArr=getSubBatchLogIdArr(parentBatchLogId);
-		
-		if(null!=batchLogIdArr) {
-			List<Map<String,Object>> result=logJdbcDao.getstatisticBybatchLogIdIn(batchLogIdArr);//logJdbcDao.statisticByParentBatchLog(parentBatchLogId, tableId);
-			
-			return processStatisticResult(result);
-		}
-		
-		return null;
-	}
-	/**
-	 * 获取子批次主键数组集合
-	 * @param parentBatchLogId
-	 * @return
-	 */
-	private Long[] getSubBatchLogIdArr(Long parentBatchLogId) {
-		//获取对应的子批次列表
-		List<BatchLogModel> batchLogList=batchLogDao.getListByParentId(parentBatchLogId);
-		
-		Long[] batchLogIdArr=null;
-		if(null!=batchLogList&&batchLogList.size()>0) {
-			batchLogIdArr=new Long[batchLogList.size()];
-			
-			int i=0;
-			for(BatchLogModel batchLog:batchLogList) {
-				batchLogIdArr[i++]=batchLog.getId();
-			}
-		}
-		return batchLogIdArr;
-	}
-	
-	/**
-	 * 处理统计数据
-	 * @param result
-	 * @return
-	 */
-	private Map<String,Object> processStatisticResult(List<Map<String,Object>> result) {
-		
-		Map<String,Object> map=null;
-		
-		if(null!=result&&result.size()>0) {
-			map=new HashMap<>();
-			for(Map<String,Object> temp:result) {
-				map.put(temp.get("category").toString(), temp.get("num"));
-			}
-		}
-		
-		return map;
-	}
-	/**
-	 * 批量保存
-	 * @param list
-	 */
-	public void insert(List<LogModel> list) {
-		logJdbcDao.saveAll(list);
 	}
 }

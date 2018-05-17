@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ipph.migratecore.enumeration.LogMessageEnum;
@@ -38,49 +37,15 @@ public class LogController {
 	private BatchService batchService;
 	
 	/**
-	 * 批次执行日志信息
-	 * @param batchId
-	 * @return
-	 */
-	@RequestMapping("/batch/{batchId}")
-	public ModelAndView getBatchLog(@PathVariable("batchId")Long batchId) {
-		ModelAndView mv=new ModelAndView("logs/batchLog");
-		
-		mv.addObject("batchLogList",batchLogService.getBatchLogByparentIdIsNull(batchId));
-		
-		return mv;
-	}
-	
-	/**
-	 * 表的执行日志信息
-	 * @param batchId
-	 * @return
-	 */
-	@RequestMapping("/tables/{batchLogId}")
-	public ModelAndView getTablesLog(@PathVariable("batchLogId")Long batchLogId) {
-		ModelAndView mv=new ModelAndView("logs/tablesLog");
-		
-		BatchLogModel batchLogModel=batchLogService.getById(batchLogId);
-		
-		BatchModel batchModel=null;
-		
-		if(null!=batchLogModel) {
-			batchModel=batchService.getBatch(batchLogModel.getBatchId());
-		}
-		
-		mv.addObject("batchLogId",batchLogId).addObject("batch",batchModel);
-		
-		return mv;
-	}
-	
-	/**
 	 * 表的执行日志信息
 	 * @param batchId
 	 * @return
 	 */
 	@RequestMapping("/table/{batchLogId}/{tableId}")
 	public ModelAndView getTableLog(@PathVariable("batchLogId")Long batchLogId,
-			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
+			@PathVariable("tableId")Long tableId,
+			@RequestParam(value="size",defaultValue="20")int size,
+			@RequestParam(value="page",defaultValue="0")int page,
 			HttpServletRequest request) {
 		
 		ModelAndView mv=new ModelAndView("logs/log");
@@ -108,7 +73,7 @@ public class LogController {
 		return mv;
 	}
 	/**
-	 * 查看成功的数据
+	 * 查看成功的数据(包含多个批次的累计成功数据)
 	 * @param batchLogId
 	 * @param tableId
 	 * @param size
@@ -118,7 +83,8 @@ public class LogController {
 	 */
 	@RequestMapping("/table/success/{batchLogId}/{tableId}")
 	public ModelAndView getTableSuccessLog(@PathVariable("batchLogId")Long batchLogId,
-			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
+			@PathVariable("tableId")Long tableId,
+			@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
 			HttpServletRequest request) {
 		
 		ModelAndView mv=new ModelAndView("logs/log");
@@ -146,24 +112,19 @@ public class LogController {
 	 */
 	@RequestMapping("/table/success/export/{batchLogId}/{tableId}")
 	public ModelAndView exportSuccess(@PathVariable("batchLogId")Long batchLogId,
-			@PathVariable("tableId")Long tableId,@RequestParam(value="size",defaultValue="20")int size,@RequestParam(value="page",defaultValue="0")int page,
+			@PathVariable("tableId")Long tableId,
+			@RequestParam(value="size",defaultValue="20")int size,
+			@RequestParam(value="page",defaultValue="0")int page,
 			HttpServletRequest request,HttpServletResponse response) {
 		
 		Pageable pageable=PageRequest.of(page, size);
-		
-		/*BatchLogModel batchLogModel=batchLogService.getById(batchLogId);*/
-		
 		
 		List<LogModel> tableLogList=logService.getSuccessLogs(batchLogId,tableId,pageable);
 		Map<String, Object> model=new HashMap<>();
 		
 		model.put("tableLogList", tableLogList);
 		
-		/*mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
-			.addObject("tableId",tableId).addObject("pageable",pageable);*/
 		return new ModelAndView(new JxlsExcelView("/export/logexport.xls", "导出执行日志"),model);
-		
-		
 	}
 	
 	/**
@@ -193,33 +154,5 @@ public class LogController {
 		
 		return mv;
 	}
-	/**
-	 * 获取统计信息
-	 * @return
-	 */
-	@RequestMapping("/statistic")
-	@ResponseBody
-	public Map<String,Object> statistic(@RequestParam("batchLogId")Long batchLogId,@RequestParam("tableId")Long tableId){
-		Map<String,Object> result=logService.statistic(batchLogId,tableId);
-		Map<String,Object> subResult=logService.statisticByParentBatchLog(batchLogId, tableId);
-		if(null!=subResult&&subResult.size()>0) {
-			if(subResult.containsKey("SUCCESS")) {
-				result.put("SUBSUCCESS",subResult.get("SUCCESS"));
-			}
-		}
-		
-		return result;
-	}
 	
-	/**
-	 * 获取统计信息
-	 * @return
-	 */
-	@RequestMapping("/statistic/error")
-	@ResponseBody
-	public Map<String,Object> errorStatistic(@RequestParam("batchLogId")Long batchLogId,@RequestParam("tableId")Long tableId){
-		Map<String,Object> result=logService.errorstatistic(batchLogId,tableId);
-		
-		return result;
-	}
 }

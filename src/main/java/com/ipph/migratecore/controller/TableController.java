@@ -46,7 +46,6 @@ public class TableController {
 		if(!file.isEmpty()){
 			
 			String fileName = file.getOriginalFilename();
-			
 	        try {
 	        	//解析上传的文件并保存到数据库中
 	        	tableService.uploadXml(file.getInputStream());
@@ -60,18 +59,6 @@ public class TableController {
         }
 		return "redirect:/tables/list";
 	}
-	
-	/*@RequestMapping("/migrate/{tableId}")
-	@ResponseBody
-	public boolean migrate(@PathVariable("tableId")Long tableId){
-		
-		if(null!=tableId){
-			return tableService.migrateTable(tableId,0L);
-			
-		}
-		
-		return false;
-	}*/
 	
 	@RequestMapping("/selectTables")
 	@ResponseBody

@@ -31,21 +31,20 @@ public class JxlsExcelView extends AbstractView{
     }
     /**
      * 输出文档
+     * @throws Exception 
      */
 	@Override
-	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Context context = new Context(model);
 		response.setCharacterEncoding("utf-8");
-		//response.setContentType("multipart/form-data");
 		response.setContentType(getContentType());
         response.setHeader("content-disposition","attachment;filename=" + getFileName(request.getHeader("User-Agent").toUpperCase(), exportFileName));
         ServletOutputStream os = response.getOutputStream();
-        InputStream is = this.getClass().getResourceAsStream(templatePath);
-        if(null!=is) {
-        	JxlsHelper.getInstance().processTemplate(is, os, context);
-        	is.close();
-        }
+        //try-with resource方式处理流资源
+        try( InputStream is = this.getClass().getResourceAsStream(templatePath)){
+        	//到处excel文档
+    		JxlsHelper.getInstance().processTemplate(is, os, context);
+    	}
 	}
 	/**
 	 * 获取文件名

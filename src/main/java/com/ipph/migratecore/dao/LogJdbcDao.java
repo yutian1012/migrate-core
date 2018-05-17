@@ -31,15 +31,15 @@ public class LogJdbcDao {
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId},new LogModelRowMapper());
 	}
 	
-	public List<LogModel> getListByBatchLogIdAndTableId(Long batchLogId,Long tableId,Pageable pageable){
+	/*public List<LogModel> getListByBatchLogIdAndTableId(Long batchLogId,Long tableId,Pageable pageable){
 		String sql="select id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name "
 				+ "from log_model "
 				+ "where batch_log_id=? and table_id=? limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
 		
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId},new LogModelRowMapper());
-	}
+	}*/
 	
-	public List<LogModel> getSuccessListByTableIdAndBatchLogIdIn(Long tableId,Long[] batchLogIdArr,Pageable pageable){
+	/*public List<LogModel> getSuccessListByTableIdAndBatchLogIdIn(Long tableId,Long[] batchLogIdArr,Pageable pageable){
 		StringBuffer buf= new StringBuffer("select * from log_model where batch_log_id in (");
 		for (int i=0; i< batchLogIdArr.length; i++) {
 			buf.append("?");
@@ -56,31 +56,31 @@ public class LogJdbcDao {
 		System.arraycopy(otherParams, 0, params, batchLogIdArr.length, otherParams.length);
 		
 		return migrateJdbcTemplate.query(buf.toString(), params,new LogModelRowMapper());
-	}
+	}*/
 	
-	public List<LogModel> getFailListByBatchLogIdAndTableId(Long batchLogId,Long tableId,Pageable pageable){
+	/*public List<LogModel> getFailListByBatchLogIdAndTableId(Long batchLogId,Long tableId,Pageable pageable){
 		String sql="select * from log_model "
 				+ "where batch_log_id=? and table_id=? and status=? "
 				+ "limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
 		
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId,LogStatusEnum.FAIL.name()},new LogModelRowMapper());
-	}
+	}*/
 	
 	
-	public List<LogModel> getListByBatchLogIdAndTableIdAndStatus(Long batchLogId,Long tableId,LogStatusEnum status,Pageable pageable){
+	/*public List<LogModel> getListByBatchLogIdAndTableIdAndStatus(Long batchLogId,Long tableId,LogStatusEnum status,Pageable pageable){
 		
 		String sql="select id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name "
 				+ "from log_model "
 				+ "where batch_log_id=? and table_id=? and status=? limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId,status.name()},new LogModelRowMapper());
-	}
+	}*/
 	
-	public List<LogModel> getListByBatchLogIdAndTableIdAndMessageType(Long batchLogId,Long tableId,LogMessageEnum messageType,Pageable pageable){
+	/*public List<LogModel> getListByBatchLogIdAndTableIdAndMessageType(Long batchLogId,Long tableId,LogMessageEnum messageType,Pageable pageable){
 		String sql="select id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name "
 				+ "from log_model "
 				+ "where batch_log_id=? and table_id=? and message_type=? limit "+pageable.getPageNumber()*pageable.getPageSize()+","+pageable.getPageSize();
 		return migrateJdbcTemplate.query(sql, new Object[] {batchLogId,tableId,messageType.name()},new LogModelRowMapper());
-	}
+	}*/
 	
 	public LogModel getByDataIdAndBatchLogId(Long dataId,Long batchLogId) {
 		String sql="select id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name "
