@@ -15,21 +15,29 @@
   <body>
   	<div>
   		批次信息：<span th:text="${batch.batchName}"></span>
+  		<input type="button" value="添加表到批次">
+  	</div>
+  	<div>
+  		<!-- 变更批次名称 -->
+  		<form action="">
+	  		<label>变更批次名称：</label><input type="text" name="batchName">
+	  		<input type="submit" value="提交">
+  		</form>
   	</div>
     <table style="width:80%;text-align:center;" border="1px">
 	    <tr>
 	      <th>序号</th>
 	      <th>源表</th>
 	      <th>目标表</th>
-	      <th>状态</th>
+	      <th>描述</th>
 	      <td>操作</td>
 	    </tr>
 	    <tr th:each="table,index : ${batch.tableList}">
 	      <td th:text="${index.count}"></td>
 	      <td th:text="${table.from}"></td>
 	      <td th:text="${table.to}"></td>
-	      <td ></td>
-	      <td></td>
+	      <td th:text="${table.note}"></td>
+	      <td><a>移除</a></td>
 	    </tr>
 	  </table>
   </body>

@@ -57,4 +57,6 @@ public class TableModel implements Serializable{
 	private List<ConstraintModel> constraintList;
 	@Transient
 	private String sourcePkName;
+	@Column
+	private String note;
 }

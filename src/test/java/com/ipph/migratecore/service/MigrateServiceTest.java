@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ipph.migratecore.model.TableModel;
+import com.ipph.migratecore.util.XmlUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -60,5 +61,5 @@ public class MigrateServiceTest {
 			e.printStackTrace();
 		}
 	}
-
+	
 }

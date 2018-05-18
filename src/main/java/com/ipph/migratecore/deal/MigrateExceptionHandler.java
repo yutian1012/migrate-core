@@ -35,6 +35,8 @@ public class MigrateExceptionHandler {
 				messageType=LogMessageEnum.FORMART_EXCEPTION;
 			}else if(e instanceof DataNotFoundException) {
 				messageType=LogMessageEnum.NOFOUND_EXCEPTION;
+			}else if(e instanceof DataExistsException) {
+				messageType=LogMessageEnum.DATAEXISTS_EXCEPTION;
 			}else {
 				messageType=LogMessageEnum.OTHERS;
 			}

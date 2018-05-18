@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.enumeration.FieldConstraintEnum;
+import com.ipph.migratecore.enumeration.TableOperationEnum;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.TableModel;
@@ -39,7 +40,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 		}
 		
 		//设置主键字段
-		String pkName=getPkFieldName(tableModel);
+		String pkName=getPkFieldName(tableModel,ApplyTypeEnum.SOURCE);
 		if(null!=pkName&&!fieldList.contains(pkName)) {
 			fieldList.add(pkName);
 		}
@@ -55,7 +56,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getFromCondition(tableModel.getWhereModel());
+		String condition=getSourceCondition(tableModel.getWhereModel());
 		
 		if(null!=condition){
 			sbuilder.append(condition);
@@ -82,7 +83,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getFromCondition(tableModel.getWhereModel());
+		String condition=getSourceCondition(tableModel.getWhereModel());
 		
 		if(null!=condition){
 			sbuilder.append(condition);
@@ -173,25 +174,31 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getTargetCondition(tableModel.getWhereModel());
+		String condition=null;
 		
+		if(tableModel.getType()==TableOperationEnum.UPDATE) {
+			condition=getTargetCondition(tableModel.getWhereModel());
+		}else{//insert数据时，判断主键字段值是否已经存在
+			condition=getTargetConstraint(tableModel.getConstraintList());
+		}
 		if(null!=condition&&!"".equals(condition)){
 			sbuilder.append(condition);
 			return sbuilder.toString();
 		}
+		
 		return null;
 	}
 	/**
 	 * 获取源表的主键字段名
 	 * @return
 	 */
-	private String getPkFieldName(TableModel tableModel) {
+	private String getPkFieldName(TableModel tableModel,ApplyTypeEnum applyType) {
 		
 		if(null==tableModel.getSourcePkName()) {
 			List<ConstraintModel> constraintList=tableModel.getConstraintList();
 			
 			for(ConstraintModel constraintModel:constraintList) {
-				if(constraintModel.getApplyType()==ApplyTypeEnum.SOURCE
+				if(constraintModel.getApplyType()==applyType
 						&&FieldConstraintEnum.PRIMARY==constraintModel.getType()&&null!=constraintModel.getField()) {
 					tableModel.setSourcePkName(constraintModel.getField().getName().toUpperCase());
 				}
@@ -208,10 +215,10 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 */
 	public boolean hasPrimaryKey(TableModel tableModel) {
 		
-		return null!=getPkFieldName(tableModel)?true:false;
+		return null!=getPkFieldName(tableModel,ApplyTypeEnum.SOURCE)?true:false;
 	}
 	/**
-	 * 获取所有字段的查询数据
+	 * 获取所有字段的查询数据--根据原表主键显示原数据
 	 * @param tableModel
 	 * @return
 	 */
@@ -223,7 +230,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 		StringBuilder sbuilder=new StringBuilder();
 		
 		//设置主键字段
-		String pkName=getPkFieldName(tableModel);
+		String pkName=getPkFieldName(tableModel,ApplyTypeEnum.SOURCE);
 		
 		sbuilder.append("select * from ").append(tableModel.getFrom()).append(" where ").append(pkName).append("=?");
 		

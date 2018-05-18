@@ -19,16 +19,18 @@
   	<div>
   		<input type="button" onclick="uploadXml();" value="上传xml文档">
   	</div>
-    <table style="width:80%;text-align:center;" border="1px">
+    <table style="width:80%;text-align:center;" border="1">
 	    <tr>
 	      <th>源表</th>
 	      <th>目标表</th>
+	      <th>描述</th>
 	      <th>操作类型</th>
 	      <th>操作</th>
 	    </tr>
 	    <tr th:each="table : ${tableList}">
 	      <td th:text="${table.from}"></td>
 	      <td th:text="${table.to}"></td>
+	      <td th:text="${table.note}"></td>
 	      <td th:text="${table.type}"></td>
 	      <td><span><a th:href="@{'/tables/info/'+${table.id}}">查看</a></span>|<span><a th:href="@{'/tables/del/'+${table.id}}">删除</a></span></td>
 	    </tr>

@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import com.ipph.migratecore.deal.condition.ConditionContext;
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.model.ConditionModel;
+import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.WhereModel;
 
@@ -93,7 +94,7 @@ public class BaseSqlBuilder {
 	 * @param whereModel
 	 * @return
 	 */
-	protected String getFromCondition(WhereModel whereModel){
+	protected String getSourceCondition(WhereModel whereModel){
 		List<ConditionModel> conditionList=new ArrayList<>();
 		if(null!=whereModel){
 			for(ConditionModel condition:whereModel.getConditionList()){
@@ -128,6 +129,27 @@ public class BaseSqlBuilder {
 		}
 		return getWhereByConditionField(conditionList);
 	}
+	/**
+	 * 获取目标表的限定条件
+	 * 如，插入操作时，判断源表的主键是否已经在目标表中了（已经存储过了）
+	 * @param constraintList
+	 * @return
+	 */
+	protected String getTargetConstraint(List<ConstraintModel> constraintList) {
+		
+		List<ConstraintModel> list=new ArrayList<>();
+		if(null!=constraintList&&constraintList.size()>0) {
+			for(ConstraintModel constraint:constraintList) {
+				if(null==constraint
+						||null==constraint.getField()
+						||constraint.getApplyType()==ApplyTypeEnum.SOURCE) {
+					continue;
+				}
+				list.add(constraint);
+			}
+		}
+		return getWhereByConstraintList(list);
+	}
 	
 	
 	/**
@@ -153,6 +175,30 @@ public class BaseSqlBuilder {
 				
 				if(null!=v&&null!=field){
 					sbuilder.append(" and ").append(field.getName().toUpperCase()).append(" ").append(v);
+				}
+			}
+		}
+		return sbuilder.toString();
+	}
+	/**
+	 * 根据限定条件获取
+	 * @param constraintList
+	 * @return
+	 */
+	private String getWhereByConstraintList(List<ConstraintModel> constraintList) {
+		
+		StringBuilder sbuilder=new StringBuilder();
+		//where条件构造
+		if(null!=constraintList&&constraintList.size()>0){
+			
+			sbuilder.append(" where 1=1 ");
+			
+			for(ConstraintModel constraint:constraintList){
+				
+				FieldModel field=constraint.getField();
+				
+				if(null!=field){
+					sbuilder.append(" and ").append(field.getName().toUpperCase()).append("=? ");
 				}
 			}
 		}

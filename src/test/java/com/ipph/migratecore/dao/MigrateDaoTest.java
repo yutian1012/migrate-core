@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.util.XmlUtil;
 
@@ -25,6 +26,8 @@ public class MigrateDaoTest {
 	
 	@Resource
 	private MigrationDao migrationDao;
+	@Resource
+	private MigrateDao migrateDao;
 	
 	@Resource(name="destJdbcTemplate")
 	private JdbcTemplate destJdbcTemplate;
@@ -96,7 +99,44 @@ public class MigrateDaoTest {
 			e.printStackTrace();
 		}
 		
-		
 	}
-
+	
+	@Test
+	public void testMigratePatentPct() {
+		
+		//清空数据表
+		String sql="delete from wf_patent_support_foreign_dest";
+		destJdbcTemplate.execute(sql);
+		
+		List<TableModel> tableList;
+		try {
+			tableList = XmlUtil.parseBySax(XmlUtil.class.getResource("/patentPctApply_test.xml").getPath());
+			assertNotNull(tableList);
+			
+			TableModel table=tableList.get(0);
+			
+			MigrateModel migrateModel=new MigrateModel();
+			
+			long total=migrateDao.getTotal(table);
+			
+			migrateModel.setType(table.getType());
+			migrateModel.setTableModel(table);
+			migrateModel.setTotal(total);
+			migrateModel.setStart(0);
+			migrateModel.setSize(3000);
+			
+			migrateDao.migrate(migrateModel);
+			
+			String result="select count(1) from wf_patent_support_foreign_dest";
+			
+			long num=destJdbcTemplate.queryForObject(result, Long.class);
+			
+			assertTrue(num>0);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

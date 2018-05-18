@@ -78,13 +78,22 @@
 			
 			$.post(url,data,function(result){
 				if(result){
-					$("#batchNum").text(result["FAIL"]+result["SUCCESS"]);
+					var total=0;
+					var success=0;
 					
-					if(result["SUBSUCCESS"]){
-						$("#sucNum").text(result["SUCCESS"]+result["SUBSUCCESS"]);
-					}else{
-						$("#sucNum").text(result["SUCCESS"]);
+					if(result["FAIL"]){
+						total+=result["FAIL"];
 					}
+					if(result["SUCCESS"]){
+						total+=result["SUCCESS"];
+						success+=result["SUCCESS"];
+					}
+					if(result["SUBSUCCESS"]){
+						success+=result["SUBSUCCESS"];
+					}
+					
+					$("#batchNum").text(total);
+					$("#sucNum").text(success);
 				}
 			})
 		}

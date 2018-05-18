@@ -63,6 +63,7 @@
 			</xsd:attribute>
 			<xsd:attribute name="to" use="required"></xsd:attribute>
 			<xsd:attribute name="from" use="required"></xsd:attribute>
+			<xsd:attribute name="note" use="required"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -89,7 +90,7 @@
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
-			<xsd:attribute name="desc"></xsd:attribute>
+			<xsd:attribute name="note"></xsd:attribute>
 			<xsd:attribute name="value"></xsd:attribute>
 			<xsd:attribute name="forLog">
 				<xsd:simpleType>

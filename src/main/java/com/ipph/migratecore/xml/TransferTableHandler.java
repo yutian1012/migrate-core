@@ -21,20 +21,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * xml中table表信息解析处理类
- * <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
-    	<fields>
-    		<field to="isApply" from="" field_default="1"></field>
-    		<field to="appNumber" from="patentNo">
-    			<format>
-    				<format_class_name>org.ipph.format.PatentNoFormater</format_class_name>
-    			</format>
-    		</field>
-    		<field to="" from="costtype">
-    			<condition type="EQUAL">SQ1</condition>
-    		</field>
-    	</fields>
-    </table>
+ * 解析时保证标签的顺序是正确解析配置的关键
+ * 如table标签中依次是：fields,where,formats和constraints标签
  */
 public class TransferTableHandler extends DefaultHandler {
 	List<TableModel> tableList=null;
@@ -80,7 +68,7 @@ public class TransferTableHandler extends DefaultHandler {
      * 标签结束时赋值对象并重置数据
      */
     @Override  
-    public void endElement(String uri, String localName, String qName)throws SAXException { 
+    public void endElement(String uri, String localName, String qName)throws SAXException {
     	String text=temp.toString().replaceAll("\\s*|\t|\r|\n", "");
     	//解析Field内的节点内容
     	processElement(qName, null, true, text);
@@ -125,6 +113,7 @@ public class TransferTableHandler extends DefaultHandler {
     		if(null!=attributes.getValue("skip")&&!"".equals(attributes.getValue("skip"))){
     			table.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
     		}
+    		table.setNote(attributes.getValue("note"));
     		table.setFiledList(new ArrayList<FieldModel>());
     		table.setSubTableList(new ArrayList<SubtableModel>());
     		table.setFormatFieldList(new ArrayList<FormatModel>());
@@ -171,7 +160,7 @@ public class TransferTableHandler extends DefaultHandler {
     		
     		fieldModel.setValue(null!=attributes.getValue("value")?attributes.getValue("value"):"");
     		
-    		fieldModel.setDesc(null!=attributes.getValue("desc")?attributes.getValue("desc"):"");
+    		fieldModel.setNote(null!=attributes.getValue("note")?attributes.getValue("note"):"");
     		
     		if(null!=attributes.getValue("applyType")&&!"".equals(attributes.getValue("applyType"))){
     			fieldModel.setApplyType(ApplyTypeEnum.valueOf(attributes.getValue("applyType")));

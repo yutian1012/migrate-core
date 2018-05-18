@@ -2,17 +2,14 @@
 <tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
     <!-- 专利申请数据的更新 -->
-   <table type="UPDATE" to="z_patent" from="tpatentallo" skip="false">
+   <table type="UPDATE" to="z_patent" from="tpatentallo" note="专利授权数据更新" skip="false">
     	<fields>
-    		<field name="isApply" applyType="TARGET" valueType="FIXED" value="1" desc="是否已申请"></field>
-    		<field name="patentNo" applyType="SOURCE" desc="申请号" forLog="true"></field>
+    		<field name="isApply" applyType="TARGET" valueType="FIXED" value="1" note="是否已申请"></field>
+    		<field name="patentNo" applyType="SOURCE" note="申请号" forLog="true"></field>
     	</fields>
     	<where>
     		<condition type="EQUAL" applyType="SOURCE">
-    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ1"></field>
-    		</condition>
-    		<condition type="LE" applyType="SOURCE">
-    			<field name="id" applyType="SOURCE" valueType="FIXED" value="13197"/>
+    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ2"></field>
     		</condition>
     		<condition type="EQUAL" applyType="TARGET">
     			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>

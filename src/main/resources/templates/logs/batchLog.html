@@ -13,7 +13,7 @@
   </head>
   
   <body>
-    <table style="width:80%;text-align:center;border:1px;">
+    <table style="width:80%;text-align:center;" border="1">
 	    <tr>
 	      <th>序号</th>
 	      <th>批次号</th>
@@ -29,5 +29,10 @@
 	      <td><span><a th:href="@{'/logs/tables/'+${tableLog.id}}">执行日志</a></span></td>
 	    </tr>
 	  </table>
+	  
+	  <!-- 统计执行量，显示批次中每个表的执行数据量，成功数据量和失败数量等 -->
+	  <div>
+	  	<label>执行量统计：</label>
+	  </div>
   </body>
 </html>

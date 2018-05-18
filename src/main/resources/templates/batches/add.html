@@ -23,9 +23,10 @@
 					for (var i=0;i<data.length;i++){
 						var tr=$("[name='table_tr']").clone().removeAttr("name");
 						tr.find("td:nth-child(1)").html('<input type="checkbox" name="tableId" value="'+data[i]["id"]+'">');
-						tr.find("td:nth-child(2)").html(data[i]["from"]);
-						tr.find("td:nth-child(3)").html(data[i]["to"]);
-						tr.find("td:nth-child(4)").html(data[i]["type"]);
+						tr.find("td:nth-child(2)").html(data[i]["note"]);
+						tr.find("td:nth-child(3)").html(data[i]["from"]);
+						tr.find("td:nth-child(4)").html(data[i]["to"]);
+						tr.find("td:nth-child(5)").html(data[i]["type"]);
 						
 						tr.insertBefore("#tables tr:last");
 					}
@@ -36,8 +37,8 @@
 		function selectTables(){
 			
 			var tableIds="";
-			
 			var tableNames="";
+			
 			$("[name='tableId']:checked").each(function(){
 				tableIds+=$(this).val()+";";
 				tableNames+=$(this).closest("tr").find("td:nth-child(2)").text()+";";
@@ -74,6 +75,7 @@
     	<table>
     		<tr name="table_tr">
     			<td></td>
+    			<td>描述</td>
     			<td>源表</td>
     			<td>目标表</td>
     			<td>操作类型</td>

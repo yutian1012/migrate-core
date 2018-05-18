@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.ipph.migratecore.deal.MigrateExceptionHandler;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.deal.exception.ConfigException;
+import com.ipph.migratecore.deal.exception.DataExistsException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
@@ -66,6 +67,7 @@ public class MigrateDao {
 			List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
 			//处理查询结果集
 			if(null!=result&&result.size()>0) {
+				
 				process(migrateModel, result);
 				
 				result.clear();
@@ -104,6 +106,8 @@ public class MigrateDao {
 		
 		if(table.getType()==TableOperationEnum.UPDATE) {
 			executeSql=sqlBuilder.getUpdateSql(table);
+		}else {
+			executeSql=sqlBuilder.getInsertSql(table);
 		}
 		
 		if(null==executeSql) {
@@ -147,7 +151,7 @@ public class MigrateDao {
 				
 				try {
 					data = processRowData(migrateModel, row);
-				} catch (FormatException | DataNotFoundException e) {
+				} catch (FormatException | DataNotFoundException | DataExistsException e) {
 					messageType=migrateExceptionHandler.handle(e);
 				}
 				
@@ -171,14 +175,15 @@ public class MigrateDao {
 	 * @return
 	 * @throws FormatException 
 	 * @throws DataNotFoundException 
+	 * @throws DataExistsException 
 	 */
-	private Object[] processRowData(MigrateModel migrateModel,Map<String,Object> row) throws FormatException, DataNotFoundException {
+	private Object[] processRowData(MigrateModel migrateModel,Map<String,Object> row) throws FormatException, DataNotFoundException, DataExistsException {
 		
 		TableModel table=migrateModel.getTableModel();
 		
-		String executeSql=sqlBuilder.getTargetSelectSql(table);
+		String targetSelectSql=sqlBuilder.getTargetSelectSql(table);
 		
-		if(null==executeSql) {
+		if(null==targetSelectSql) {
 			return null;
 		}
 		
@@ -187,8 +192,12 @@ public class MigrateDao {
 		
 		if(table.getType()==TableOperationEnum.UPDATE){
 			//判断待更新的数据是否存在
-			if(!sqlOperation.isDestExists(executeSql, migrateRowDataHandler.handleTargetFieldCondtion(row,table))){
+			if(!sqlOperation.isDestExists(targetSelectSql, migrateRowDataHandler.handleTargetFieldCondtion(row,table))){
 				throw new DataNotFoundException("未找到更新记录");
+			}
+		}else {
+			if(sqlOperation.isDestExists(targetSelectSql, migrateRowDataHandler.handleTargetConstraintCondtion(row,table))){
+				throw new DataExistsException("待插入的记录已经存在");
 			}
 		}
 		

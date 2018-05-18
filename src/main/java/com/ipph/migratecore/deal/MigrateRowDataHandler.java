@@ -68,9 +68,6 @@ public class MigrateRowDataHandler {
 	 */
 	public Object[] handleTargetFieldCondtion(Map<String,Object> row,TableModel table)throws FormatException{
 		
-		//先进行一步格式化操作
-		//handleFormatRowData(table, row);
-		
 		if(null!=table.getWhereModel()){
 			
 			List<ConditionModel> conditionList=new ArrayList<>();
@@ -91,6 +88,24 @@ public class MigrateRowDataHandler {
 			}
 		}
 		
+		return null;
+	}
+	
+	/**
+	 * 获取目标数据限定条件（主要针对主键值进行处理）
+	 * @param row
+	 * @param table
+	 * @return
+	 * @throws FormatException
+	 */
+	public Object[] handleTargetConstraintCondtion(Map<String,Object> row,TableModel table)throws FormatException{
+		
+		if(row.containsKey(table.getSourcePkName().toUpperCase())) {
+			Object[] result=new Object[] {row.get(table.getSourcePkName().toUpperCase())};
+			
+			return result;
+					
+		}
 		return null;
 	}
 	

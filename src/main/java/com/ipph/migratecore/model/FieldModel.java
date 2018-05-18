@@ -18,7 +18,7 @@ public class FieldModel implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private String name;
 	private String value;
-	private String desc;
+	private String note;
 	private FieldDataTypeEnum fieldType;
 	private ApplyTypeEnum applyType;
 	private FieldValueTypeEnum valueType;
