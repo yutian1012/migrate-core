@@ -11,13 +11,17 @@ import org.springframework.stereotype.Component;
 
 import com.ipph.migratecore.deal.condition.ConditionContext;
 import com.ipph.migratecore.deal.exception.FormatException;
+import com.ipph.migratecore.deal.exception.SplitException;
 import com.ipph.migratecore.deal.format.FormaterContext;
+import com.ipph.migratecore.deal.split.SpliterContext;
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.ConditionModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
+import com.ipph.migratecore.model.SplitModel;
 import com.ipph.migratecore.model.TableModel;
+import com.ipph.migratecore.util.IdGenerator;
 
 /**
  * 数据集行处理类
@@ -31,6 +35,8 @@ public class MigrateRowDataHandler {
 	private FormaterContext formaterContext;
 	@Resource
 	private ConditionContext conditionContext;
+	@Resource
+	private SpliterContext spliterContext;
 	
 	/**
 	 * 获取数据源查询条件参数值
@@ -213,6 +219,8 @@ public class MigrateRowDataHandler {
 			
 			if(field.getValueType()==FieldValueTypeEnum.FIXED) {
 				result.add(field.getValue());
+			}else if(field.getValueType()==FieldValueTypeEnum.GENCODE){//生成主键
+				result.add(IdGenerator.genId());
 			}else {
 				result.add(row.get(field.getValue().toUpperCase()));
 			}
@@ -239,6 +247,31 @@ public class MigrateRowDataHandler {
 			}
 		}
 		return data;
+	}
+	/**
+	 * 处理字段拆分
+	 * @param table
+	 * @param row
+	 * @return
+	 * @throws SplitException 
+	 */
+	public int handleSplitRowData(TableModel table,Map<String,Object> rowData) throws SplitException {
+		
+		int size=1;
+		
+		List<SplitModel> splitModelList=table.getSplitFieldList();
+		
+		if(null==splitModelList||splitModelList.size()==0) {
+			return size;
+		}
+		
+		for(SplitModel splitModel:splitModelList) {
+			List<Object> value=spliterContext.getSplitedValue(splitModel, rowData.get(splitModel.getFiledName().toUpperCase()));
+			
+			rowData.put(splitModel.getFiledName().toUpperCase(), value);
+			size=value.size();
+		}
+		return size;
 	}
 	
 }

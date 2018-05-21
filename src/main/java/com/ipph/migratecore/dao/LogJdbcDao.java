@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -134,12 +133,12 @@ public class LogJdbcDao {
 	
 	public LogModel save(LogModel log) {
 		
-		String sql="insert into log_model (id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name) values (?,?,?,?,?,?,?,?,?,?) ";
+		String sql="insert into log_model (id,batch_log_id,create_date,data_id,deal_data,message,message_type,status,table_id,table_name,exception) values (?,?,?,?,?,?,?,?,?,?,?) ";
 		
 		log.setId(IdGenerator.genId());
 		
 		migrateJdbcTemplate.update(sql,new Object[] {log.getId(),log.getBatchLogId(),log.getCreateDate(),log.getDataId(),log.getDealData(),
-				log.getMessage(),null!=log.getMessageType()?log.getMessageType().name():null,null!=log.getStatus()?log.getStatus().name():null,log.getTableId(),log.getTableName()});
+				log.getMessage(),null!=log.getMessageType()?log.getMessageType().name():null,null!=log.getStatus()?log.getStatus().name():null,log.getTableId(),log.getTableName(),log.getException()});
 		
 		return log;
 	}

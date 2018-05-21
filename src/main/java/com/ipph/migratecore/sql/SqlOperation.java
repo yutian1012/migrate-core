@@ -79,7 +79,7 @@ public class SqlOperation {
 	 * @param params
 	 * @return
 	 */
-	public int executeDest(String sql,Object[] params){
+	public int executeDest(String sql,Object[] params)throws RuntimeException{
 		return destJdbcTemplate.update(sql, params);
 	}
 	

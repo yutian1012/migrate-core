@@ -149,8 +149,29 @@ public class LogService {
 		
 		return log.getId();
 	}
-	
+	/**
+	 * 记录日志
+	 * @param migrateModel
+	 * @param messageType
+	 * @param data
+	 */
+	public void addLog(MigrateModel migrateModel,LogMessageEnum messageType,Map<String,Object> data,String exception) {
+		LogModel log=getLogModel(migrateModel, messageType, data);
+		log.setException(exception);
+		logJdbcDao.save(log);
+	}
+	/**
+	 * 获取日志
+	 * @param migrateModel
+	 * @param messageType
+	 * @param data
+	 * @return
+	 */
 	public LogModel getLogModel(MigrateModel migrateModel,LogMessageEnum messageType,Map<String,Object> data) {
+		
+		if(null==messageType) {
+			messageType=LogMessageEnum.SUCCESS;
+		}
 		
 		LogStatusEnum status=messageType==LogMessageEnum.SUCCESS?LogStatusEnum.SUCCESS:LogStatusEnum.FAIL;
 		

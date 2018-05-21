@@ -1,6 +1,7 @@
 package com.ipph.migratecore.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +15,12 @@ import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.deal.exception.DataExistsException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
+import com.ipph.migratecore.deal.exception.SplitException;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.TableOperationEnum;
 import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.MigrateModel;
+import com.ipph.migratecore.model.SplitModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.LogService;
 import com.ipph.migratecore.service.TableService;
@@ -67,9 +70,7 @@ public class MigrateDao {
 			List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
 			//处理查询结果集
 			if(null!=result&&result.size()>0) {
-				
 				process(migrateModel, result);
-				
 				result.clear();
 			}
 		}
@@ -98,7 +99,7 @@ public class MigrateDao {
 	 * @param migrateModel
 	 * @param result
 	 */
-	private void process(MigrateModel migrateModel,List<Map<String,Object>> result) {
+	private void process(MigrateModel migrateModel,List<Map<String,Object>> result){
 		
 		String executeSql=null;
 		
@@ -113,22 +114,70 @@ public class MigrateDao {
 		if(null==executeSql) {
 			return ;
 		}
-		
+		try {
+			batchProcess(migrateModel, result, executeSql);
+		}catch (RuntimeException e) {
+			e.printStackTrace();
+			singleProcess(migrateModel, result, executeSql);
+		}
+	}
+	/**
+	 * 单条执行记录
+	 * @param migrateModel
+	 * @param result
+	 * @param executeSql
+	 */
+	private void singleProcess(MigrateModel migrateModel,List<Map<String,Object>> result,String executeSql) {
+		if(result!=null&&result.size()>0){
+			for(Map<String,Object> row:result){
+				
+				Object[] data=null;
+				String exception="";
+				LogMessageEnum messageType=LogMessageEnum.SUCCESS;
+				
+				try {
+					data = processRowData(migrateModel, row);
+					sqlOperation.executeDest(executeSql, data);
+				} catch (FormatException | DataNotFoundException | DataExistsException |RuntimeException e) {
+					messageType=migrateExceptionHandler.handle(e);
+					if(messageType==LogMessageEnum.SQL_EXCEPTION) {
+						exception=e.getMessage();
+					}
+				}
+				logService.addLog(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row),exception);
+			}
+		}
+	}
+	
+	/**
+	 * 批次处理结果集
+	 * 不处理SQL异常信息，直接抛出
+	 * @param migrateModel
+	 * @param result
+	 * @param executeSql
+	 */
+	private void batchProcess(MigrateModel migrateModel,List<Map<String,Object>> result,String executeSql)throws RuntimeException {
 		List<Object[]> batchDataList=new ArrayList<>(result.size());
+		
 		List<LogModel> logModelList=processResult(migrateModel, result, batchDataList);
 		
 		//保存数据
-		if(batchDataList.size()>0){
-			sqlOperation.executeBatchDest(executeSql, batchDataList);
-			batchDataList.clear();
+		try {
+			if(batchDataList.size()>0){
+				sqlOperation.executeBatchDest(executeSql, batchDataList);
+			}
+			//保存日志
+			if(null!=logModelList&&logModelList.size()>0) {
+				logService.insert(logModelList);
+			}
+		}finally {
+			if(null!=batchDataList) {
+				batchDataList.clear();
+			}
+			if(null!=batchDataList) {
+				logModelList.clear();
+			}
 		}
-		
-		//保存日志
-		if(null!=logModelList&&logModelList.size()>0) {
-			logService.insert(logModelList);
-			logModelList.clear();
-		}
-		
 	}
 	
 	/**
@@ -147,20 +196,27 @@ public class MigrateDao {
 			for(Map<String,Object> row:result){
 				
 				Object[] data=null;
+				List<Object[]> subDataList=null;
 				LogMessageEnum messageType=LogMessageEnum.SUCCESS;
 				
 				try {
-					data = processRowData(migrateModel, row);
-				} catch (FormatException | DataNotFoundException | DataExistsException e) {
+					if(null!=migrateModel.getTableModel().getMain()) {//处理子表的数据拆分
+						subDataList=processSplitRowData(migrateModel,row);
+					}else {
+						data = processRowData(migrateModel, row);
+					}
+				} catch (FormatException | DataNotFoundException | DataExistsException | SplitException e) {
 					messageType=migrateExceptionHandler.handle(e);
 				}
 				
+				if(null!=subDataList&&subDataList.size()>0) {
+					batchDataList.addAll(subDataList);
+				}
 				if(null!=data) {
 					batchDataList.add(data);
 				}
-				if(data!=null||messageType!=LogMessageEnum.SUCCESS) {
-					logModelList.add(logService.getLogModel(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row)));
-				}
+				
+				logModelList.add(logService.getLogModel(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row)));
 			}
 		}
 		
@@ -201,12 +257,66 @@ public class MigrateDao {
 			}
 		}
 		
+		//主键
+		
 		//判断数据是否已经处理过了
 		if(null!=migrateModel.getParentLogId()&&logService.isLogSuccess((Long)row.get(table.getSourcePkName()),migrateModel.getParentLogId())) {
 			return null;
 		}
 		
 		return migrateRowDataHandler.handleMigrateField(row,table);
+	}
+	
+	/**
+	 * 处理字段拆分
+	 * @param migrateModel
+	 * @param row
+	 * @return
+	 * @throws SplitException 
+	 * @throws DataExistsException 
+	 * @throws DataNotFoundException 
+	 * @throws FormatException 
+	 */
+	private List<Object[]> processSplitRowData(MigrateModel migrateModel,Map<String,Object> row) throws SplitException, FormatException, DataNotFoundException, DataExistsException{
+		
+		List<Map<String,Object>> subRowList=new ArrayList<>();
+		
+		int size=migrateRowDataHandler.handleSplitRowData(migrateModel.getTableModel(),row);
+		
+		List<Object[]> result=new ArrayList<>(size);
+		
+		List<SplitModel> splitModelList=migrateModel.getTableModel().getSplitFieldList();
+		for(int i=0;i<size;i++) {
+			Map<String,Object> tmp=new HashMap<>();
+			//处理拆分字段
+			for(SplitModel splitModel:splitModelList) {
+				if(null==splitModel
+						||tmp.containsKey(splitModel.getFiledName().toUpperCase())
+						||null==row.get(splitModel.getFiledName().toUpperCase())) {
+					continue;
+				}
+				List<Object> splitField=(List<Object>) row.get(splitModel.getFiledName().toUpperCase());
+				if(splitField.size()!=size) {
+					throw new SplitException("拆分"+splitModel.getFiledName()+"字段长度不匹配，长度应为："+size);
+				}
+				tmp.put(splitModel.getFiledName().toUpperCase(),splitField.get(i));
+			}
+			//拷贝其他字段到集合中
+			for(String key:row.keySet()) {
+				if(!tmp.containsKey(key)) {
+					tmp.put(key, row.get(key));
+				}
+			}
+			subRowList.add(tmp);
+		}
+		
+		if(subRowList.size()>0) {
+			for(int i=0;i<size;i++) {
+				result.add(processRowData(migrateModel, subRowList.get(i)));
+			}
+		}
+		
+		return result;
 	}
 	
 	/**

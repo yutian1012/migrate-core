@@ -119,6 +119,14 @@
 				}
 			})
 		}
+		
+		function logException(obj){
+			if($(obj).attr("title")&&$(obj).attr("title")!=''){
+				$("#exception").text($(obj).attr("title"));
+			}else{
+				$("#exception").text("");
+			}
+		}
 	</script>
   </head>
   
@@ -144,6 +152,7 @@
 	      <th>执行状态</th>
 	      <th>数据</th>
 	      <th>描述</th>
+	      <th>异常</th>
 	      <td>操作</td>
 	    </tr>
 	    <tr th:each="log,index : ${tableLogList}">
@@ -152,6 +161,7 @@
 	      <td th:text="${log.status}"></td>
 	      <td th:text="${log.dealData}"></td>
 	      <td th:text="${log.message}"></td>
+	      <td><span><a th:title="${log.exception}" onclick="logException(this)">查看异常</a></span></td>
 	      <td><span><a th:href="@{'/tables/record/'+${log.tableId}+'/'+${log.dataId}}">原表记录信息</a></span></td>
 	    </tr>
 	  </table>
@@ -172,6 +182,11 @@
   		数据格式化错误：<span id="formatError"></span>
   		数据未检索到：<span id="notFoundError"></span>
   		其他错误：<span id="otherError"></span>
+  	</div>
+  	
+  	<div>
+  		<label>记录执行异常</label>
+  		<div id="exception"></div>
   	</div>
   </body>
 </html>

@@ -207,7 +207,11 @@ public class MigrationDao {
 	 */
 	private void deal(TableModel table,Map<String,Object> row,String targetSelect,String executeSql) throws DataNotFoundException, FormatException {
 		Object[] data=processRowData(table, row, targetSelect);
-		sqlOperation.executeDest(executeSql,data);
+		try {
+			sqlOperation.executeDest(executeSql,data);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * 处理行数据

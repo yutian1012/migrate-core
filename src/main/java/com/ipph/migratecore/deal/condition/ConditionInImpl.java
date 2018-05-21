@@ -2,7 +2,9 @@ package com.ipph.migratecore.deal.condition;
 
 import java.util.Map;
 
+import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.ConditionModel;
+import com.ipph.migratecore.model.FieldModel;
 
 public class ConditionInImpl implements Condition{
 	
@@ -23,7 +25,12 @@ public class ConditionInImpl implements Condition{
 		if(null==fieldConditionModel||null==fieldConditionModel.getType())
 			return null;
 		
-		String value=null;//fieldConditionModel.get
+		String value=null;
+		
+		FieldModel field=fieldConditionModel.getField();
+		if(null!=field&&field.getValueType()==FieldValueTypeEnum.FIXED) {
+			value=field.getValue();
+		}
 		
 		if(null==value||"".equals(value)){
 			//throw new ConditionException("in 条件参数设置问题");

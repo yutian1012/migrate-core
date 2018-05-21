@@ -12,6 +12,7 @@ import com.ipph.migratecore.model.ConditionModel;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
+import com.ipph.migratecore.model.SplitModel;
 import com.ipph.migratecore.model.SubtableModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.model.WhereModel;
@@ -33,6 +34,7 @@ public class TransferTableHandler extends DefaultHandler {
     private SubtableModel subTableModel=null;
     private WhereModel whereModel=null;
     private ConstraintModel constraintModel=null;
+    private SplitModel splitModel=null;
     private StringBuffer temp=new StringBuffer();
     
     @Override
@@ -96,6 +98,8 @@ public class TransferTableHandler extends DefaultHandler {
         	processConditionElement(attributes,isEnd,text);
         }else if(XmlElement.constraint.equals(qName)) {//字段限定
         	processConstraintElement(attributes,isEnd,text);
+        }else if(XmlElement.split.equals(qName)) {
+        	processSplitElement(attributes,isEnd,text);
         }
     }
   
@@ -114,10 +118,12 @@ public class TransferTableHandler extends DefaultHandler {
     			table.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
     		}
     		table.setNote(attributes.getValue("note"));
+    		table.setMain(attributes.getValue("main"));
     		table.setFiledList(new ArrayList<FieldModel>());
     		table.setSubTableList(new ArrayList<SubtableModel>());
     		table.setFormatFieldList(new ArrayList<FormatModel>());
     		table.setConstraintList(new ArrayList<ConstraintModel>());
+    		table.setSplitFieldList(new ArrayList<SplitModel>());
     	}else{
     		if(null!=table){
     			tableList.add(table);
@@ -211,6 +217,7 @@ public class TransferTableHandler extends DefaultHandler {
     	if(!isEnd){
     		formatModel=new FormatModel();
     		formatModel.setFiledName(null!=attributes.getValue("fieldName")?attributes.getValue("fieldName"):"");
+    		formatModel.setDefaultValue(null!=attributes.getValue("defaultValue")?attributes.getValue("defaultValue"):"");
     		try {
     			formatModel.setClazz(null!=attributes.getValue("clazz")?Class.forName(attributes.getValue("clazz")):null);
     		} catch (ClassNotFoundException e) {
@@ -219,7 +226,6 @@ public class TransferTableHandler extends DefaultHandler {
     	}else{//format标签可能存在于table或subtable标签中
     		if(null!=formatModel){
     			formatModel.setFormatParameter(text);
-    			
     			if(null!=subTableModel){
     				subTableModel.getFormatFieldList().add(formatModel);
     			}else if(null!=table){
@@ -264,6 +270,32 @@ public class TransferTableHandler extends DefaultHandler {
     				subTableModel.getConstraintList().add(constraintModel);
     			}else if(null!=table){
     				table.getConstraintList().add(constraintModel);
+    			}
+    		}
+    	}
+    }
+    
+    /**
+     * 处理拆分字段标签
+     * @param attributes
+     */
+    private void processSplitElement(Attributes attributes,boolean isEnd,String text){
+    	if(!isEnd){
+    		splitModel=new SplitModel();
+    		splitModel.setFiledName(null!=attributes.getValue("fieldName")?attributes.getValue("fieldName"):"");
+    		splitModel.setDefaultValue(null!=attributes.getValue("defaultValue")?attributes.getValue("defaultValue"):"");
+    		try {
+    			splitModel.setClazz(null!=attributes.getValue("clazz")?Class.forName(attributes.getValue("clazz")):null);
+    		} catch (ClassNotFoundException e) {
+    			splitModel.setClazz(null);
+    		}
+    	}else{//split标签可能存在于table或subtable标签中
+    		if(null!=splitModel){
+    			splitModel.setSplitParameter(text);
+    			if(null!=subTableModel){
+    				subTableModel.getSplitFieldList().add(splitModel);
+    			}else if(null!=table){
+    				table.getSplitFieldList().add(splitModel);
     			}
     		}
     	}

@@ -44,4 +44,6 @@ public class LogModel implements Serializable{
 	@Column
 	@Enumerated(EnumType.STRING)
 	private LogMessageEnum messageType;
+	@Column(length=2048*2)
+	private String exception;
 }

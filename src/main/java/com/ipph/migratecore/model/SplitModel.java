@@ -13,10 +13,10 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-public class FormatModel implements Serializable{
+public class SplitModel implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private Class<?> clazz;
-	private String formatParameter;
+	private String splitParameter;
 	private String filedName;
 	private String defaultValue;
 }

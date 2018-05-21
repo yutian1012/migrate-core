@@ -29,19 +29,19 @@ public class TableModel implements Serializable{
 	private Long id;
 	@Column
 	private TableOperationEnum type;
-	@Column(length=2048)
+	@Column(length=2048*2)
 	private String fieldListJson;
 	@Transient
 	private List<FieldModel> filedList;
-	@Column(length=2048)
+	@Column(length=2048*2)
 	private String subTableListJson;
 	@Transient
 	private List<SubtableModel> subTableList;
-	@Column(length=2048)
+	@Column(length=2048*2)
 	private String formatFieldListJson;
 	@Transient
 	private List<FormatModel> formatFieldList;
-	@Column(length=2048)
+	@Column(length=2048*2)
 	private String whereJson;
 	@Transient
 	private WhereModel whereModel;
@@ -51,12 +51,18 @@ public class TableModel implements Serializable{
 	private String to;
 	@Column
 	private boolean skip;
-	@Column(length=2048)
+	@Column(length=2048*2)
 	private String constraintListJson;
 	@Transient
 	private List<ConstraintModel> constraintList;
+	@Column(length=2048)
+	private String splitFieldListJson;
+	@Transient
+	private List<SplitModel> splitFieldList;
 	@Transient
 	private String sourcePkName;
 	@Column
 	private String note;
+	@Column
+	private String main;
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import com.ipph.migratecore.deal.exception.ConfigException;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
+import com.ipph.migratecore.model.SplitModel;
 import com.ipph.migratecore.model.SubtableModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.model.WhereModel;
@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@Transactional
 public class TableService {
 
 	@Resource
@@ -90,6 +89,9 @@ public class TableService {
 		if(null!=table.getConstraintList()&&table.getConstraintList().size()>0) {
 			table.setConstraintListJson(JSON.toJSONString(table.getConstraintList()));
 		}
+		if(null!=table.getSplitFieldList()&&table.getSplitFieldList().size()>0) {
+			table.setSplitFieldListJson(JSON.toJSONString(table.getSplitFieldList()));
+		}
 	}
 	
 	public void setTableFieldFromJson(TableModel table){
@@ -107,6 +109,9 @@ public class TableService {
 		}
 		if(null!=table.getConstraintListJson()) {
 			table.setConstraintList(JSON.parseArray(table.getConstraintListJson(), ConstraintModel.class));
+		}
+		if(null!=table.getSplitFieldListJson()) {
+			table.setSplitFieldList(JSON.parseArray(table.getSplitFieldListJson(),SplitModel.class));
 		}
 	}
 	

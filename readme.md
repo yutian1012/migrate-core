@@ -197,4 +197,8 @@ DROP TABLE IF EXISTS `log_model`;
 
 27)统计字段信息
 
+28）formatmodel中提供一个默认值（sourceType,area如果数据为空，则设置一个默认值）
 
+29）迁移数据到子表
+
+30）JsonMethodFormater格式化数据问题

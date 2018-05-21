@@ -44,6 +44,14 @@
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
+				<xsd:element name="splits">
+					<xsd:complexType>
+						<xsd:sequence>
+							<!-- format标签可以出现多次，至少出现1次 -->
+							<xsd:element ref="split" minOccurs="1"></xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
 			</xsd:sequence>
 			<xsd:attribute name="skip">
 				<xsd:simpleType>
@@ -64,6 +72,7 @@
 			<xsd:attribute name="to" use="required"></xsd:attribute>
 			<xsd:attribute name="from" use="required"></xsd:attribute>
 			<xsd:attribute name="note" use="required"></xsd:attribute>
+			<xsd:attribute name="main"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -87,6 +96,7 @@
 					<xsd:restriction base="xsd:string">
 						<xsd:enumeration value="FIXED"></xsd:enumeration>
 						<xsd:enumeration value="FIELD"></xsd:enumeration>
+						<xsd:enumeration value="GENCODE"></xsd:enumeration>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
@@ -105,6 +115,7 @@
 			<xsd:attribute name="clazz"></xsd:attribute>
 			<!-- <xsd:attribute name="formatParameter"></xsd:attribute> -->
 			<xsd:attribute name="fieldName"></xsd:attribute>
+			<xsd:attribute name="defaultValue"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -149,6 +160,14 @@
 				</xsd:simpleType>
 			</xsd:attribute>
 			<xsd:attribute ref="applyType" use="required"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="split">
+		<xsd:complexType>
+			<xsd:attribute name="clazz"></xsd:attribute>
+			<xsd:attribute name="fieldName"></xsd:attribute>
+			<xsd:attribute name="defaultValue"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	

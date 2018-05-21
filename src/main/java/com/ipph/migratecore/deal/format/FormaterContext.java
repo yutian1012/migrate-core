@@ -37,6 +37,11 @@ public class FormaterContext {
 			if(null!=formater){
 				value=formater.format(fieldFormatModel.getFormatParameter(), value);
 			}
+			if(null==value||"".equals(value)) {//提供默认值设置
+				if(null!=fieldFormatModel.getDefaultValue()||!"".equals(fieldFormatModel.getDefaultValue())) {
+					value=fieldFormatModel.getDefaultValue();
+				}
+			}
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new FormatException("format class not exists!!!");
 		}
@@ -77,6 +82,12 @@ public class FormaterContext {
 	private Formater getFormaterInstance(Class<?> clazz) {
 		if(clazz.getName()==PatentNoFormater.class.getName()) {
 			return new PatentNoFormater();
+		}
+		if(clazz.getName()==PctNoFormater.class.getName()) {
+			return new PctNoFormater();
+		}
+		if(clazz.getName()==JsonMethodFormater.class.getName()) {
+			return new JsonMethodFormater();
 		}
 		return null;
 	}

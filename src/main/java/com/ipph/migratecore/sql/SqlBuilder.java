@@ -36,7 +36,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 				continue;
 			}
 			
-			fieldList.add(field.getName());
+			fieldList.add(field.getName().toUpperCase());
 		}
 		
 		//设置主键字段

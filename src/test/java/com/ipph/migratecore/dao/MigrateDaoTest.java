@@ -133,10 +133,86 @@ public class MigrateDaoTest {
 			
 			assertTrue(num>0);
 			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testMigrateCopyright() {
+		
+		//清空数据表
+		String sql="delete from cs_copyright_dest";
+		destJdbcTemplate.execute(sql);
+		
+		List<TableModel> tableList;
+		try {
+			tableList = XmlUtil.parseBySax(XmlUtil.class.getResource("/copyright_test.xml").getPath());
+			assertNotNull(tableList);
+			
+			TableModel table=tableList.get(0);
+			
+			MigrateModel migrateModel=new MigrateModel();
+			
+			long total=migrateDao.getTotal(table);
+			
+			migrateModel.setType(table.getType());
+			migrateModel.setTableModel(table);
+			migrateModel.setTotal(total);
+			migrateModel.setStart(0);
+			migrateModel.setSize(3000);
+			
+			migrateDao.migrate(migrateModel);
+			
+			String result="select count(1) from cs_copyright_dest";
+			
+			long num=destJdbcTemplate.queryForObject(result, Long.class);
+			
+			assertTrue(num>0);
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	
+	@Test
+	public void testMigrateSubCopyright() {
+		
+		//清空数据表
+		String sql="delete from cs_copyright_owner_dest";
+		destJdbcTemplate.execute(sql);
+		
+		List<TableModel> tableList;
+		try {
+			tableList = XmlUtil.parseBySax(XmlUtil.class.getResource("/copyright_sub_owner_test.xml").getPath());
+			
+			assertNotNull(tableList);
+			
+			TableModel table=tableList.get(0);
+			
+			MigrateModel migrateModel=new MigrateModel();
+			
+			long total=migrateDao.getTotal(table);
+			
+			migrateModel.setType(table.getType());
+			migrateModel.setTableModel(table);
+			migrateModel.setTotal(total);
+			migrateModel.setStart(0);
+			migrateModel.setSize(3000);
+			
+			migrateDao.migrate(migrateModel);
+			
+			String result="select count(1) from cs_copyright_owner_dest";
+			
+			long num=destJdbcTemplate.queryForObject(result, Long.class);
+			
+			assertTrue(num>0);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
