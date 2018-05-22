@@ -9,7 +9,6 @@
     		<field name="registNo" applyType="TARGET" valueType="FIELD" value="workno" note="登记号"></field>
     		<field name="copyrightName" applyType="TARGET" valueType="FIELD" value="workname"/>
     		<field name="copyrightType" applyType="TARGET" valueType="FIELD" value="workType"/>
-    		<field name="userType" applyType="TARGET" valueType="FIELD" value="sourceType"/>
     		<field name="issueDate" applyType="TARGET" valueType="FIELD" value="releasedate"/>
     		<field name="registFee" applyType="TARGET" valueType="FIELD" value="regcost"/>
     		<field name="applyName" applyType="TARGET" valueType="FIELD" value="name"/>
@@ -54,7 +53,6 @@
     	</where>
     	<formats>
     		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="workType" defaultValue="录像制品">{'LXZP':'录像制品','LYZP':'录音制品','SY':'录像制品','SZDY':'录像制品','DY':'录像制品'}</format>
-    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="sourceType" defaultValue="其他">{'QY':'企业','KYYS':'其他','GR':'个人','ZCGX':'高校','SHTT':'其他','JG':'其他'}</format>
     		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="area">{'YLQ':'岳麓区','GXQ':'高新区','HRQ':'芙蓉区','YHQ':'雨花区','JKQ':'经开区','KFQ':'开福区','TXQ':'天心区','CSX':'长沙县','LXX':'宁乡县','LYX':'浏阳市','WCQ':'望城区'}</format>
     	</formats>
     	<constraints>

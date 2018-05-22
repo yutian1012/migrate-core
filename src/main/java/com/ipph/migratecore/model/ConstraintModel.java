@@ -16,4 +16,5 @@ public class ConstraintModel implements Serializable{
 	private FieldConstraintEnum type;
 	private FieldModel field;
 	private ApplyTypeEnum applyType;
+	private String value;
 }

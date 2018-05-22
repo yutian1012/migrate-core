@@ -206,12 +206,18 @@ public class LogService {
 	 */
 	private void parseData(LogModel log,Map<String,Object> data) {
 		
-		log.setDataId(Long.parseLong(data.get(MigrateRowDataHandler.pkName).toString()));
-		//从集合中去掉主键字段
-		data.remove(MigrateRowDataHandler.pkName);
+		if(null!=data.get(MigrateRowDataHandler.pkName)) {
+			log.setDataId(Long.parseLong(data.get(MigrateRowDataHandler.pkName).toString()));
+			//从集合中去掉主键字段
+			data.remove(MigrateRowDataHandler.pkName);
+		}else if(null!=data.get(MigrateRowDataHandler.fkName)){
+			log.setDataId(Long.parseLong(data.get(MigrateRowDataHandler.fkName).toString()));
+			data.remove(MigrateRowDataHandler.fkName);
+		}
 		
 		if(data.size()==1) {
-			log.setDealData(data.values().iterator().next().toString());
+			Object value=data.values().iterator().next();
+			log.setDealData(null!=value?value.toString():null);
 		}else {
 			log.setDealData(MapUtil.outMapData(data));
 		}

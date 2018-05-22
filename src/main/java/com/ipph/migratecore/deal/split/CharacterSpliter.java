@@ -14,16 +14,7 @@ public class CharacterSpliter implements Spliter{
 		if(null!=args&&!"".equals(args.trim())){
 			String temp=(String) value;
 			String separators=args.trim();
-			String[] arr=null;
-			for(int i=0;i<separators.length();i++){
-				String s=separators.substring(i,i+1);
-				if(temp.indexOf(s)==-1) {
-					continue;
-				}
-				arr=temp.split(s);
-				
-				break;
-			}
+			String[] arr=temp.split(separators);
 			if(arr!=null){
 				for(String s:arr){
 					result.add(s);

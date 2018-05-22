@@ -228,7 +228,6 @@ public class MigrateDao {
 	 * @param table
 	 * @param row
 	 * @param targetSelect
-	 * @return
 	 * @throws FormatException 
 	 * @throws DataNotFoundException 
 	 * @throws DataExistsException 
@@ -252,8 +251,25 @@ public class MigrateDao {
 				throw new DataNotFoundException("未找到更新记录");
 			}
 		}else {
-			if(sqlOperation.isDestExists(targetSelectSql, migrateRowDataHandler.handleTargetConstraintCondtion(row,table))){
-				throw new DataExistsException("待插入的记录已经存在");
+			
+			boolean isExists=sqlOperation.isDestExists(targetSelectSql, migrateRowDataHandler.handleTargetConstraintCondtion(row,table));
+			
+			if(null!=table.getMain()&&!"".equals(table.getMain())) {
+				//判断主表记录是否已经存在
+				if(!isExists) {
+					throw new DataNotFoundException("主记录不存在！");
+				}
+				//判断子表记录是否已经出来过，通过外键判断
+				String subTargetSelectgSql=sqlBuilder.getTargetSelectSql(table,true);
+				if(null!=subTargetSelectgSql) {
+					if(sqlOperation.isDestExists(subTargetSelectgSql, migrateRowDataHandler.handleTargetConstraintCondtion(row,table))) {
+						throw new DataExistsException("待插入的记录已经存在");
+					}
+				}
+			}else {
+				if(isExists) {
+					throw new DataExistsException("待插入的记录已经存在");
+				}
 			}
 		}
 		

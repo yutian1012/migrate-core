@@ -264,6 +264,7 @@ public class TransferTableHandler extends DefaultHandler {
     		if(null!=attributes.getValue("applyType")&&!"".equals(attributes.getValue("applyType"))){
     			constraintModel.setApplyType(ApplyTypeEnum.valueOf(attributes.getValue("applyType")));
     		}
+    		constraintModel.setValue(attributes.getValue("value"));
     	}else{//constraint标签处于table或subtable标签内
     		if(null!=constraintModel){
     			if(null!=subTableModel){

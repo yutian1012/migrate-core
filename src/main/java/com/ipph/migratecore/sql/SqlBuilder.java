@@ -154,13 +154,21 @@ public class SqlBuilder extends BaseSqlBuilder{
 		
 		return sbuilder.toString();
 	}
+	/**
+	 * 获取主表的查询sql
+	 * @param tableModel
+	 * @return
+	 */
+	public String getTargetSelectSql(TableModel tableModel) {
+		return getTargetSelectSql(tableModel,false);
+	}
 	
 	/**
 	 * 获取待更新记录信息是否存在的判断语句
 	 * @param tableModel
 	 * @return
 	 */
-	public String getTargetSelectSql(TableModel tableModel){
+	public String getTargetSelectSql(TableModel tableModel,boolean isForeign){
 		
 		if(tableModel.getFiledList().size()==0){
 			return null;
@@ -168,7 +176,15 @@ public class SqlBuilder extends BaseSqlBuilder{
 		
 		StringBuilder sbuilder=new StringBuilder();
 		
-		String sql=getCountSql(tableModel.getTo());
+		
+		String sql=null;
+		//isForeign用来判断查询的表是否是子表，getMain用来判断此TableModel是否为子表定义
+		//处理数据时需要先判断主记录是否存在，如果主记录都不存在，处理子表数据也没有什么意义。
+		if(!isForeign&&null!=tableModel.getMain()&&!"".equals(tableModel.getMain())) {
+			sql=getCountSql(tableModel.getMain());
+		}else {
+			sql=getCountSql(tableModel.getTo());
+		}
 		
 		if(null!=sql){
 			sbuilder.append(sql);
@@ -179,7 +195,11 @@ public class SqlBuilder extends BaseSqlBuilder{
 		if(tableModel.getType()==TableOperationEnum.UPDATE) {
 			condition=getTargetCondition(tableModel.getWhereModel());
 		}else{//insert数据时，判断主键字段值是否已经存在
-			condition=getTargetConstraint(tableModel.getConstraintList());
+			if(null!=tableModel.getMain()&&!"".equals(tableModel.getMain())) {//子表，获取外键约束
+				condition=getTargetConstraint(tableModel.getConstraintList(),isForeign);
+			}else {
+				condition=getTargetConstraint(tableModel.getConstraintList(),false);
+			}
 		}
 		if(null!=condition&&!"".equals(condition)){
 			sbuilder.append(condition);

@@ -30,6 +30,7 @@ import com.ipph.migratecore.util.IdGenerator;
 public class MigrateRowDataHandler {
 	
 	public static final String pkName="pkName";
+	public static final String fkName="fkName";
 	
 	@Resource
 	private FormaterContext formaterContext;
@@ -108,7 +109,6 @@ public class MigrateRowDataHandler {
 		
 		if(row.containsKey(table.getSourcePkName().toUpperCase())) {
 			Object[] result=new Object[] {row.get(table.getSourcePkName().toUpperCase())};
-			
 			return result;
 					
 		}
@@ -237,7 +237,11 @@ public class MigrateRowDataHandler {
 	public Map<String,Object> handleForLog(TableModel table,Map<String,Object> row){
 		Map<String,Object> data=new HashMap<String,Object>();
 		
-		data.put(MigrateRowDataHandler.pkName, row.get(table.getSourcePkName().toUpperCase()));
+		if(null!=table.getMain()&&!"".equals(table.getMain())) {
+			data.put(MigrateRowDataHandler.fkName, row.get(table.getSourcePkName().toUpperCase()));
+		}else {
+			data.put(MigrateRowDataHandler.pkName, row.get(table.getSourcePkName().toUpperCase()));
+		}
 		
 		List<FieldModel> fieldList=table.getFiledList();
 		

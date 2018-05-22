@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+    <!-- 登记信息申请人类型的更新 -->
+   <table type="UPDATE" to="cs_copyright" from="tcopyrightreg" note="登记信息申请人类型的更新-文字" skip="false">
+    	<fields>
+    		<field name="userType" applyType="TARGET" valueType="FIELD" value="type"></field>
+    		<field name="authorname" applyType="SOURCE" note="著作权人" forLog="true"></field>
+    		<field name="type" applyType="SOURCE"/>
+    	</fields>
+    	<where>
+    		<!-- <condition type="IN" applyType="SOURCE">
+    			<field name="workType" applyType="SOURCE" valueType="FIXED" value="LYZP,LXZP,SY,SZDY,DY"></field>
+    		</condition> -->
+    		<condition type="EQUAL" applyType="TARGET">
+    			<field name="ownername" applyType="TARGET" valueType="FIELD" value="authorname"></field>
+    		</condition>
+    	</where>
+    	<formats>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="type" defaultValue="其他">{'FR':'企业','QYFR':'企业','ZRR':'个人','QT':'其他','SYDWFR':'企业','QTZZ':'其他','SHTTFR':'企业','JGFR':'企业'}</format>
+    	</formats>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    		<constraint type="PRIMARY" applyType="TARGET">
+    			<field name="id" applyType="TARGET"/>
+    		</constraint>
+    	</constraints>
+    </table>
+</tables>

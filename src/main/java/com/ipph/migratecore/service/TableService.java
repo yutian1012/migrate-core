@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@Transactional
 public class TableService {
 
 	@Resource

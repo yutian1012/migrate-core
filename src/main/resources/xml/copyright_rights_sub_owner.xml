@@ -2,12 +2,12 @@
 <tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
     <!-- 专利申请数据的更新 -->
-   <table type="MIGRATE" to="cs_copyright_owner" from="tcopyrightallo" note="软件著作权补助数据迁移-文字-著作权人" skip="false" main="cs_copyright">
+   <table type="MIGRATE" to="cs_rights_copyright_owner" from="tcopyrightallo" note="软件著作权补助数据迁移-影视-著作权人" skip="false" main="cs_rights_copyright">
     	<fields>
     		<!-- target field list -->
     		<field name="id" applyType="TARGET" valueType="GENCODE"></field>
-    		<field name="oid" applyType="TARGET" valueType="FIELD" value="id"/>
-    		<field name="ownerName" applyType="TARGET" valueType="FIELD" value="copyrightman"/>
+    		<field name="rid" applyType="TARGET" valueType="FIELD" value="id"/>
+    		<field name="obligeeName" applyType="TARGET" valueType="FIELD" value="copyrightman"/>
     		<!-- source field list -->
     		<field name="id" applyType="SOURCE"/>
     		<field name="copyrightman" applyType="SOURCE" forLog="true"/>
@@ -16,7 +16,7 @@
     		<condition type="ISNOTNULL" applyType="SOURCE">
     			<field name="copyrightman" applyType="SOURCE"></field>
     		</condition>
-    		<condition type="NOTIN" applyType="SOURCE">
+    		<condition type="IN" applyType="SOURCE">
     			<field name="workType" applyType="SOURCE" valueType="FIXED" value="LYZP,LXZP,SY,SZDY,DY"></field>
     		</condition>
     	</where>
@@ -24,12 +24,12 @@
     		<constraint type="PRIMARY" applyType="SOURCE">
     			<field name="id" applyType="SOURCE"/>
     		</constraint>
-    		<constraint type="PRIMARY" applyType="TARGET" value="cs_copyright">
-    			<field name="id" applyType="TARGET"/>
+    		<constraint type="PRIMARY" applyType="TARGET" value="cs_rights_copyright">
+    			<field name="rid" applyType="TARGET"/>
     		</constraint>
     		<!-- 子表外键 -->
     		<constraint type="FOREIGNKEY" applyType="TARGET">
-    			<field name="oid" applyType="TARGET"/>
+    			<field name="rid" applyType="TARGET"/>
     		</constraint>
     	</constraints>
     	<splits>

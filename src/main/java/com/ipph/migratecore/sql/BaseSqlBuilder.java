@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import com.ipph.migratecore.deal.condition.ConditionContext;
 import com.ipph.migratecore.enumeration.ApplyTypeEnum;
+import com.ipph.migratecore.enumeration.FieldConstraintEnum;
 import com.ipph.migratecore.model.ConditionModel;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
@@ -135,7 +136,7 @@ public class BaseSqlBuilder {
 	 * @param constraintList
 	 * @return
 	 */
-	protected String getTargetConstraint(List<ConstraintModel> constraintList) {
+	protected String getTargetConstraint(List<ConstraintModel> constraintList,boolean isForeign) {
 		
 		List<ConstraintModel> list=new ArrayList<>();
 		if(null!=constraintList&&constraintList.size()>0) {
@@ -145,7 +146,15 @@ public class BaseSqlBuilder {
 						||constraint.getApplyType()==ApplyTypeEnum.SOURCE) {
 					continue;
 				}
-				list.add(constraint);
+				if(isForeign) {
+					if(constraint.getType()==FieldConstraintEnum.FOREIGNKEY) {
+						list.add(constraint);
+					}
+				}else {
+					if(constraint.getType()==FieldConstraintEnum.PRIMARY) {
+						list.add(constraint);
+					}
+				}
 			}
 		}
 		return getWhereByConstraintList(list);

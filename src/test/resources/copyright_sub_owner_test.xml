@@ -2,7 +2,7 @@
 <tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
     <!-- 专利申请数据的更新 -->
-   <table type="MIGRATE" to="cs_copyright_owner_dest" from="tcopyrightallo" note="软件著作权补助数据迁移-文字-著作权人" skip="false" main="cs_rights_copyright">
+   <table type="MIGRATE" to="cs_copyright_owner_dest" from="tcopyrightallo" note="软件著作权补助数据迁移-文字-著作权人" skip="false" main="cs_copyright">
     	<fields>
     		<!-- target field list -->
     		<field name="id" applyType="TARGET" valueType="GENCODE"></field>
@@ -10,7 +10,7 @@
     		<field name="ownerName" applyType="TARGET" valueType="FIELD" value="copyrightman"/>
     		<!-- source field list -->
     		<field name="id" applyType="SOURCE"/>
-    		<field name="copyrightman" applyType="SOURCE"/>
+    		<field name="copyrightman" applyType="SOURCE" forLog="true"/>
     	</fields>
     	<where>
     		<condition type="ISNOTNULL" applyType="SOURCE">
@@ -27,12 +27,16 @@
     		<constraint type="PRIMARY" applyType="SOURCE">
     			<field name="id" applyType="SOURCE"/>
     		</constraint>
-    		<constraint type="PRIMARY" applyType="TARGET">
+    		<constraint type="PRIMARY" applyType="TARGET" value="cs_copyright">
     			<field name="id" applyType="TARGET"/>
+    		</constraint>
+    		<!-- 子表外键 -->
+    		<constraint type="FOREIGNKEY" applyType="TARGET">
+    			<field name="oid" applyType="TARGET"/>
     		</constraint>
     	</constraints>
     	<splits>
-    		<split clazz="com.ipph.migratecore.deal.split.CharacterSpliter" fieldName="copyrightman"></split>
+    		<split clazz="com.ipph.migratecore.deal.split.CharacterSpliter" fieldName="copyrightman">[,;\/ :]</split>
     	</splits>
     </table>
 </tables>

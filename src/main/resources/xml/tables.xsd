@@ -156,10 +156,12 @@
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:enumeration value="PRIMARY"></xsd:enumeration>
+						<xsd:enumeration value="FOREIGNKEY"></xsd:enumeration>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
 			<xsd:attribute ref="applyType" use="required"></xsd:attribute>
+			<xsd:attribute name="value"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
