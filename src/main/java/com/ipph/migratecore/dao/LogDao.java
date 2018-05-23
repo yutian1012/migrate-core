@@ -23,9 +23,16 @@ public interface LogDao extends JpaRepository<LogModel,Long>{
 	
 	public LogModel getByDataIdAndBatchLogId(Long dataId,Long batchLogId);
 	
-	@Query(" select count(1) as num ,log.status as status from LogModel log where log.batchLogId=?1 and log.tableId=?2 group by log.status ")
+	@Query(" select count(1) as num ,log.status as category from LogModel log where log.batchLogId=?1 and log.tableId=?2 group by log.status ")
 	public List<Map<String,Object>> statistic(Long batchLogId,Long tableId);
 	
+	@Query(" select count(1) as num ,log.messageType as category from LogModel log where log.batchLogId=?1 and log.tableId=?2 and log.status=?3 group by log.status ")
+	public List<Map<String,Object>> statisticByStatus(Long batchLogId,Long tableId,LogStatusEnum status);
+	
+	@Query("select count(1) as num,log.status as category from LogModel log where log.batchLogId in (?1) group by log.status")
+	public List<Map<String,Object>> statisticBybatchLogIdIn(Long[] batchLogId);
+	
 	public List<LogModel> getListByTableIdAndStatusAndBatchLogIdIn(Long tableId,LogStatusEnum status,Long[] batchLogIdArr,Pageable pageable);
+	
 	
 }

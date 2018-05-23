@@ -21,7 +21,8 @@ import com.ipph.migratecore.model.LogModel;
 public class LogDaoTest {
 	
 	@Resource
-	//private LogDao logDao;
+	private LogDao logDao;
+	@Resource
 	private LogJdbcDao logJdbcDao;
 
 	@Test
@@ -35,14 +36,16 @@ public class LogDaoTest {
 		model.setStatus(LogStatusEnum.SUCCESS);
 		model.setTableId(0L);
 		model.setTableName("tablename");
-		model=logJdbcDao.save(model);
+		//model=logJdbcDao.save(model);
+		model=logDao.save(model);
 		
 		assertNotNull(model.getId());
 		
 		id=model.getId();
 		
 		//从数据库中检索
-		LogModel model2=logJdbcDao.findById(id);//logDao.findById(id).get();
+		//LogModel model2=logJdbcDao.findById(id);
+		LogModel model2=logDao.findById(id).get();
 		
 		assertNotNull(model2);
 		

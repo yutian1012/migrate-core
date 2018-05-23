@@ -90,4 +90,13 @@ public class BatchLogService {
 	public BatchLogModel findFirstByParentIdOrderByIdDesc(Long parentBatchLogId) {
 		return batchLogDao.findFirstByParentIdOrderByIdDesc(parentBatchLogId);
 	}
+	/**
+	 * 获取子批次记录
+	 * @param batchId
+	 * @param parentId
+	 * @return
+	 */
+	public List<BatchLogModel> getByBatchIdAndParentId(Long batchId,Long parentId){
+		return batchLogDao.getListByParentId(parentId);
+	}
 }

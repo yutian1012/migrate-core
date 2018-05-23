@@ -68,6 +68,7 @@ public class BatchService {
 			
 			List<TableModel> tableList=new ArrayList<TableModel>();
 			
+			//中间表数据获取
 			List<BatchTableModel> batchTableList=batchTableDao.getListByBatchId(batchId);
 			
 			for(BatchTableModel batchTable:batchTableList) {

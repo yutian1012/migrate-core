@@ -57,7 +57,7 @@ public class JxlsExcelView extends AbstractView{
         if(browser.indexOf("MSIE")!=-1){//IE浏览器
             fileName = new String((fileName+".xls").getBytes("gb2312"), "ISO8859-1");
         }else if(browser.indexOf("FIREFOX")!=-1){//google,火狐浏览器，会自动添加文件扩展名。
-            fileName = "=?UTF-8?B?" + (new String (Base64.getEncoder().encode(fileName.getBytes("UTF-8")))) + "?=";  //火狐文件名空格被截断问题
+            fileName = "=?UTF-8?B?" + (new String (Base64.getEncoder().encode((fileName+".xls").getBytes("UTF-8")))) + "?=";  //火狐文件名空格被截断问题
         }else{
             fileName = new String((fileName+".xls").getBytes("gb2312"), "ISO8859-1");
         }

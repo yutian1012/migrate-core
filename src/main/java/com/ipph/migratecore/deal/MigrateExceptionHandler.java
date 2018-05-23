@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.stereotype.Component;
 
+import com.ipph.migratecore.deal.exception.DataAlreadyDealed;
 import com.ipph.migratecore.deal.exception.DataExistsException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
@@ -39,6 +40,8 @@ public class MigrateExceptionHandler {
 				messageType=LogMessageEnum.DATAEXISTS_EXCEPTION;
 			}else if (e instanceof RuntimeException){
 				messageType=LogMessageEnum.SQL_EXCEPTION;
+			}else if(e instanceof DataAlreadyDealed){
+				messageType=LogMessageEnum.SKIP;
 			}else {
 				messageType=LogMessageEnum.OTHERS;
 			}

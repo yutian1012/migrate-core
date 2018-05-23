@@ -33,6 +33,20 @@ public class BatchLogController {
 		
 		return mv;
 	}
+	/**
+	 * 子批次查询记录
+	 * @param batchId
+	 * @param batchLogId
+	 * @return
+	 */
+	@RequestMapping("/batch/sub/{batchId}/{batchLogId}")
+	public ModelAndView getSubBatchLog(@PathVariable("batchId")Long batchId,@PathVariable("batchLogId")Long batchLogId) {
+		ModelAndView mv=new ModelAndView("logs/sub/batchLog");
+		
+		mv.addObject("batchLogList",batchLogService.getByBatchIdAndParentId(batchId,batchLogId));
+		
+		return mv;
+	}
 	
 	/**
 	 * 批次日志中该批次的表集合，该批次中的每个表都有相应的执行日志

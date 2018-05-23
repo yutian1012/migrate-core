@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+    <!-- 登记信息申请人类型的更新 -->
+   <table type="UPDATE" to="tcopyrightreg_dest" from="tcopyrightallo" note="历史数据中著作权资助与登记不符的记录" skip="false">
+    	<fields>
+    		<field name="remark" applyType="TARGET" valueType="FIXED" value="1"></field>
+    		<field name="copyrightman" applyType="SOURCE" note="著作权人" forLog="true"></field>
+    	</fields>
+    	<where>
+    		<!-- <condition type="IN" applyType="SOURCE">
+    			<field name="workType" applyType="SOURCE" valueType="FIXED" value="LYZP,LXZP,SY,SZDY,DY"></field>
+    		</condition> -->
+    		<condition type="EQUAL" applyType="TARGET">
+    			<field name="authorname" applyType="TARGET" valueType="FIELD" value="copyrightman"></field>
+    		</condition>
+    	</where>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    		<constraint type="PRIMARY" applyType="TARGET">
+    			<field name="id" applyType="TARGET"/>
+    		</constraint>
+    	</constraints>
+    </table>
+</tables>

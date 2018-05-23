@@ -20,7 +20,7 @@
 		function subBatchLog(){
 			var parentId=/*[[${batchLog.id}]]*/ '';
 			var batchId=/*[[${batchLog.batchId}]]*/ '';
-			window.location.href='/logs/batch/sub/'+batchId+'/'+parentId;
+			window.location.href='/batches/subList/'+batchId;
 		}
 		
 		function migrateSuccess(){
@@ -151,14 +151,14 @@
   </head>
   
   <body>
-  	<div>
+  	<!-- <div>
   		<input type="button" value="错误信息更正" onclick="migrate()">
-  		<input type="button" value="查看子批次处理记录" onclick="subBatchLog()">
+  		<input type="button" value="查看子批次处理记录" onclick="subBatch()">
   		<input type="button" value="查看正确处理的数据" onclick="migrateSuccess()">
   		<input type="button" value="查看处理错误数据" onclick="migrateFail()">
   		<input type="button" value="导出成功数据" onclick="exportSuccess()">
   		<input type="button" value="导出错误数据" onclick="exportFail()">
-  	</div>
+  	</div> -->
   	<div>
   		<form th:action="@{'/logs/table/'+${batchLog.id}+'/'+${tableId}}" th:method="post">
 	  		执行状态:<select name="status"><option value="">请选择</option><option value="SUCCESS">成功</option><option value="FAIL">失败</option></select>

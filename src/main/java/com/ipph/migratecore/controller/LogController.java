@@ -95,35 +95,9 @@ public class LogController {
 		List<LogModel> tableLogList=logService.getSuccessLogs(batchLogId,tableId,pageable);
 		
 		mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
-			.addObject("tableId",tableId).addObject("pageable",pageable);
+			.addObject("tableId",tableId).addObject("pageable",pageable).addObject("success",true);
 		
 		return mv;
-	}
-	
-	/**
-	 * 导出数据
-	 * @param batchLogId
-	 * @param tableId
-	 * @param size
-	 * @param page
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping("/table/success/export/{batchLogId}/{tableId}")
-	public ModelAndView exportSuccess(@PathVariable("batchLogId")Long batchLogId,
-			@PathVariable("tableId")Long tableId,
-			@RequestParam(value="size",defaultValue="20")int size,
-			@RequestParam(value="page",defaultValue="0")int page,
-			HttpServletRequest request,HttpServletResponse response) {
-		
-		Pageable pageable=PageRequest.of(page, size);
-		
-		List<LogModel> tableLogList=logService.getSuccessLogs(batchLogId,tableId,pageable);
-		Map<String, Object> model=new HashMap<>();
-		
-		model.put("tableLogList", tableLogList);
-		
-		return new ModelAndView(new JxlsExcelView("/export/logexport.xls", "导出执行日志"),model);
 	}
 	
 	/**
@@ -149,9 +123,61 @@ public class LogController {
 		List<LogModel> tableLogList=logService.getFailLogs(batchLogId, tableId,pageable);
 		
 		mv.addObject("tableLogList",tableLogList).addObject("batchLog",batchLogModel)
-			.addObject("tableId",tableId).addObject("pageable",pageable);
+			.addObject("tableId",tableId).addObject("pageable",pageable).addObject("fail",true);
 		
 		return mv;
+	}
+	
+	/**
+	 * 导出正确数据
+	 * @param batchLogId
+	 * @param tableId
+	 * @param size
+	 * @param page
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/table/success/export/{batchLogId}/{tableId}")
+	public ModelAndView exportSuccess(@PathVariable("batchLogId")Long batchLogId,
+			@PathVariable("tableId")Long tableId,
+			@RequestParam(value="size",defaultValue="20")int size,
+			@RequestParam(value="page",defaultValue="0")int page,
+			HttpServletRequest request,HttpServletResponse response) {
+		
+		//Pageable pageable=PageRequest.of(page, size);
+		
+		List<LogModel> tableLogList=logService.getSuccessLogs(batchLogId,tableId,null);
+		Map<String, Object> model=new HashMap<>();
+		
+		model.put("tableLogList", tableLogList);
+		
+		return new ModelAndView(new JxlsExcelView("/export/logexport.xls", "导出执行日志"),model);
+	}
+	
+	/**
+	 * 导出错误数据
+	 * @param batchLogId
+	 * @param tableId
+	 * @param size
+	 * @param page
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/table/fail/export/{batchLogId}/{tableId}")
+	public ModelAndView exportFail(@PathVariable("batchLogId")Long batchLogId,
+			@PathVariable("tableId")Long tableId,
+			@RequestParam(value="size",defaultValue="20")int size,
+			@RequestParam(value="page",defaultValue="0")int page,
+			HttpServletRequest request,HttpServletResponse response) {
+		
+		//Pageable pageable=PageRequest.of(page, size);
+		
+		List<LogModel> tableLogList=logService.getFailLogs(batchLogId,tableId,null);
+		Map<String, Object> model=new HashMap<>();
+		
+		model.put("tableLogList", tableLogList);
+		
+		return new ModelAndView(new JxlsExcelView("/export/logexport.xls", "导出执行日志"),model);
 	}
 	
 }

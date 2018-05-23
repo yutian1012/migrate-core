@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>批次执行日志</title>
+	
+    <meta name="keywords" content="keyword1,keyword2,keyword3">
+    <meta name="description" content="this is my page">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    
+	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
+	<script type="text/javascript">
+	</script>
+  </head>
+  
+  <body>
+    <table style="width:80%;text-align:center;" border="1">
+	    <tr>
+	      <th>序号</th>
+	      <th>批次号</th>
+	      <th>批次执行时间</th>
+	      <th>状态</th>
+	      <td>操作</td>
+	    </tr>
+	    <tr th:each="tableLog,index : ${batchLogList}">
+	      <td th:text="${index.count}"></td>
+	      <td th:text="${tableLog.batchNo}"></td>
+	      <td th:text="${tableLog.createDate}"></td>
+	      <td th:text="${tableLog.status}"></td>
+	      <td><span><a th:href="@{'/logs/tables/'+${tableLog.id}}">执行日志</a></span></td>
+	    </tr>
+	  </table>
+	  
+	  <!-- 统计执行量，显示批次中每个表的执行数据量，成功数据量和失败数量等 -->
+	  <div>
+	  	<label>执行量统计：</label>
+	  </div>
+  </body>
+</html>

@@ -42,7 +42,8 @@ public class LogService {
 			log.setStatus(status);
 			log.setMessage(message);
 			log.setMessageType(messageType);
-			logJdbcDao.save(log);
+			//logJdbcDao.save(log);
+			logDao.save(log);
 		}
 	}
 	
@@ -72,18 +73,21 @@ public class LogService {
 	 * @return
 	 */
 	public List<LogModel> getSuccessLogs(Long batchLogId,Long tableId,Pageable pageable){
+		
 		Long[] subBatchLogIdArr=batchLogService.getSubBatchLogIdArr(batchLogId);
 		
 		List<LogModel> list=null;
 		
+		Long[] batchLogIdArr=new Long[null!=subBatchLogIdArr?subBatchLogIdArr.length+1:1];
+		
+		batchLogIdArr[0]=batchLogId;
+		
 		//获取所有该批次日志中的所有执行记录（包括该批次的日志已经该批次的子批次日志）
 		if(null!=subBatchLogIdArr&&subBatchLogIdArr.length>0) {
-			Long[] batchLogIdArr=new Long[subBatchLogIdArr.length+1];
-			batchLogIdArr[0]=batchLogId;
 			System.arraycopy(subBatchLogIdArr, 0, batchLogIdArr, 1, subBatchLogIdArr.length);
-			
-			list=logDao.getListByTableIdAndStatusAndBatchLogIdIn(tableId,LogStatusEnum.SUCCESS,batchLogIdArr,pageable);
 		}
+		
+		list=logDao.getListByTableIdAndStatusAndBatchLogIdIn(tableId,LogStatusEnum.SUCCESS,batchLogIdArr,pageable);
 		
 		return list;
 	}
@@ -114,7 +118,8 @@ public class LogService {
 	 * @return
 	 */
 	public boolean isLogSuccess(Long dataId,Long batchLogId) {
-		LogModel log=logJdbcDao.getByDataIdAndBatchLogId(dataId,batchLogId);
+		//LogModel log=logJdbcDao.getByDataIdAndBatchLogId(dataId,batchLogId);
+		LogModel log=logDao.getByDataIdAndBatchLogId(dataId,batchLogId);
 		if(null!=log&&LogStatusEnum.SUCCESS==log.getStatus()) {
 			return true;
 		}
@@ -145,7 +150,8 @@ public class LogService {
 		log.setTableId(table.getId());
 		log.setTableName(table.getFrom());
 		log.setBatchLogId(batchLogId);
-		logJdbcDao.save(log);
+		//logJdbcDao.save(log);
+		logDao.save(log);
 		
 		return log.getId();
 	}
@@ -158,7 +164,8 @@ public class LogService {
 	public void addLog(MigrateModel migrateModel,LogMessageEnum messageType,Map<String,Object> data,String exception) {
 		LogModel log=getLogModel(migrateModel, messageType, data);
 		log.setException(exception);
-		logJdbcDao.save(log);
+		//logJdbcDao.save(log);
+		logDao.save(log);
 	}
 	/**
 	 * 获取日志

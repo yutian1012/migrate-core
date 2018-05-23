@@ -8,13 +8,16 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.ipph.migratecore.dao.LogDao;
 import com.ipph.migratecore.dao.LogJdbcDao;
+import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.BatchLogModel;
 
 @Service
 public class LogStatisticService {
 	@Resource
-	//private LogDao logDao;
+	private LogDao logDao;
+	@Resource
 	private LogJdbcDao logJdbcDao;
 	@Resource
 	private BatchLogService BatchLogService;
@@ -27,7 +30,7 @@ public class LogStatisticService {
 	 */
 	public Map<String,Object> statistic(Long batchLogId,Long tableId){
 		
-		List<Map<String,Object>> result=logJdbcDao.statistic(batchLogId, tableId);
+		List<Map<String,Object>> result=logDao.statistic(batchLogId, tableId);//logJdbcDao.statistic(batchLogId, tableId);
 		
 		return processStatisticResult(result);
 		
@@ -46,7 +49,7 @@ public class LogStatisticService {
 			batchLogIdForSearch=subBatchLogModel.getId();
 		}
 		
-		List<Map<String,Object>> result=logJdbcDao.statisticError(batchLogIdForSearch, tableId);
+		List<Map<String,Object>> result=logDao.statisticByStatus(batchLogIdForSearch, tableId, LogStatusEnum.FAIL);//logJdbcDao.statisticError(batchLogIdForSearch, tableId);
 		
 		return processStatisticResult(result);
 	}
@@ -62,7 +65,7 @@ public class LogStatisticService {
 		Long[] batchLogIdArr=BatchLogService.getSubBatchLogIdArr(parentBatchLogId);
 		
 		if(null!=batchLogIdArr) {
-			List<Map<String,Object>> result=logJdbcDao.getstatisticBybatchLogIdIn(batchLogIdArr);//logJdbcDao.statisticByParentBatchLog(parentBatchLogId, tableId);
+			List<Map<String,Object>> result=logDao.statisticBybatchLogIdIn(batchLogIdArr);//logJdbcDao.getstatisticBybatchLogIdIn(batchLogIdArr);
 			
 			return processStatisticResult(result);
 		}

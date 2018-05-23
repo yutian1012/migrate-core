@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.ipph.migratecore.deal.MigrateExceptionHandler;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.deal.exception.ConfigException;
+import com.ipph.migratecore.deal.exception.DataAlreadyDealed;
 import com.ipph.migratecore.deal.exception.DataExistsException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
@@ -117,12 +118,11 @@ public class MigrateDao {
 		try {
 			batchProcess(migrateModel, result, executeSql);
 		}catch (RuntimeException e) {
-			e.printStackTrace();
 			singleProcess(migrateModel, result, executeSql);
 		}
 	}
 	/**
-	 * 单条执行记录
+	 * 单条执行记录(对批次操作错误的情况下进行逐条单独执行)
 	 * @param migrateModel
 	 * @param result
 	 * @param executeSql
@@ -138,13 +138,15 @@ public class MigrateDao {
 				try {
 					data = processRowData(migrateModel, row);
 					sqlOperation.executeDest(executeSql, data);
-				} catch (FormatException | DataNotFoundException | DataExistsException |RuntimeException e) {
+				} catch (FormatException | DataNotFoundException | DataExistsException |RuntimeException | DataAlreadyDealed e) {
 					messageType=migrateExceptionHandler.handle(e);
 					if(messageType==LogMessageEnum.SQL_EXCEPTION) {
 						exception=e.getMessage();
 					}
 				}
-				logService.addLog(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row),exception);
+				if(messageType!=LogMessageEnum.SKIP) {
+					logService.addLog(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row),exception);
+				}
 			}
 		}
 	}
@@ -191,10 +193,8 @@ public class MigrateDao {
 	private List<LogModel> processResult(MigrateModel migrateModel,List<Map<String,Object>> result,List<Object[]> batchDataList) {
 		
 		List<LogModel> logModelList=new ArrayList<>();
-		
 		if(result!=null&&result.size()>0){
 			for(Map<String,Object> row:result){
-				
 				Object[] data=null;
 				List<Object[]> subDataList=null;
 				LogMessageEnum messageType=LogMessageEnum.SUCCESS;
@@ -205,7 +205,7 @@ public class MigrateDao {
 					}else {
 						data = processRowData(migrateModel, row);
 					}
-				} catch (FormatException | DataNotFoundException | DataExistsException | SplitException e) {
+				} catch (FormatException | DataNotFoundException | DataExistsException | SplitException | DataAlreadyDealed e) {
 					messageType=migrateExceptionHandler.handle(e);
 				}
 				
@@ -216,7 +216,9 @@ public class MigrateDao {
 					batchDataList.add(data);
 				}
 				
-				logModelList.add(logService.getLogModel(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row)));
+				if(messageType!=LogMessageEnum.SKIP) {//防止子批次执行时记录已经正确处理过的数据
+					logModelList.add(logService.getLogModel(migrateModel,messageType,migrateRowDataHandler.handleForLog(migrateModel.getTableModel(),row)));
+				}
 			}
 		}
 		
@@ -231,8 +233,9 @@ public class MigrateDao {
 	 * @throws FormatException 
 	 * @throws DataNotFoundException 
 	 * @throws DataExistsException 
+	 * @throws DataAlreadyDealed 
 	 */
-	private Object[] processRowData(MigrateModel migrateModel,Map<String,Object> row) throws FormatException, DataNotFoundException, DataExistsException {
+	private Object[] processRowData(MigrateModel migrateModel,Map<String,Object> row) throws FormatException, DataNotFoundException, DataExistsException, DataAlreadyDealed {
 		
 		TableModel table=migrateModel.getTableModel();
 		
@@ -268,12 +271,13 @@ public class MigrateDao {
 				}
 			}else {
 				if(isExists) {
+					if(null!=migrateModel.getParentLogId()) {
+						throw new DataAlreadyDealed("数据已正确处理了！");
+					}
 					throw new DataExistsException("待插入的记录已经存在");
 				}
 			}
 		}
-		
-		//主键
 		
 		//判断数据是否已经处理过了
 		if(null!=migrateModel.getParentLogId()&&logService.isLogSuccess((Long)row.get(table.getSourcePkName()),migrateModel.getParentLogId())) {
@@ -292,8 +296,9 @@ public class MigrateDao {
 	 * @throws DataExistsException 
 	 * @throws DataNotFoundException 
 	 * @throws FormatException 
+	 * @throws DataAlreadyDealed 
 	 */
-	private List<Object[]> processSplitRowData(MigrateModel migrateModel,Map<String,Object> row) throws SplitException, FormatException, DataNotFoundException, DataExistsException{
+	private List<Object[]> processSplitRowData(MigrateModel migrateModel,Map<String,Object> row) throws SplitException, FormatException, DataNotFoundException, DataExistsException, DataAlreadyDealed{
 		
 		List<Map<String,Object>> subRowList=new ArrayList<>();
 		
