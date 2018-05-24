@@ -110,4 +110,83 @@ public class PatentValidationUtil {
 			return (flag+"").equalsIgnoreCase(validation);
 		}
 	}
+	
+	
+	public static String getPatentInterfaceDbName(String appNumber){
+		if(PatentValidationUtil.isForeignPatent(appNumber)) return null;
+		String number="";
+		String[] zlNumberArr=getZlNumber(appNumber);
+		if(null!=zlNumberArr&&null!=zlNumberArr[0])
+		{
+			String zlNumber=zlNumberArr[0];
+			Pattern p=Pattern.compile("^(85|86|87|88)(1|2|3|8|9)\\d+");
+			Matcher m=p.matcher(zlNumber);
+			if(m.matches()){
+				number=zlNumber.substring(2,3);
+			}
+			else if(zlNumber.length()==8){
+				p=Pattern.compile("^(89|90|91|92|93|94|95|96|97|98|99|00|01|02|03)(1|2|3|8|9)\\d+");
+				m=p.matcher(zlNumber);
+				if(m.matches()){
+					number=zlNumber.substring(2,3);
+				}
+			}
+			else{
+				number=zlNumber.substring(4,5);
+			}
+		}
+			
+		if(number.equals("1")||number.equals("8")){
+			return "fmzl";
+		}
+		else if(number.equals("2")||number.equals("9")){
+			return "syxx";
+		}
+		else if(number.equals("3")){
+			return "wgzl";
+		}
+		else{
+			return null;
+		}
+	}
+	/**
+	 * 判断是否是国外专利
+	 * @param appNumber
+	 * @return
+	 */
+	public static boolean isForeignPatent(String appNumber){
+		if(null!=appNumber&&!"".equals(appNumber)){
+			if(appNumber.toUpperCase().startsWith("CN")||appNumber.toUpperCase().startsWith("ZL")){
+				return false;
+			}
+		}
+		return true;
+	}
+	/**
+	 * 获取申请号中国家电前两位字符
+	 * @param appNumber
+	 * @return
+	 */
+	public static String getCountryEn(String appNumber){
+		if(isStartWithCharacter(appNumber)){
+			Pattern p=Pattern.compile("^([a-zA-Z]{2})[\\w.]+");
+			Matcher m=p.matcher(appNumber);
+			if(m.matches()){
+				return m.group(1);
+			}
+		}
+		return "";
+	}
+	/**
+	 * 判断是否以字母开头
+	 * @param str
+	 */
+	public static boolean isStartWithCharacter(String str){
+		Pattern p=Pattern.compile("^[A-Za-z]+.*");
+		Matcher m=p.matcher(str);
+		if(m.matches()){
+			return true;
+		}
+		return false;
+	}
 }

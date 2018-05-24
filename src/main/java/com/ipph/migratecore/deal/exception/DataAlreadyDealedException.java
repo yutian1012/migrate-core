@@ -1,9 +1,9 @@
 package com.ipph.migratecore.deal.exception;
 
-public class DataAlreadyDealed extends Exception{
+public class DataAlreadyDealedException extends Exception{
 	private static final long serialVersionUID = 1L;
 
-	public DataAlreadyDealed(String message){
+	public DataAlreadyDealedException(String message){
 		super(message);
 	}
 }

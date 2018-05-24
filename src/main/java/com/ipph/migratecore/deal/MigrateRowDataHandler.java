@@ -161,10 +161,14 @@ public class MigrateRowDataHandler {
 		}
 		
 		for(FormatModel format:formatList) {
+			
 			Object value=formaterContext.getFormatedValue(format,rowData.get(format.getFiledName().toUpperCase()));
 			
 			rowData.put(format.getFiledName().toUpperCase(), value);
 		}
+		
+		//获取字段的格式化链，向formaterContext中传递格式化链对象，实现格式化操作
+		//formaterContext.format(formatList)
 	}
 	
 	/**

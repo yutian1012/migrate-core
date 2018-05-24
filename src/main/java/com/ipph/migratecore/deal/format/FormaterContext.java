@@ -49,6 +49,15 @@ public class FormaterContext {
 		return value;
 	}
 	/**
+	 * 获取格式化操作链
+	 * @return
+	 */
+	private synchronized Formater getFormaterChain() {
+		
+		return null;
+	}
+	
+	/**
 	 * 获取格式化处理类
 	 * @param formater
 	 * @return

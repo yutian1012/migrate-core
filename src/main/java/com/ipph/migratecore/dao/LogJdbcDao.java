@@ -13,7 +13,8 @@ import com.ipph.migratecore.util.IdGenerator;
 
 @Repository
 public class LogJdbcDao {
-	@Resource(name="migrateJdbcTemplate")
+	//@Resource(name="migrateJdbcTemplate")
+	@Resource
 	private JdbcTemplate migrateJdbcTemplate;
 	
 	public void saveAll(List<LogModel> list) {

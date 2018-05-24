@@ -28,10 +28,11 @@ public class DataSourceConfig {
         return DataSourceBuilder.create().build();
     }
     
-    @Bean(name = "migrateDataSource")
-    @Qualifier("migrateDataSource")
-    @ConfigurationProperties(prefix="spring.datasource.migrate")
+    //@Bean(name = "migrateDataSource")
+    //@Qualifier("migrateDataSource")
     @Primary
+    @Bean
+    @ConfigurationProperties(prefix="spring.datasource.migrate")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
@@ -47,8 +48,11 @@ public class DataSourceConfig {
         return new JdbcTemplate(dataSource);
     }
     
-    @Bean(name="migrateJdbcTemplate")
-    public JdbcTemplate migrateJdbcTemplate(@Qualifier("migrateDataSource")DataSource dataSource) {
+    //@Bean(name="migrateJdbcTemplate")
+    //public JdbcTemplate migrateJdbcTemplate(@Qualifier("migrateDataSource")DataSource dataSource) {
+    @Bean
+    @Primary
+    public JdbcTemplate migrateJdbcTemplate(DataSource dataSource) {
     	return new JdbcTemplate(dataSource);
     }
 }

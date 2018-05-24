@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.ipph.migratecore.deal.MigrateExceptionHandler;
 import com.ipph.migratecore.deal.MigrateRowDataHandler;
 import com.ipph.migratecore.deal.exception.ConfigException;
-import com.ipph.migratecore.deal.exception.DataAlreadyDealed;
+import com.ipph.migratecore.deal.exception.DataAlreadyDealedException;
 import com.ipph.migratecore.deal.exception.DataExistsException;
 import com.ipph.migratecore.deal.exception.DataNotFoundException;
 import com.ipph.migratecore.deal.exception.FormatException;
@@ -138,7 +138,7 @@ public class MigrateDao {
 				try {
 					data = processRowData(migrateModel, row);
 					sqlOperation.executeDest(executeSql, data);
-				} catch (FormatException | DataNotFoundException | DataExistsException |RuntimeException | DataAlreadyDealed e) {
+				} catch (FormatException | DataNotFoundException | DataExistsException |RuntimeException | DataAlreadyDealedException e) {
 					messageType=migrateExceptionHandler.handle(e);
 					if(messageType==LogMessageEnum.SQL_EXCEPTION) {
 						exception=e.getMessage();
@@ -205,7 +205,7 @@ public class MigrateDao {
 					}else {
 						data = processRowData(migrateModel, row);
 					}
-				} catch (FormatException | DataNotFoundException | DataExistsException | SplitException | DataAlreadyDealed e) {
+				} catch (FormatException | DataNotFoundException | DataExistsException | SplitException | DataAlreadyDealedException e) {
 					messageType=migrateExceptionHandler.handle(e);
 				}
 				
@@ -233,9 +233,9 @@ public class MigrateDao {
 	 * @throws FormatException 
 	 * @throws DataNotFoundException 
 	 * @throws DataExistsException 
-	 * @throws DataAlreadyDealed 
+	 * @throws DataAlreadyDealedException 
 	 */
-	private Object[] processRowData(MigrateModel migrateModel,Map<String,Object> row) throws FormatException, DataNotFoundException, DataExistsException, DataAlreadyDealed {
+	private Object[] processRowData(MigrateModel migrateModel,Map<String,Object> row) throws FormatException, DataNotFoundException, DataExistsException, DataAlreadyDealedException {
 		
 		TableModel table=migrateModel.getTableModel();
 		
@@ -272,7 +272,7 @@ public class MigrateDao {
 			}else {
 				if(isExists) {
 					if(null!=migrateModel.getParentLogId()) {
-						throw new DataAlreadyDealed("数据已正确处理了！");
+						throw new DataAlreadyDealedException("数据已正确处理了！");
 					}
 					throw new DataExistsException("待插入的记录已经存在");
 				}
@@ -296,9 +296,9 @@ public class MigrateDao {
 	 * @throws DataExistsException 
 	 * @throws DataNotFoundException 
 	 * @throws FormatException 
-	 * @throws DataAlreadyDealed 
+	 * @throws DataAlreadyDealedException 
 	 */
-	private List<Object[]> processSplitRowData(MigrateModel migrateModel,Map<String,Object> row) throws SplitException, FormatException, DataNotFoundException, DataExistsException, DataAlreadyDealed{
+	private List<Object[]> processSplitRowData(MigrateModel migrateModel,Map<String,Object> row) throws SplitException, FormatException, DataNotFoundException, DataExistsException, DataAlreadyDealedException{
 		
 		List<Map<String,Object>> subRowList=new ArrayList<>();
 		

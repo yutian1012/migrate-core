@@ -10,4 +10,5 @@ public interface Formater {
 	 * @return
 	 */
 	public Object format(String args,Object value) throws FormatException;
+	
 }
