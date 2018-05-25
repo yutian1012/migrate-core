@@ -2,6 +2,7 @@ package com.ipph.migratecore.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,6 +17,7 @@ public class PatentInfo {
 	@Id
 	@GeneratedValue
 	private Long id;
+	@Column(unique=true)
 	private String appNumber;
 	private String appName;
 	private Date appDate;

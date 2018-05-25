@@ -9,6 +9,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Transient;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -46,4 +49,6 @@ public class LogModel implements Serializable{
 	private LogMessageEnum messageType;
 	@Column(length=2048*2)
 	private String exception;
+	@Transient
+	private PatentInfo patentInfo;
 }

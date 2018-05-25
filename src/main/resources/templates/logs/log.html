@@ -50,6 +50,13 @@
 			window.location.href='/logs/table/fail/'+batchLogId+'/'+tableId;
 		}
 		
+		function migratePatentFail(){
+			var batchLogId=/*[[${batchLog.id}]]*/ '';
+			var tableId=/*[[${tableId}]]*/ '';
+			
+			window.location.href='/logs/table/patentFail/export/'+batchLogId+'/'+tableId;
+		}
+		
 		function next(){
 			var pageNum=/*[[${pageable.next().getPageNumber()}]]*/ '';
 			var pageSize=/*[[${pageable.next().getPageSize()}]]*/ '';
@@ -156,6 +163,7 @@
   		<input type="button" value="查看子批次处理记录" onclick="subBatchLog()">
   		<input type="button" value="查看正确处理的数据" onclick="migrateSuccess()">
   		<input type="button" value="查看处理错误数据" onclick="migrateFail()">
+  		<input type="button" value="查看专利错误数据" onclick="migratePatentFail()">
   		<input type="button" value="导出成功数据" onclick="exportSuccess()">
   		<input type="button" value="导出错误数据" onclick="exportFail()">
   	</div>

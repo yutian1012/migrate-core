@@ -179,5 +179,31 @@ public class LogController {
 		
 		return new ModelAndView(new JxlsExcelView("/export/logexport.xls", "导出执行日志"),model);
 	}
-	
+	/**
+	 * 导出关联专利的错误信息
+	 * @param batchLogId
+	 * @param tableId
+	 * @param size
+	 * @param page
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/table/patentFail/export/{batchLogId}/{tableId}")
+	public ModelAndView exportPatentFail(@PathVariable("batchLogId")Long batchLogId,
+			@PathVariable("tableId")Long tableId,
+			@RequestParam(value="size",defaultValue="20")int size,
+			@RequestParam(value="page",defaultValue="0")int page,
+			HttpServletRequest request,HttpServletResponse response) {
+		
+		//Pageable pageable=PageRequest.of(page, size);
+		
+		List<LogModel> tableLogList=logService.getPatentFailLogs(batchLogId,tableId,null);
+		
+		Map<String, Object> model=new HashMap<>();
+		
+		model.put("tableLogList", tableLogList);
+		
+		return new ModelAndView(new JxlsExcelView("/export/logpatentexport.xls", "导出专利错误执行日志"),model);
+	}
 }

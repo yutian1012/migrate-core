@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -108,6 +109,15 @@ public class LogService {
 			batchLogId=subBatchLogModel.getId();
 		}
 		return logDao.getListByBatchLogIdAndTableIdAndStatus(batchLogId, tableId,LogStatusEnum.FAIL,pageable);
+	}
+	
+	public List<LogModel> getPatentFailLogs(Long parentBatchLogId,Long tableId,Pageable pageable){
+		BatchLogModel subBatchLogModel=batchLogService.findFirstByParentIdOrderByIdDesc(parentBatchLogId);
+		Long batchLogId=parentBatchLogId;
+		if(null!=subBatchLogModel) {
+			batchLogId=subBatchLogModel.getId();
+		}
+		return logDao.getListByBatchLogIdAndTableIdAndStatusWithPatent(batchLogId, tableId,LogStatusEnum.FAIL,pageable);
 	}
 	
 	
@@ -229,4 +239,23 @@ public class LogService {
 			log.setDealData(MapUtil.outMapData(data));
 		}
 	}
+	/**
+	 * 获取日志集合
+	 * @param batchLogId
+	 * @param type
+	 * @return
+	 */
+	public List<LogModel> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable){
+		return logDao.getListByBatchLogIdAndMessageType(batchLogId,messageType,pageable);
+	}
+	/**
+	 * 统计数据量
+	 * @param batchLogId
+	 * @param messageType
+	 * @return
+	 */
+	public Long countByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType) {
+		return logDao.countByBatchLogIdAndMessageType(batchLogId,messageType);
+	}
+	
 }

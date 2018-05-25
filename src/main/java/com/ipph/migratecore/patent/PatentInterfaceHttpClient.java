@@ -101,7 +101,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEURL||"".equals(PatentInterfaceConnection.INTERFACEURL)){
-			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";
+			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";
 		}
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEURL);
@@ -168,7 +168,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEURL||"".equals(PatentInterfaceConnection.INTERFACEURL)){
-			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";
+			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";
 		}
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEURL);
 		if(null!=resultJson&&resultJson.get("message").equals("SUCCESS")){
@@ -253,7 +253,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEPRS||"".equals(PatentInterfaceConnection.INTERFACEPRS)){
-        	PatentInterfaceConnection.INTERFACEPRS="http://api.souips.com:8080/ipms/prs";
+        	PatentInterfaceConnection.INTERFACEPRS="http://api.souips.com:8080/ipms-pi/prs";
         }
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEPRS);
@@ -301,7 +301,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEURL||"".equals(PatentInterfaceConnection.INTERFACEURL)){
-			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";
+			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";
 		}
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEURL);
@@ -338,7 +338,7 @@ public class PatentInterfaceHttpClient {
 		nvps.add(new BasicNameValuePair("to", to+""));
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACECITE||"".equals(PatentInterfaceConnection.INTERFACECITE)){
-        	PatentInterfaceConnection.INTERFACECITE="http://api.souips.com:8080/ipms/cite";
+        	PatentInterfaceConnection.INTERFACECITE="http://api.souips.com:8080/ipms-pi/cite";
         }
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACECITE);
@@ -399,7 +399,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEFEE||"".equals(PatentInterfaceConnection.INTERFACEFEE)){
-			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms/fee";
+			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms-pi/fee";
 		}
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEFEE);
@@ -443,7 +443,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEFEE||"".equals(PatentInterfaceConnection.INTERFACEFEE)){
-			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms/fee";
+			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms-pi/fee";
 		}
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEFEE);
@@ -466,7 +466,7 @@ public class PatentInterfaceHttpClient {
 		}
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEFEE||"".equals(PatentInterfaceConnection.INTERFACEFEE)){
-			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms/fee";
+			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms-pi/fee";
 		}
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEFEE);
@@ -498,7 +498,7 @@ public class PatentInterfaceHttpClient {
 		 nvps.add(new BasicNameValuePair("displayCols","appNumber,pubNumber,pubDate,dbName"));
 		 //请求路径
 		 if(null==PatentInterfaceConnection.INTERFACEURL||"".equals(PatentInterfaceConnection.INTERFACEURL)){
-			 PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";
+			 PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";
 		 }
 		 JSONArray arrayJson=null;
 		 JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEURL);
@@ -536,7 +536,7 @@ public class PatentInterfaceHttpClient {
 		 nvps.add(new BasicNameValuePair("displayCols","appNumber"));
 		 //请求路径
 		 if(null==PatentInterfaceConnection.INTERFACEURL||"".equals(PatentInterfaceConnection.INTERFACEURL)){
-			 PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";
+			 PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";
 		 }
 		 JSONArray arrayJson=null;
 		 JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEURL);
@@ -565,7 +565,7 @@ public class PatentInterfaceHttpClient {
 		nvps.add(new BasicNameValuePair("displayCols","appNumber"));
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEFEE||"".equals(PatentInterfaceConnection.INTERFACEFEE)){
-			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms/fee";
+			PatentInterfaceConnection.INTERFACEFEE="http://api.souips.com:8080/ipms-pi/fee";
 		}
 		JSONArray arrayJson=null;
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEFEE);
@@ -586,7 +586,7 @@ public class PatentInterfaceHttpClient {
 		nvps.add(new BasicNameValuePair("displayCols",displayCols));
 		//请求路径
 		if(null==PatentInterfaceConnection.INTERFACEURL||"".equals(PatentInterfaceConnection.INTERFACEURL)){
-			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";
+			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";
 		}
 		
 		JSONObject resultJson=getByHttpClient(nvps,PatentInterfaceConnection.INTERFACEURL);
@@ -629,8 +629,8 @@ public class PatentInterfaceHttpClient {
 			entry.setContentType(PatentInterfaceConnection._application);  
 			httpPost.setEntity(entry);
 			//发送post请求
-			System.out.println("请求地址："+url);
-			System.out.println("参数："+nvps);
+			/*System.out.println("请求地址："+url);
+			System.out.println("参数："+nvps);*/
 			HttpResponse response = httpClient.execute(httpPost);
 			if(response.getStatusLine().getStatusCode()==200){
 				HttpEntity entity = response.getEntity();

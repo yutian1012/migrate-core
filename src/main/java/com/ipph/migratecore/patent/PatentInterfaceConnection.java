@@ -51,10 +51,10 @@ public class PatentInterfaceConnection {
 		boolean flag=false;
 		//访问服务器的一个地址，看能不能正常获取链接
 		if(null==PatentInterfaceConnection.INTERFACEURL){
-			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms/pat";//"http://59.151.99.154:8080/ipms/pat";
+			PatentInterfaceConnection.INTERFACEURL="http://api.souips.com:8080/ipms-pi/pat";//"http://59.151.99.154:8080/ipms-pi/pat";
 		}
 		if(null==PatentInterfaceConnection.INTERFACEPRS){
-			PatentInterfaceConnection.INTERFACEPRS="http://api.souips.com:8080/ipms/prs";//"http://59.151.99.154:8080/ipms/prs";
+			PatentInterfaceConnection.INTERFACEPRS="http://api.souips.com:8080/ipms-pi/prs";//"http://59.151.99.154:8080/ipms-pi/prs";
 		}
 		
         DefaultHttpClient httpclient = new DefaultHttpClient();  
