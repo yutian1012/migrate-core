@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>上传补充专利</title>
+</head>
+<body>
+	<div>
+		<form th:action="@{/patent/uploadXls}" method="post" enctype="multipart/form-data">
+			<label>上传补充专利：</label>
+	    	<input type="file" name="patentFile" value="选择上传的补充的专利数据" accept="*.xls">
+	    	<input type="submit" value="提交">
+    	</form>
+	</div>
+</body>
+</html>

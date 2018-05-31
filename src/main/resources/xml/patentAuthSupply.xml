@@ -2,7 +2,7 @@
 <tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
     <!-- 专利申请数据的更新 -->
-   <table type="UPDATE" to="z_patent" from="tpatentallo" note="专利授权数据更新" skip="false">
+   <table type="UPDATE" to="z_patent" from="patent_upload_model" note="专利授权补录数据更新" skip="false">
     	<fields>
     		<field name="iscity" applyType="TARGET" valueType="FIXED" value="1" note="是否已授权"></field>
     		<field name="patentNo" applyType="SOURCE" note="申请号" forLog="true"></field>

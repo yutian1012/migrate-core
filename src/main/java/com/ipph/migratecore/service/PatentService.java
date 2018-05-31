@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -21,11 +20,9 @@ import com.ipph.migratecore.dao.PatentDao;
 import com.ipph.migratecore.deal.exception.FormatException;
 import com.ipph.migratecore.deal.format.PatentNoFormater;
 import com.ipph.migratecore.enumeration.LogMessageEnum;
-import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.PatentInfo;
 import com.ipph.migratecore.patent.PatentInterfaceHttpClient;
 import com.ipph.migratecore.patent.util.DateFormatUtil;
-import com.ipph.migratecore.util.PatentValidationUtil;
 
 @Service
 //@Transactional
@@ -68,12 +65,15 @@ public class PatentService {
 		Long size=logService.countByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION);
 		int batch=500;
 		for(int i=0;i*batch<size;i++) {
-			List<LogModel> list=logService.getListByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION,PageRequest.of(i, batch));
+			List<Object> list=logService.getListByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION,PageRequest.of(i, batch));
 			if(null!=list&&list.size()>0) {
-				for(LogModel log:list) {
+				for(Object appNumber:list) {
+					executorService.execute(new PatentRunnable((String) appNumber));
+				}
+				/*for(LogModel log:list) {
 					if(null!=log.getDealData())
 						executorService.execute(new PatentRunnable(log.getDealData()));
-				}
+				}*/
 				list.clear();
 			}
 		}
@@ -126,14 +126,14 @@ public class PatentService {
 	 * @param pageable
 	 */
 	public void processPatentBatch(Long batchLogId,Pageable pageable) {
-		List<LogModel> list=logService.getListByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION,pageable);
+		List<Object> list=logService.getListByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION,pageable);
 		
 		if(null!=list&&list.size()>0) {
 			List<String> appNumberList=new ArrayList<>(list.size()*2);
-			for(LogModel log:list) {
+			for(Object temp:list) {
 				String appNumber=null;
 				try {
-					appNumber = (String) formater.format(null,log.getDealData());
+					appNumber = (String) formater.format(null,temp);
 					if(null!=appNumber) {
 						//判断数据库中是否已经存在了
 						if(!patentDao.existsByAppNumber(appNumber)) {

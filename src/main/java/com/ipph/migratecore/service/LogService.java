@@ -245,7 +245,7 @@ public class LogService {
 	 * @param type
 	 * @return
 	 */
-	public List<LogModel> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable){
+	public List<Object> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable){
 		return logDao.getListByBatchLogIdAndMessageType(batchLogId,messageType,pageable);
 	}
 	/**
