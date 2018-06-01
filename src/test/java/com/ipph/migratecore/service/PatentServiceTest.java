@@ -47,7 +47,7 @@ public class PatentServiceTest {
 	
 	@Test
 	public void testAddBatchByThread() {
-		Long batchLogId=90L;
+		Long batchLogId=17692L;
 		
 		patentService.addBatchByThread(batchLogId);
 		
@@ -57,4 +57,5 @@ public class PatentServiceTest {
 			e.printStackTrace();
 		}
 	}
+	
 }

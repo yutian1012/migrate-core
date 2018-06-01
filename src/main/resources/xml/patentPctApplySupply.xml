@@ -6,31 +6,31 @@
     	<fields>
     		<field name="id" applyType="TARGET" valueType="FIELD" value="id" note="主键字段"></field>
     		<field name="id" applyType="SOURCE"/>
-    		<field name="patentName" applyType="TARGET" valueType="FIELD" value="patentName"/>
-    		<field name="patentName" applyType="SOURCE"/>
-    		<field name="applyNo" applyType="TARGET" valueType="FIELD" value="patentNo"/>
-    		<field name="patentNo" applyType="SOURCE" note="申请号" forLog="true"></field>
-    		<field name="applyDate" applyType="TARGET" valueType="FIELD" value="requestDate"/>
-    		<field name="requestDate" applyType="SOURCE"/>
-    		<field name="authDate" applyType="TARGET" valueType="FIELD" value="pctDate"/>
-    		<field name="pctDate" applyType="SOURCE"/>
-    		<field name="country" applyType="TARGET" valueType="FIELD" value="requestCountry"/>
-    		<field name="requestCountry" applyType="SOURCE"/>
-    		<field name="applyer" applyType="TARGET" valueType="FIELD" value="firstRequest"/>
-    		<field name="firstRequest" applyType="SOURCE"/>
-    		<field name="money" applyType="TARGET" valueType="FIELD" value="transfermoney"/>
-    		<field name="transfermoney" applyType="SOURCE"/>
+    		<field name="patentName" applyType="TARGET" valueType="FIELD" value="patent_name"/>
+    		<field name="patent_name" applyType="SOURCE"/>
+    		<field name="applyNo" applyType="TARGET" valueType="FIELD" value="patent_no"/>
+    		<field name="patent_no" applyType="SOURCE" note="申请号" forLog="true"></field>
+    		<field name="applyDate" applyType="TARGET" valueType="FIELD" value="request_date"/>
+    		<field name="request_date" applyType="SOURCE"/>
+    		<field name="authDate" applyType="TARGET" valueType="FIELD" value="pct_date"/>
+    		<field name="pct_date" applyType="SOURCE"/>
+    		<field name="country" applyType="TARGET" valueType="FIELD" value="request_country"/>
+    		<field name="request_country" applyType="SOURCE"/>
+    		<field name="applyer" applyType="TARGET" valueType="FIELD" value="first_request"/>
+    		<field name="first_request" applyType="SOURCE"/>
+    		<field name="money" applyType="TARGET" valueType="FIELD" value="transfer_money"/>
+    		<field name="transfer_money" applyType="SOURCE"/>
     		<field name="statusType" applyType="TARGET" valueType="FIXED" value="1"/>
     		<field name="type" applyType="TARGET" valueType="FIXED" value="0"/>
     	</fields>
     	<where>
     		<condition type="EQUAL" applyType="SOURCE">
-    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ5"></field>
+    			<field name="cost_type" applyType="SOURCE" valueType="FIXED" value="SQ5"></field>
     		</condition>
     	</where>
     	<formats>
-    		<format clazz="com.ipph.migratecore.deal.format.PctNoFormater" fieldName="patentNo"/>
-    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="requestCountry">{'QT':'CN','MG':'US','ZG':'CN','RB':'JP','OM':'EP'}</format>
+    		<format clazz="com.ipph.migratecore.deal.format.PctNoFormater" fieldName="patent_no"/>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="request_country">{'QT':'CN','MG':'US','ZG':'CN','RB':'JP','OM':'EP'}</format>
     	</formats>
     	<constraints>
     		<constraint type="PRIMARY" applyType="SOURCE">

@@ -2,6 +2,7 @@ package com.ipph.migratecore.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,15 +38,16 @@ public class PatentUploadExcelController {
 	 * 上传excel文档
 	 * @param file
 	 * @return
+	 * @throws ParseException 
 	 */
 	@RequestMapping("/uploadXls")
-	public String uploadXls(@RequestParam("patentFile") MultipartFile file){
+	public String uploadXls(@RequestParam("patentFile") MultipartFile file) throws ParseException{
 		if(!file.isEmpty()){
 			
 			String fileName = file.getOriginalFilename();
 	        try {
 	        	//解析上传的文件并保存到数据库中
-	        	ExcelRead excelRead=new ExcelRead(2);
+	        	ExcelRead excelRead=new ExcelRead(8);
 	        	
 	        	List<Map<String,String>> result=excelRead.readExcel(file);
 	        	

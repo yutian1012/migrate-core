@@ -6,6 +6,7 @@
     	<fields>
     		<field name="iscity" applyType="TARGET" valueType="FIXED" value="1" note="是否已授权"></field>
     		<field name="patentNo" applyType="SOURCE" note="申请号" forLog="true"></field>
+    		<field name="costtype" applyType="SOURCE"/>
     	</fields>
     	<where>
     		<condition type="EQUAL" applyType="SOURCE">
