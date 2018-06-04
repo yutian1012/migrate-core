@@ -50,12 +50,6 @@ public class PatentUploadExcelController {
 	        	ExcelRead excelRead=new ExcelRead(8);
 	        	
 	        	List<Map<String,String>> result=excelRead.readExcel(file);
-	        	
-	        	/*for(Map<String,String> dataRow:result) {
-	        		for(String key:dataRow.keySet()) {
-	        			System.out.println("第"+key+"列--值为"+dataRow.get(key));
-	        		}
-	        	}*/
 	        	patentUploadService.uploadXls(result);
 	        	
 	        	
@@ -80,4 +74,6 @@ public class PatentUploadExcelController {
 		Pageable pageable=PageRequest.of(page, size);
 		return patentUploadService.list(pageable);
 	}
+	
+	
 }

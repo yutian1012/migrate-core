@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+    <!-- 专利旧系统数据处理 -->
+   <table type="MIGRATE" to="z_patent_history" from="tpatentallo" note="专利旧系统数据迁移" skip="false">
+    	<fields>
+    		<field name="id" applyType="TARGET" valueType="FIELD" value="id" note="主键字段"></field>
+    		<field name="id" applyType="SOURCE"/>
+    		<field name="patentName" applyType="TARGET" valueType="FIELD" value="patentName"/>
+    		<field name="patentName" applyType="SOURCE"/>
+    		<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo"/>
+    		<field name="patentNo" applyType="SOURCE" note="申请号" forLog="true"></field>
+    		<field name="appDate" applyType="TARGET" valueType="FIELD" value="requestDate"/>
+    		<field name="requestDate" applyType="SOURCE"/>
+    		<field name="authDate" applyType="TARGET" valueType="FIELD" value="authDate"/>
+    		<field name="authDate" applyType="SOURCE"/>
+    		<field name="type" applyType="TARGET" valueType="FIELD" value="costType"/>
+    		<field name="costType" applyType="SOURCE"/>
+    		<field name="patentee" applyType="TARGET" valueType="FIELD" value="firstRequest"/>
+    		<field name="firstRequest" applyType="SOURCE"/>
+    		<field name="status" applyType="TARGET" valueType="FIELD" value="status"/>
+    		<field name="status" applyType="SOURCE"/>
+    		<field name="amount" applyType="TARGET" valueType="FIELD" value="transfermoney"/>
+    		<field name="transfermoney" applyType="SOURCE"/>
+    		<field name="linkMan" applyType="TARGET" valueType="FIELD" value="linkMan"/>
+    		<field name="linkMan" applyType="SOURCE"/>
+    		<field name="linkTel" applyType="TARGET" valueType="FIELD" value="linkTel"/>
+    		<field name="linkTel" applyType="SOURCE"/>
+    		<field name="address" applyType="TARGET" valueType="FIELD" value="address"/>
+    		<field name="address" applyType="SOURCE"/>
+    		<field name="batch" applyType="TARGET" valueType="FIELD" value="batch"/>
+    		<field name="batch" applyType="SOURCE"/>
+    		<field name="bank" applyType="TARGET" valueType="FIELD" value="bank"/>
+    		<field name="bank" applyType="SOURCE"/>
+    		<field name="bankAccount" applyType="TARGET" valueType="FIELD" value="account"/>
+    		<field name="account" applyType="SOURCE"/>
+    		<field name="result" applyType="TARGET" valueType="FIELD" value="result"/>
+    		<field name="result" applyType="SOURCE"/>
+    		<field name="resultTime" applyType="TARGET" valueType="FIELD" value="resultTime"/>
+    		<field name="createTime" applyType="TARGET" valueType="FIELD" value="createTime"/>
+    		<field name="createTime" applyType="SOURCE"/>
+    		<field name="creator" applyType="TARGET" valueType="FIELD" value="creator"/>
+    		<field name="creator" applyType="SOURCE"/>
+    		<field name="resultor" applyType="TARGET" valueType="FIELD" value="resultor"/>
+    		<field name="resultor" applyType="SOURCE"/>
+    	</fields>
+    	<where>
+    		<!-- <condition type="EQUAL" applyType="SOURCE">
+    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ5"></field>
+    		</condition> -->
+    		<condition type="ISNOTNULL" applyType="SOURCE">
+    			<field name="patentNo" applyType="SOURCE"/>
+    		</condition>
+    		<condition type="ISNOTNULL" applyType="SOURCE">
+    			<field name="costType" applyType="SOURCE"/>
+    		</condition>
+    	</where>
+    	<formats>
+    		<!-- <format clazz="com.ipph.migratecore.deal.format.PctNoFormater" fieldName="patentNo"/>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="requestCountry">{'QT':'CN','MG':'US','ZG':'CN','RB':'JP','OM':'EP'}</format> -->
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="costType">{'SQ1':'国内发明专利申请','SQ2':'国内发明专利授权','SQ3':'国内工矿企业首个发明专利申请','SQ4':'国内工矿企业首个发明专利授权','SQ5':'（职务）PCT国际专利申请','SQ6':'（职务）国外专利授权'}</format>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="status">{'0':'申请中','1':'审核通过','2':'审核不通过','3':'初审通过','4':'审核过期'}</format>
+    	</formats>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    		<constraint type="PRIMARY" applyType="TARGET">
+    			<field name="id" applyType="TARGET"/>
+    		</constraint>
+    	</constraints>
+    </table>
+</tables>

@@ -12,8 +12,8 @@
     		<field name="patent_no" applyType="SOURCE" note="申请号" forLog="true"></field>
     		<field name="applyDate" applyType="TARGET" valueType="FIELD" value="request_date"/>
     		<field name="request_date" applyType="SOURCE"/>
-    		<field name="authDate" applyType="TARGET" valueType="FIELD" value="pct_date"/>
-    		<field name="pct_date" applyType="SOURCE"/>
+    		<field name="authDate" applyType="TARGET" valueType="FIELD" value="auth_date"/>
+    		<field name="auth_date" applyType="SOURCE"/>
     		<field name="country" applyType="TARGET" valueType="FIELD" value="request_country"/>
     		<field name="request_country" applyType="SOURCE"/>
     		<field name="applyer" applyType="TARGET" valueType="FIELD" value="first_request"/>

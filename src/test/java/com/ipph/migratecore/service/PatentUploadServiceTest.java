@@ -1,8 +1,11 @@
 package com.ipph.migratecore.service;
 
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 
 import javax.annotation.Resource;
@@ -76,6 +79,81 @@ public class PatentUploadServiceTest {
 		}
 		
 		patentUploadService.exportInsertSqlByBatchLogId(batchLogId,tableId,f,isApply);
+	}
+	
+	@Test
+	public void exportApplyPatent2ImportExcel() throws IOException {
+		Long batchLogId=19699L;//
+		Long tableId=19686L;
+		File f=new File(filePath+"\\importApply.txt");
+		
+		if(!f.exists()) {
+			f.createNewFile();
+		}
+		
+		patentUploadService.exportPatent2ImportExcel(batchLogId,tableId,f);
+		
+		getImportedPatent2UpdSql("importApply.sql", f,true);
+		
+	}
+	
+	@Test
+	public void exportAuthPatent2ImportExcel() throws IOException {
+		Long batchLogId=19699L;//
+		Long tableId=19686L;
+		File f=new File(filePath+"\\importAuth.txt");
+		
+		if(!f.exists()) {
+			f.createNewFile();
+		}
+		
+		patentUploadService.exportPatent2ImportExcel(batchLogId,tableId,f);
+		
+		getImportedPatent2UpdSql("importAuth.sql", f,false);
+	}
+	
+	private void getImportedPatent2UpdSql(String fileName,File f,boolean isApply) throws IOException {
+		File f2=new File(filePath+"\\"+fileName);
+		
+		if(!f2.exists()) {
+			f2.createNewFile();
+		}
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		try(BufferedReader  br=new BufferedReader(new FileReader(f))){
+			String appNumber=null;
+			while((appNumber=br.readLine())!=null) {
+				String sql=getSql(appNumber, isApply);
+				if(null!=sql) {
+					stringBuffer.append(sql);
+				}
+			}
+		}
+		
+		if(stringBuffer.length()>0) {
+			//写入到文件
+			try(FileOutputStream fos=new FileOutputStream(f2);){
+				fos.write(stringBuffer.toString().getBytes(), 0, stringBuffer.toString().getBytes().length);
+			}
+		}
+	}
+	
+	private String getSql(String appNumber,boolean isApply) {
+		if(null==appNumber||"".equals(appNumber)) {
+			return null;
+		}
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append("update z_patent set ");
+		if(isApply) {
+			stringBuffer.append("isApply=1");
+		}else {
+			stringBuffer.append("isCity=1");
+		}
+		
+		stringBuffer.append(" where appNumber='").append(appNumber).append("';");
+		
+		return stringBuffer.toString();
 	}
 
 }

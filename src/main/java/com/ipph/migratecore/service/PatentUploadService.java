@@ -47,7 +47,7 @@ public class PatentUploadService {
 	public void uploadXls(List<Map<String,String>> result) throws ParseException {
 		
 		//定义匹配规则
-		String[] rule= {"patentNo","costType","patentName","requestDate","pctDate","requestCountry","firstRequest","transferMoney"};
+		String[] rule= {"patentNo","costType","patentName","requestDate","authDate","requestCountry","firstRequest","transferMoney","linkMan","address","linkTel","batch","createTime","status","sourceType","errorAppNo"};
 		
 		if(null!=result) {
 			for(Map<String,String> dataRow:result) {
@@ -84,7 +84,7 @@ public class PatentUploadService {
 						}else if(field.getType() == Integer.class){
 							value=Integer.parseInt(row.get(key));
 						}else {
-							value=formatUploadData(row.get(key));
+							value=formatUploadData(row.get(key),field.getName());
 						}
 						ReflectionUtils.makeAccessible(field);
 						ReflectionUtils.setField(field, model,value);
@@ -104,18 +104,19 @@ public class PatentUploadService {
 	 * @param value
 	 * @return
 	 */
-	private Object formatUploadData(String value) {
-		if((value.indexOf("国外申请")!=-1)) {
-			return "SQ5";
-		}else if(value.indexOf("国外授权")!=-1){
-			return "SQ6";
-		} else if(value.indexOf("授权")!=-1) {
-			return "SQ2";
-		}else if(value.indexOf("申请")!=-1) {
-			return "SQ1";
-		}else{
-			return value;
+	private Object formatUploadData(String value,String fieldName) {
+		if("costType".equals(fieldName)) {
+			if((value.indexOf("国外申请")!=-1)) {
+				return "SQ5";
+			}else if(value.indexOf("国外授权")!=-1){
+				return "SQ6";
+			} else if(value.indexOf("授权")!=-1) {
+				return "SQ2";
+			}else if(value.indexOf("申请")!=-1) {
+				return "SQ1";
+			}
 		}
+		return value;
 	}
 	/**
 	 * 处理国家
@@ -201,8 +202,8 @@ public class PatentUploadService {
 					}else {
 						stringBuffer.append("null,");
 					}
-					if(null!=model.getPctDate()) {
-						stringBuffer.append("'").append(DateFormatUtil.format(model.getPctDate())).append("',");
+					if(null!=model.getAuthDate()) {
+						stringBuffer.append("'").append(DateFormatUtil.format(model.getAuthDate())).append("',");
 					}else {
 						stringBuffer.append("null,");
 					}
@@ -236,6 +237,32 @@ public class PatentUploadService {
 			try(FileOutputStream fos=new FileOutputStream(f);){
 				fos.write(stringBuffer.toString().getBytes(), 0, stringBuffer.toString().getBytes().length);
 			}
+		}
+	}
+	
+	/**
+	 * 获取待导入的申请号信息
+	 * @param batchLogId
+	 * @param tableId
+	 * @param f
+	 * @param isApply
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	public void exportPatent2ImportExcel(Long batchLogId,Long tableId,File f) throws FileNotFoundException, IOException {
+		List<LogModel> logList=logService.getPatentFailLogs(batchLogId, tableId, null);
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		if(null!=logList) {
+			for(LogModel log:logList) {
+				if(null!=log&&null!=log.getPatentInfo()&&!"未公开".equals(log.getPatentInfo().getStatus())) {
+					stringBuffer.append(log.getPatentInfo().getAppNumber()).append(System.getProperty("line.separator"));
+				}
+			}
+		}
+		//写入到文件
+		try(FileOutputStream fos=new FileOutputStream(f);){
+			fos.write(stringBuffer.toString().getBytes(), 0, stringBuffer.toString().getBytes().length);
 		}
 	}
 }
