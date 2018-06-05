@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+    <!-- 专利旧系统数据处理 -->
+   <table type="MIGRATE" to="z_patent_history" from="patent_upload_model" note="专利旧系统数据补录" skip="false">
+    	<fields>
+    		<field name="id" applyType="TARGET" valueType="FIELD" value="id" note="主键字段"></field>
+    		<field name="id" applyType="SOURCE"/>
+    		<field name="patentName" applyType="TARGET" valueType="FIELD" value="patent_name"/>
+    		<field name="patent_name" applyType="SOURCE"/>
+    		<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patent_no"/>
+    		<field name="patent_no" applyType="SOURCE" note="申请号" forLog="true"></field>
+    		<field name="appDate" applyType="TARGET" valueType="FIELD" value="request_date"/>
+    		<field name="request_date" applyType="SOURCE"/>
+    		<field name="authDate" applyType="TARGET" valueType="FIELD" value="auth_date"/>
+    		<field name="auth_date" applyType="SOURCE"/>
+    		<field name="type" applyType="TARGET" valueType="FIELD" value="cost_type"/>
+    		<field name="cost_type" applyType="SOURCE"/>
+    		<field name="patentee" applyType="TARGET" valueType="FIELD" value="first_request"/>
+    		<field name="first_request" applyType="SOURCE"/>
+    		<field name="status" applyType="TARGET" valueType="FIELD" value="status"/>
+    		<field name="status" applyType="SOURCE"/>
+    		<field name="amount" applyType="TARGET" valueType="FIELD" value="transfer_money"/>
+    		<field name="transfer_money" applyType="SOURCE"/>
+    		<field name="linkMan" applyType="TARGET" valueType="FIELD" value="link_man"/>
+    		<field name="link_man" applyType="SOURCE"/>
+    		<field name="linkTel" applyType="TARGET" valueType="FIELD" value="link_tel"/>
+    		<field name="link_tel" applyType="SOURCE"/>
+    		<field name="address" applyType="TARGET" valueType="FIELD" value="address"/>
+    		<field name="address" applyType="SOURCE"/>
+    		<field name="batch" applyType="TARGET" valueType="FIELD" value="batch"/>
+    		<field name="batch" applyType="SOURCE"/>
+    		<field name="bank" applyType="TARGET" valueType="FIELD" value="bank"/>
+    		<field name="bank" applyType="SOURCE"/>
+    		<field name="bankAccount" applyType="TARGET" valueType="FIELD" value="bank_account"/>
+    		<field name="bank_account" applyType="SOURCE"/>
+    		<field name="result" applyType="TARGET" valueType="FIELD" value="result"/>
+    		<field name="result" applyType="SOURCE"/>
+    		<field name="resultTime" applyType="TARGET" valueType="FIELD" value="result_time"/>
+    		<field name="result_time" applyType="SOURCE"/>
+    		<field name="createTime" applyType="TARGET" valueType="FIELD" value="create_time"/>
+    		<field name="create_time" applyType="SOURCE"/>
+    		<field name="creator" applyType="TARGET" valueType="FIELD" value="creator"/>
+    		<field name="creator" applyType="SOURCE"/>
+    		<field name="resultor" applyType="TARGET" valueType="FIELD" value="resultor"/>
+    		<field name="resultor" applyType="SOURCE"/>
+    	</fields>
+    	<where>
+    		<condition type="EQUAL" applyType="SOURCE">
+    			<field name="source_type" applyType="SOURCE" valueType="FIXED" value="插入"/>
+    		</condition>
+    		<!--<condition type="ISNOTNULL" applyType="SOURCE">
+    			<field name="costType" applyType="SOURCE"/>
+    		</condition>-->
+    	</where>
+    	<formats>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="cost_type">{'SQ1':'国内发明专利申请','SQ2':'国内发明专利授权','SQ3':'国内工矿企业首个发明专利申请','SQ4':'国内工矿企业首个发明专利授权','SQ5':'（职务）PCT国际专利申请','SQ6':'（职务）国外专利授权'}</format>
+    	</formats>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    		<constraint type="PRIMARY" applyType="TARGET">
+    			<field name="id" applyType="TARGET"/>
+    		</constraint>
+    	</constraints>
+    </table>
+</tables>

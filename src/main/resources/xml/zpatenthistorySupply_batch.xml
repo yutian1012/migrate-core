@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+	 
+   <table type="UPDATE" to="z_patent_history" from="patent_upload_model" note="旧系统补录专利更新批次" skip="false">
+    	<fields>
+    		<field name="batch" applyType="TARGET" valueType="FIELD" value="batch" note="批次信息"></field>
+    		<field name="batch" applyType="SOURCE" note="批次名"></field>
+    		<field name="patent_no" applyType="SOURCE"/>
+    	</fields>
+    	<where>
+            <condition type="EQUAL" applyType="TARGET">
+                <field name="appNumber" applyType="TARGET" valueType="FIELD" value="patent_no"></field>
+            </condition>
+    	</where>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    		<condition type="EQUAL" applyType="SOURCE">
+    			<field name="source_type" applyType="SOURCE" valueType="FIXED" value="更新批次号"/>
+    		</condition>
+    	</constraints>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    	</constraints>
+    </table>
+</tables>

@@ -37,6 +37,7 @@
     		<field name="result" applyType="TARGET" valueType="FIELD" value="result"/>
     		<field name="result" applyType="SOURCE"/>
     		<field name="resultTime" applyType="TARGET" valueType="FIELD" value="resultTime"/>
+    		<field name="resultTime" applyType="SOURCE"/>
     		<field name="createTime" applyType="TARGET" valueType="FIELD" value="createTime"/>
     		<field name="createTime" applyType="SOURCE"/>
     		<field name="creator" applyType="TARGET" valueType="FIELD" value="creator"/>
@@ -48,12 +49,12 @@
     		<!-- <condition type="EQUAL" applyType="SOURCE">
     			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ5"></field>
     		</condition> -->
-    		<condition type="ISNOTNULL" applyType="SOURCE">
+    		<!-- <condition type="ISNOTNULL" applyType="SOURCE">
     			<field name="patentNo" applyType="SOURCE"/>
     		</condition>
     		<condition type="ISNOTNULL" applyType="SOURCE">
     			<field name="costType" applyType="SOURCE"/>
-    		</condition>
+    		</condition> -->
     	</where>
     	<formats>
     		<!-- <format clazz="com.ipph.migratecore.deal.format.PctNoFormater" fieldName="patentNo"/>
