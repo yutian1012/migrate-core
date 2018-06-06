@@ -104,4 +104,33 @@ public class TableController {
 		
 		return tableModel;
 	}
+	
+	@RequestMapping("/add")
+	public ModelAndView add() {
+		
+		ModelAndView mv=new ModelAndView("/tables/add");
+		
+		mv.addObject("sourceTableList",tableService.getSourceTables()).addObject("targetTableList",tableService.getTargetTables());
+		
+		return mv;
+	}
+	/**
+	 * 查看表定义信息
+	 * @param isSourceTable
+	 * @param tableName
+	 * @return
+	 */
+	@RequestMapping("/getTable")
+	@ResponseBody
+	public com.ipph.migratecore.table.TableModel getTable(@RequestParam("isSourceTable") Boolean isSourceTable,@RequestParam("tableName") String tableName){
+		return tableService.getTableByName(isSourceTable,tableName);
+	}
+	/**
+	 * 保存表
+	 */
+	@RequestMapping("/saveTable")
+	public String saveTable(TableModel table) {
+		tableService.save(table);
+		return "redirect:/tables/add";
+	}
 }

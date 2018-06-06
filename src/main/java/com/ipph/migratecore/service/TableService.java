@@ -38,6 +38,8 @@ public class TableService {
 	private MigrateService migrateService;
 	@Resource
 	private BatchTableDao batchTableDao;
+	@Resource
+	private MigrateTableService migrateTableService;
 	
 	public List<TableModel> getList(){
 		return tableDao.findAll();
@@ -54,14 +56,23 @@ public class TableService {
 			if(null!=tableList&&tableList.size()>0){
 				
 				for(TableModel table :tableList){
-					if(null!=table){
-						setTableJsonData(table);
-						tableDao.save(table);
-					}
+					save(table);
 				}
 			}
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			return false;
+		}
+		return true;
+	}
+	/**
+	 * 保存数据
+	 * @param table
+	 * @return
+	 */
+	public boolean save(TableModel table) {
+		if(null!=table){
+			setTableJsonData(table);
+			tableDao.save(table);
 		}
 		return true;
 	}
@@ -180,5 +191,27 @@ public class TableService {
 		//先删除中间表数据
 		batchTableDao.deleteByTableId(tableId);
 		tableDao.deleteById(tableId);
+	}
+	/**
+	 * 获取源库中的数据表信息列表
+	 * @return
+	 */
+	public List<String> getSourceTables(){
+		return migrateTableService.getSourceTables();
+	}
+	/**
+	 * 获取目标数据库中的表信息列表
+	 * @return
+	 */
+	public List<String> getTargetTables(){
+		return migrateTableService.getTargetTables();
+	}
+	
+	public com.ipph.migratecore.table.TableModel getTableByName(boolean isSourceTable,String tableName){
+		if(isSourceTable) {
+			return migrateTableService.getSourceTable(tableName);
+		}else {
+			return migrateTableService.getTargetTable(tableName);
+		}
 	}
 }

@@ -11,13 +11,19 @@
 	<script type="text/javascript">
 		function uploadXml(){
 			window.location.href='/tables/toUploadXml';
-		}	
+		}
+		
+		function addTable(){
+			window.location.href='/tables/add';
+		}
 	</script>
   </head>
   
   <body>
   	<div>
   		<input type="button" onclick="uploadXml();" value="上传xml文档">
+  		<label></label>
+  		<input type="button" onclick="addTable();" value="添加表定义">
   	</div>
     <table style="width:80%;text-align:center;" border="1">
 	    <tr>
