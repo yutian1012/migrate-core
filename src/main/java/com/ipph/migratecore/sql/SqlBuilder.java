@@ -23,7 +23,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 */
 	public String getSelectSql(TableModel tableModel){
 
-		if(tableModel.getFiledList().size()==0){//查询或迁移的数据表列字段
+		if(tableModel.getFieldList().size()==0){//查询或迁移的数据表列字段
 			return null;
 		}
 		
@@ -31,7 +31,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 		List<String> fieldList=new ArrayList<>();
 		
 		//select查询字段
-		for(FieldModel field:tableModel.getFiledList()){
+		for(FieldModel field:tableModel.getFieldList()){
 			if(null==field||field.getApplyType()==ApplyTypeEnum.TARGET) {
 				continue;
 			}
@@ -71,7 +71,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 */
 	public String getSelectCountSql(TableModel tableModel){
 
-		if(tableModel.getFiledList().size()==0){
+		if(tableModel.getFieldList().size()==0){
 			return null;
 		}
 		
@@ -98,13 +98,13 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 */
 	public String getInsertSql(TableModel tableModel){
 		
-		if(tableModel.getFiledList().size()==0){
+		if(tableModel.getFieldList().size()==0){
 			return null;
 		}
 		
 		List<String> fieldList=new ArrayList<>();
 		
-		for(FieldModel field:tableModel.getFiledList()){
+		for(FieldModel field:tableModel.getFieldList()){
 			if(null==field||field.getApplyType()==ApplyTypeEnum.SOURCE){
 				continue;
 			}
@@ -124,14 +124,14 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 */
 	public String getUpdateSql(TableModel tableModel){
 		
-		if(tableModel.getFiledList().size()==0){
+		if(tableModel.getFieldList().size()==0){
 			return null;
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
 		List<String> fieldList=new ArrayList<>();
 		
-		for(FieldModel field:tableModel.getFiledList()){
+		for(FieldModel field:tableModel.getFieldList()){
 			if(null==field||field.getApplyType()==ApplyTypeEnum.SOURCE){
 				continue;
 			}
@@ -170,7 +170,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 */
 	public String getTargetSelectSql(TableModel tableModel,boolean isForeign){
 		
-		if(tableModel.getFiledList().size()==0){
+		if(tableModel.getFieldList().size()==0){
 			return null;
 		}
 		
@@ -243,7 +243,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 * @return
 	 */
 	public String getAllFieldSelectWithPK(TableModel tableModel) {
-		if(tableModel.getFiledList().size()==0){//查询或迁移的数据表列字段
+		if(tableModel.getFieldList().size()==0){//查询或迁移的数据表列字段
 			return null;
 		}
 		

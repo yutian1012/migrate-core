@@ -7,6 +7,10 @@
 	<script type="text/javascript">
 		var sourceTableModel=null;
 		var targetTableModel=null;
+		//json枚举数据
+		/*<![CDATA[*/
+		  var valueType = /*[[${valueType}]]*/ '';
+		/*]]>*/
 		
 		function changeTable(source){
 			var tableName='';
@@ -65,11 +69,11 @@
 			//目标表字段
 			html.append($("<td></td>").append(getTableFieldColumn(targetTableModel,"filedList["+index+"].name")));
 			//值来源
-			html.append("<td><select name='"+"filedList["+index+"].valueType"+"'><option value='FIXED'>固定值</option><option>字段值</option></select></td>");
+			html.append($("<td></td>").append(getValueType("filedList["+index+"].valueType")));
 			//数据值
 			html.append($("<td></td>").append(getTableFieldValue(true,"filedList["+index+"].value")));
 			//默认值
-			html.append($("<td></td>").append(getTableFieldDefaultValue()));
+			html.append($("<td></td>").append("")));
 			//格式化
 			html.append("<td></td>");
 			
@@ -94,9 +98,31 @@
 				return getTableFieldColumn(sourceTableModel,name);
 			}
 		}
+		//获取值来源字段值
+		function getValueType(name){
+			var select=$("<select name='"+name+"' onchange='changValueType(this)'></select>");//设置name字段值
+			for(var key in valueType){
+				select.append("<option value='"+key+"'>"+valueType[key]+"</option>");
+			}
+			return select;
+		}
 		//获取表字段默认值
 		function getTableFieldDefaultValue(name){
 			return $("<input type='text'>");
+		}
+		
+		//修改值来源选项
+		function changValueType(obj){
+			//联动改变数据值控件
+			var value=$(obj).val();
+			//首先清空
+			var nextTd=$(obj).parent("td").next();
+			var name=nextTd.children("select").attr("name");
+			nextTd.empty();
+			//从新设置内容
+			if(value=='FIXED'){
+				nextTd.append(getTableFieldValue(true,name)));
+			}
 		}
 		
 		/* //目标字段改变
@@ -136,7 +162,6 @@
 			<label>源表表名：</label><span id="sourceTableName"></span>
 			<span style="width:20px;"></span>
 			<label>备注</label>
-			
 			<div>
 				<label>字段信息：</label><input type="button" value="添加字段" onclick="addField();">
 				<table id="migrateTable">

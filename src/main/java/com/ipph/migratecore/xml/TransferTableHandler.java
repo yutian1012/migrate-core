@@ -119,7 +119,7 @@ public class TransferTableHandler extends DefaultHandler {
     		}
     		table.setNote(attributes.getValue("note"));
     		table.setMain(attributes.getValue("main"));
-    		table.setFiledList(new ArrayList<FieldModel>());
+    		table.setFieldList(new ArrayList<FieldModel>());
     		table.setSubTableList(new ArrayList<SubtableModel>());
     		table.setFormatFieldList(new ArrayList<FormatModel>());
     		table.setConstraintList(new ArrayList<ConstraintModel>());
@@ -144,7 +144,7 @@ public class TransferTableHandler extends DefaultHandler {
     		if(null!=attributes.getValue("skip")&&!"".equals(attributes.getValue("skip"))){
     			subTableModel.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
     		}
-    		subTableModel.setFiledList(new ArrayList<FieldModel>());
+    		subTableModel.setFieldList(new ArrayList<FieldModel>());
     		table.setFormatFieldList(new ArrayList<FormatModel>());
     		table.setConstraintList(new ArrayList<ConstraintModel>());
     	}else{
@@ -185,9 +185,9 @@ public class TransferTableHandler extends DefaultHandler {
     			else if(conditionModel!=null){
     				conditionModel.setField(fieldModel);
     			}else if(subTableModel!=null){
-    				subTableModel.getFiledList().add(fieldModel);
+    				subTableModel.getFieldList().add(fieldModel);
     			}else if(table!=null){
-    				table.getFiledList().add(fieldModel);
+    				table.getFieldList().add(fieldModel);
     			}
     		}
     	}

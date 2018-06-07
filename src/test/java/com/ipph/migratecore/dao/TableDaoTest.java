@@ -43,8 +43,8 @@ public class TableDaoTest {
 			TableModel table=tableList.get(0);
 			
 			//处理对象的序列化
-			if(null!=table.getFiledList()&&table.getFiledList().size()>0) {
-				table.setFieldListJson(JSON.toJSONString(table.getFiledList()));
+			if(null!=table.getFieldList()&&table.getFieldList().size()>0) {
+				table.setFieldListJson(JSON.toJSONString(table.getFieldList()));
 			}
 			if(null!=table.getSubTableList()&&table.getSubTableList().size()>0) {
 				table.setSubTableListJson(JSON.toJSONString(table.getSubTableList()));
@@ -64,7 +64,7 @@ public class TableDaoTest {
 			TableModel model2=tableDao.findById(id).get();
 			
 			if(null!=model2.getFieldListJson()) {
-				model2.setFiledList(JSON.parseArray(model2.getFieldListJson(), FieldModel.class));
+				model2.setFieldList(JSON.parseArray(model2.getFieldListJson(), FieldModel.class));
 			}
 			if(null!=model2.getSubTableListJson()) {
 				model2.setSubTableList(JSON.parseArray(model2.getSubTableListJson(), SubtableModel.class));

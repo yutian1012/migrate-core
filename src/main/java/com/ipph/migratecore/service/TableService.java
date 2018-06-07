@@ -87,8 +87,8 @@ public class TableService {
 	}
 	
 	public void setTableJsonData(TableModel table){
-		if(null!=table.getFiledList()&&table.getFiledList().size()>0) {
-			table.setFieldListJson(JSON.toJSONString(table.getFiledList()));
+		if(null!=table.getFieldList()&&table.getFieldList().size()>0) {
+			table.setFieldListJson(JSON.toJSONString(table.getFieldList()));
 		}
 		if(null!=table.getSubTableList()&&table.getSubTableList().size()>0) {
 			table.setSubTableListJson(JSON.toJSONString(table.getSubTableList()));
@@ -109,7 +109,7 @@ public class TableService {
 	
 	public void setTableFieldFromJson(TableModel table){
 		if(null!=table.getFieldListJson()) {
-			table.setFiledList(JSON.parseArray(table.getFieldListJson(), FieldModel.class));
+			table.setFieldList(JSON.parseArray(table.getFieldListJson(), FieldModel.class));
 		}
 		if(null!=table.getSubTableListJson()) {
 			table.setSubTableList(JSON.parseArray(table.getSubTableListJson(), SubtableModel.class));
@@ -207,7 +207,7 @@ public class TableService {
 		return migrateTableService.getTargetTables();
 	}
 	
-	public com.ipph.migratecore.table.TableModel getTableByName(boolean isSourceTable,String tableName){
+	public com.ipph.migratecore.table.TableMetaModel getTableByName(boolean isSourceTable,String tableName){
 		if(isSourceTable) {
 			return migrateTableService.getSourceTable(tableName);
 		}else {

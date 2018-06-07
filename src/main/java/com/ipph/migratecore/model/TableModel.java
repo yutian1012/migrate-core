@@ -9,10 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ipph.migratecore.enumeration.TableOperationEnum;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -21,27 +21,27 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@JsonIgnoreProperties(value={"handler","hibernateLazyInitializer"})
+@NoArgsConstructor
+//@JsonIgnoreProperties(value={"handler","hibernateLazyInitializer"})
 public class TableModel implements Serializable{
-	private static final long serialVersionUID = 1L;
 	@Id
     @GeneratedValue
 	private Long id;
 	@Column
 	private TableOperationEnum type;
-	@Column(length=2048*2)
+	@Column(length=2048)
 	private String fieldListJson;
 	@Transient
-	private List<FieldModel> filedList;
-	@Column(length=2048*2)
+	private List<FieldModel> fieldList;
+	@Column(length=2048)
 	private String subTableListJson;
 	@Transient
 	private List<SubtableModel> subTableList;
-	@Column(length=2048*2)
+	@Column(length=2048)
 	private String formatFieldListJson;
 	@Transient
 	private List<FormatModel> formatFieldList;
-	@Column(length=2048*2)
+	@Column(length=2048)
 	private String whereJson;
 	@Transient
 	private WhereModel whereModel;
@@ -51,7 +51,7 @@ public class TableModel implements Serializable{
 	private String to;
 	@Column
 	private boolean skip;
-	@Column(length=2048*2)
+	@Column(length=2048)
 	private String constraintListJson;
 	@Transient
 	private List<ConstraintModel> constraintList;

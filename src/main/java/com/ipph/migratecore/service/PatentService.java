@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,34 @@ public class PatentService {
 	private LogService logService;
 	@Resource
 	private PatentInterfaceHttpClient patentInterfaceHttpClient;
+	
 	private PatentNoFormater formater=new PatentNoFormater();
+	
+	public PatentInfo findByAppNumber(String appNumber) {
+		
+		return patentDao.findByAppNumber(appNumber);
+	}
+	
+	/**
+	 * 添加专利数据
+	 * @param patent
+	 * @param appNumber
+	 */
+	@Transactional
+	private void addPatent(PatentInfo patent,String appNumber) {
+		if(null!=patent) {
+			patentDao.save(patent);
+			return;
+		}
+		
+		if(null!=appNumber&&isPatentExistsFromFee(appNumber)) {
+			patent=new PatentInfo();
+			patent.setAppNumber(appNumber);
+			patent.setStatus("未公开");
+			patentDao.save(patent);
+		}
+	}
+	
 	
 	private ExecutorService executorService=Executors.newFixedThreadPool(10);
 	
@@ -59,9 +85,10 @@ public class PatentService {
 	}
 	/**
 	 * 多线程方式获取专利数据
+	 * 获取申请号，单个申请号作为一个线程查询专利数据
 	 * @param batchLogId
 	 */
-	public void addBatchByThread(Long batchLogId) {
+	public void processNotFoundExceptionByThread(Long batchLogId) {
 		Long size=logService.countByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION);
 		int batch=500;
 		for(int i=0;i*batch<size;i++) {
@@ -70,10 +97,6 @@ public class PatentService {
 				for(Object appNumber:list) {
 					executorService.execute(new PatentRunnable((String) appNumber));
 				}
-				/*for(LogModel log:list) {
-					if(null!=log.getDealData())
-						executorService.execute(new PatentRunnable(log.getDealData()));
-				}*/
 				list.clear();
 			}
 		}
@@ -87,85 +110,77 @@ public class PatentService {
 	 * @throws ParseException
 	 * @throws FormatException 
 	 */
-	@Transactional
-	public void addPatent(String appNumber) throws ParseException, FormatException {
-		
+	
+	private void addPatent(String appNumber) throws ParseException, FormatException {
 		appNumber=(String) formater.format(null, appNumber);
 		
 		if(!patentDao.existsByAppNumber(appNumber)) {
-			PatentInfo patent=getPatent(appNumber);
-			
-			if(null!=patent) {
-				patentDao.save(patent);
-			}else {
-				if(isPatentExistsFromFee(appNumber)) {
-					patent=new PatentInfo();
-					patent.setAppNumber(appNumber);
-					patent.setStatus("未公开");
-					patentDao.save(patent);
-				}
-			}
-			
+			PatentInfo patent=procesPatent(appNumber);
+			addPatent(patent,appNumber);
 		}
 		
 	}
+	
 	/**
 	 * 批次添加
 	 */
-	public void addBatch(Long batchLogId) {
+	@Deprecated
+	public void processNotFound(Long batchLogId) {
 		//通过批次日志获取专利的数据
 		Long size=logService.countByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION);
 		int batch=500;
 		for(int i=0;i*batch<size;i++) {
-			processPatentBatch(batchLogId,PageRequest.of(i, batch));
+			List<Object> list=logService.getListByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION,PageRequest.of(i, batch));
+			if(null!=list&&list.size()>0) {
+				List<String> appNumberList=new ArrayList<>(list.size()*2);
+				for(Object temp:list) {
+					String appNumber=null;
+					try {
+						appNumber = (String) formater.format(null,temp);
+						if(null!=appNumber) {
+							//判断数据库中是否已经存在了
+							if(!patentDao.existsByAppNumber(appNumber)) {
+								appNumberList.add(appNumber);
+							}
+						}
+					} catch (FormatException e) {
+						e.printStackTrace();
+					}
+				}
+				if(appNumberList.size()>0) {
+					processPatent(appNumberList);
+				}
+				
+				appNumberList.clear();
+				list.clear();
+			}
 		}
 	}
 	/**
 	 * 处理批次
+	 * 不能处理检索不到专利
 	 * @param batchLogId
 	 * @param pageable
 	 */
-	public void processPatentBatch(Long batchLogId,Pageable pageable) {
-		List<Object> list=logService.getListByBatchLogIdAndMessageType(batchLogId,LogMessageEnum.NOFOUND_EXCEPTION,pageable);
-		
-		if(null!=list&&list.size()>0) {
-			List<String> appNumberList=new ArrayList<>(list.size()*2);
-			for(Object temp:list) {
-				String appNumber=null;
-				try {
-					appNumber = (String) formater.format(null,temp);
-					if(null!=appNumber) {
-						//判断数据库中是否已经存在了
-						if(!patentDao.existsByAppNumber(appNumber)) {
-							appNumberList.add(appNumber);
-						}
-					}
-				} catch (FormatException e) {
-					e.printStackTrace();
-				}
-			}
-			if(appNumberList.size()>0) {
-				JSONArray array=getPatentListFromInterface(appNumberList);
-				if(null!=array) {
-					for(int i=0;i<array.size();i++) {
-						if(null!=array.getJSONObject(i)) {
-							try {
-								PatentInfo patent=getPatent(array.getJSONObject(i));
-								if(null!=patent) {
-									if(!patentDao.existsByAppNumber(patent.getAppNumber())) {//发明专利和发明授权只保存一个
-										patentDao.save(patent);
-									}
-								}
-							} catch (ParseException e) {
-								e.printStackTrace();
+	@Deprecated
+	private void processPatent(List<String> appNumberList) {
+		if(appNumberList.size()>0) {
+			JSONArray array=getPatentListFromInterface(appNumberList);
+			if(null!=array) {
+				for(int i=0;i<array.size();i++) {
+					if(null!=array.getJSONObject(i)) {
+						try {
+							PatentInfo patent=getPatentFromJson(array.getJSONObject(i));
+							if(null!=patent) {
+								patentDao.save(patent);
 							}
+						} catch (ParseException e) {
+							e.printStackTrace();
 						}
 					}
-					array.clear();
 				}
+				array.clear();
 			}
-			appNumberList.clear();
-			list.clear();
 		}
 	}
 	
@@ -175,10 +190,10 @@ public class PatentService {
 	 * @return
 	 * @throws ParseException
 	 */
-	private PatentInfo getPatent(String appNumber) throws ParseException {
+	private PatentInfo procesPatent(String appNumber) throws ParseException {
 		JSONObject jsonData=getPatentFromInterface(appNumber);
 		if(null!=jsonData) {
-			return getPatent(jsonData);
+			return getPatentFromJson(jsonData);
 		}
 		return null;
 	}
@@ -188,7 +203,7 @@ public class PatentService {
 	 * @return
 	 * @throws ParseException 
 	 */
-	private PatentInfo getPatent(JSONObject jsonData) throws ParseException {
+	private PatentInfo getPatentFromJson(JSONObject jsonData) throws ParseException {
 		PatentInfo patent=new PatentInfo();
 		patent.setAppName(jsonData.getString("title"));
 		patent.setAppNumber(jsonData.getString("appNumber"));
@@ -247,7 +262,7 @@ public class PatentService {
 	 * @param appNumber
 	 * @return
 	 */
-	public boolean isPatentExistsFromFee(String appNumber) {
+	private boolean isPatentExistsFromFee(String appNumber) {
 		try {
 			JSONArray array=patentInterfaceHttpClient.getFees(appNumber);
 			if(null!=array&&array.size()>0) {
@@ -255,7 +270,6 @@ public class PatentService {
 				return true;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

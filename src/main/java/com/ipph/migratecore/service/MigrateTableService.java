@@ -7,7 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.MigrateTableDao;
-import com.ipph.migratecore.table.TableModel;
+import com.ipph.migratecore.table.TableMetaModel;
 
 /**
  * 源表和目标表的结构信息
@@ -26,11 +26,11 @@ public class MigrateTableService {
 		return migrateTableDao.getTargetTables();
 	}
 	
-	public TableModel getSourceTable(String tableName) {
+	public TableMetaModel getSourceTable(String tableName) {
 		return migrateTableDao.getSourceTable(tableName);
 	}
 	
-	public TableModel getTargetTable(String tableName) {
+	public TableMetaModel getTargetTable(String tableName) {
 		return migrateTableDao.getTargetTable(tableName);
 	}
 }

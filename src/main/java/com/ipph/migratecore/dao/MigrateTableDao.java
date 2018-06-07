@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ipph.migratecore.table.MySqlSourceTableMeta;
 import com.ipph.migratecore.table.MySqlTargetTableMeta;
-import com.ipph.migratecore.table.TableModel;
+import com.ipph.migratecore.table.TableMetaModel;
 /**
  * 源表和目标表的结构信息
  */
@@ -38,7 +38,7 @@ public class MigrateTableDao {
 	
 	private List<String> getTableNameList(boolean isSource){
 		try {
-			List<TableModel> tableList=null;
+			List<TableMetaModel> tableList=null;
 			if(isSource) {
 				tableList=mySqlSourceTableMeta.getTablesByName(null);
 			}else {
@@ -46,7 +46,7 @@ public class MigrateTableDao {
 			}
 			if(null!=tableList&&tableList.size()>0) {
 				List<String> tableNameList=new ArrayList<>(tableList.size());
-				for(TableModel table:tableList) {
+				for(TableMetaModel table:tableList) {
 					if(null!=table)
 						tableNameList.add(table.getName());
 				}
@@ -62,7 +62,7 @@ public class MigrateTableDao {
 	 * @param tableName
 	 * @return
 	 */
-	public TableModel getSourceTable(String tableName) {
+	public TableMetaModel getSourceTable(String tableName) {
 		return mySqlSourceTableMeta.getTableByName(tableName);
 	}
 	/**
@@ -70,7 +70,7 @@ public class MigrateTableDao {
 	 * @param tableName
 	 * @return
 	 */
-	public TableModel getTargetTable(String tableName) {
+	public TableMetaModel getTargetTable(String tableName) {
 		return mySqlTargetTableMeta.getTableByName(tableName);
 	}
 }

@@ -2,6 +2,7 @@ package com.ipph.migratecore.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.TableService;
 import com.ipph.migratecore.util.XmlUtil;
@@ -111,6 +113,7 @@ public class TableController {
 		ModelAndView mv=new ModelAndView("/tables/add");
 		
 		mv.addObject("sourceTableList",tableService.getSourceTables()).addObject("targetTableList",tableService.getTargetTables());
+		mv.addAllObjects(getEnumeration());
 		
 		return mv;
 	}
@@ -122,7 +125,7 @@ public class TableController {
 	 */
 	@RequestMapping("/getTable")
 	@ResponseBody
-	public com.ipph.migratecore.table.TableModel getTable(@RequestParam("isSourceTable") Boolean isSourceTable,@RequestParam("tableName") String tableName){
+	public com.ipph.migratecore.table.TableMetaModel getTable(@RequestParam("isSourceTable") Boolean isSourceTable,@RequestParam("tableName") String tableName){
 		return tableService.getTableByName(isSourceTable,tableName);
 	}
 	/**
@@ -132,5 +135,17 @@ public class TableController {
 	public String saveTable(TableModel table) {
 		tableService.save(table);
 		return "redirect:/tables/add";
+	}
+	/**
+	 * 获取枚举信息，在页面上使用
+	 * @return
+	 */
+	private Map<String,Map<?,?>> getEnumeration(){
+		Map<String,Map<?,?>> result=new HashMap<String, Map<?,?>>();
+		
+		//值来源枚举对象
+		result.put("valueType", FieldValueTypeEnum.getEnumValues());
+		
+		return result;
 	}
 }

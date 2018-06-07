@@ -49,8 +49,8 @@ public abstract class MySqlTableMeta extends BaseTableMeta{
 	 * 获取表对象
 	 */
 	@Override
-	public TableModel getTableByName(String tableName) {
-		TableModel model=getTableModel(tableName);
+	public TableMetaModel getTableByName(String tableName) {
+		TableMetaModel model=getTableModel(tableName);
 		//获取列对象
 		List<ColumnModel> columnList= getColumnsByTableName(tableName);
 		model.setColumnList(columnList);
@@ -133,15 +133,15 @@ public abstract class MySqlTableMeta extends BaseTableMeta{
 	 * @param tableName
 	 * @return
 	 */
-	private TableModel getTableModel(final String tableName){
+	private TableMetaModel getTableModel(final String tableName){
 	
 		String sql=String.format(sqlComment, tableName);
-		TableModel tableModel= (TableModel) getJdbcTemplate().queryForObject(sql, null, new RowMapper<TableModel>() {
+		TableMetaModel tableModel= (TableMetaModel) getJdbcTemplate().queryForObject(sql, null, new RowMapper<TableMetaModel>() {
 
 			@Override
-			public TableModel mapRow(ResultSet rs, int row)
+			public TableMetaModel mapRow(ResultSet rs, int row)
 					throws SQLException {
-				TableModel tableModel=new TableModel();
+				TableMetaModel tableModel=new TableMetaModel();
 				String comments=rs.getString("table_comment");
 				comments=getComments(comments,tableName);
 				tableModel.setName(tableName);
@@ -150,7 +150,7 @@ public abstract class MySqlTableMeta extends BaseTableMeta{
 			}
 		});
 		if(null!=tableModel)
-			tableModel=new TableModel();
+			tableModel=new TableMetaModel();
 		
 		return tableModel;
 	}
@@ -210,16 +210,16 @@ public abstract class MySqlTableMeta extends BaseTableMeta{
 	 * 通过表名查询数据
 	 */
 	@Override
-	public List<TableModel> getTablesByName(String tableName) throws Exception {
+	public List<TableMetaModel> getTablesByName(String tableName) throws Exception {
 		String sql=sqlAllTable;
 		if(StringUtil.isNotEmpty(tableName))
 			sql +=" AND TABLE_NAME LIKE '%" +tableName +"%'";
 		
-		RowMapper<TableModel> rowMapper=new RowMapper<TableModel>() {
+		RowMapper<TableMetaModel> rowMapper=new RowMapper<TableMetaModel>() {
 			@Override
-			public TableModel mapRow(ResultSet rs, int row)
+			public TableMetaModel mapRow(ResultSet rs, int row)
 					throws SQLException {
-				TableModel tableModel=new TableModel();
+				TableMetaModel tableModel=new TableMetaModel();
 				tableModel.setName(rs.getString("TABLE_NAME"));
 				String comments=rs.getString("TABLE_COMMENT");
 				comments=getComments(comments,tableModel.getName());
@@ -227,16 +227,16 @@ public abstract class MySqlTableMeta extends BaseTableMeta{
 				return tableModel;
 			}
 		};
-		List<TableModel> tableModels=getJdbcTemplate().query(sql,  rowMapper);
+		List<TableMetaModel> tableModels=getJdbcTemplate().query(sql,  rowMapper);
 		
 		List<String> tableNames=new ArrayList<String>();
 		//get all table names
-		for(TableModel model:tableModels){
+		for(TableMetaModel model:tableModels){
 			tableNames.add(model.getName());
 		}
 		Map<String,List<ColumnModel>> tableColumnsMap = getColumnsByTableName(tableNames);
 		for(Entry<String, List<ColumnModel>> entry:tableColumnsMap.entrySet()){
-			for(TableModel model:tableModels){
+			for(TableMetaModel model:tableModels){
 				if(model.getName().equalsIgnoreCase(entry.getKey())){
 					model.setColumnList(entry.getValue());
 				}

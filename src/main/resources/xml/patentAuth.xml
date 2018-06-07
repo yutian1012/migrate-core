@@ -9,8 +9,11 @@
     		<field name="costtype" applyType="SOURCE"/>
     	</fields>
     	<where>
-    		<condition type="EQUAL" applyType="SOURCE">
+    		<!-- <condition type="EQUAL" applyType="SOURCE">
     			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ2"></field>
+    		</condition> -->
+    		<condition type="IN" applyType="SOURCE">
+    			<field name="costtype" applyType="SOURCE" valueType="FIXED" value="SQ2,SQ4"></field>
     		</condition>
     		<condition type="EQUAL" applyType="TARGET">
     			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patentNo" ></field>

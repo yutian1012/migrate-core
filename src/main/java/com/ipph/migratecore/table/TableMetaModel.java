@@ -3,7 +3,7 @@ package com.ipph.migratecore.table;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TableModel {
+public class TableMetaModel {
 	//表名
 	private String name="";
 	//表注释

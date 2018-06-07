@@ -20,6 +20,7 @@ public class PatentInfo {
 	@Column(unique=true)
 	private String appNumber;
 	private String appName;
+	@Column()
 	private Date appDate;
 	private String status;
 	private String applicant;

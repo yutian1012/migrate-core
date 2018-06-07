@@ -216,7 +216,7 @@ public class MigrateRowDataHandler {
 	private Object[] handleTargetField(Map<String,Object> row,TableModel table) throws FormatException{
 		List<Object> result=new ArrayList<>();
 		
-		for(FieldModel field:table.getFiledList()){
+		for(FieldModel field:table.getFieldList()){
 			if(null==field || field.getApplyType()==ApplyTypeEnum.SOURCE) {
 				continue;
 			}
@@ -247,7 +247,7 @@ public class MigrateRowDataHandler {
 			data.put(MigrateRowDataHandler.pkName, row.get(table.getSourcePkName().toUpperCase()));
 		}
 		
-		List<FieldModel> fieldList=table.getFiledList();
+		List<FieldModel> fieldList=table.getFieldList();
 		
 		for(FieldModel field:fieldList) {
 			if(field.isForLog()) {

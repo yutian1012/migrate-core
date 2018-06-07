@@ -1,16 +1,11 @@
 package com.ipph.migratecore.service;
 
-
-import java.text.ParseException;
-
 import javax.annotation.Resource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.ipph.migratecore.deal.exception.FormatException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -19,7 +14,7 @@ public class PatentServiceTest {
 	@Resource
 	private PatentService patentService;
 	
-	@Test
+	/*@Test
 	public void testPatentConnection() {
 		String appNumber="CN201210424464.6";
 		
@@ -29,33 +24,53 @@ public class PatentServiceTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	@Test
-	public void testAddBatch() {
-		Long batchLogId=90L;
+	}*/
+	/*@Test
+	public void testPatentInfoList() {
+		List<String> appNumberList=new ArrayList<>();
 		
-		patentService.addBatch(batchLogId);
-	}
+		appNumberList.add("CN201720396828.2");
+		appNumberList.add("CN201710546883.X");
+		
+		patentService.processPatent(appNumberList);
+		
+		PatentInfo patent=patentService.findByAppNumber("CN201720396828.2");
+		
+		assertNotNull(patent);
+		
+	}*/
 	
-	
-	@Test 
+	/*@Test 
 	public void testIsPatentExistsFromFee() {
 		String appNumber="CN201711291121.6";
 		System.out.println(patentService.isPatentExistsFromFee(appNumber));
-	}
+	}*/
+	
+	/*@Test
+	public void testProcessNotFound() {
+		Long batchLogId=90L;
+		
+		patentService.processNotFound(batchLogId);
+	}*/
 	
 	@Test
-	public void testAddBatchByThread() {
+	public void testProcessNotFoundExceptionByThread() {
 		Long batchLogId=17692L;
 		
-		patentService.addBatchByThread(batchLogId);
+		patentService.processNotFoundExceptionByThread(batchLogId);
 		
 		try {
 			Thread.currentThread().join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void testProcessFormatException() {
+		Long batchLogId=1L;
+		
+		
 	}
 	
 }
