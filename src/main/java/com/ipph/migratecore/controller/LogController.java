@@ -206,4 +206,5 @@ public class LogController {
 		
 		return new ModelAndView(new JxlsExcelView("/export/logpatentexport.xls", "导出专利错误执行日志"),model);
 	}
+	
 }

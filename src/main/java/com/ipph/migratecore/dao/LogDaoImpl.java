@@ -37,7 +37,6 @@ public class LogDaoImpl implements ILogDao{
 		}
 		
 		return migrateJdbcTemplate.query(sql,param,new LogModelRowMapper());
-		
 	}
 	
 	

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>校验专利错误</title>
+</head>
+<body>
+	<div>专利接口校验专利信息</div>
+	<table style="width:80%;text-align:center;" border="1px">
+	    <tr>
+	      <th>批次名</th>
+	      <th>批次创建时间</th>
+	      <th>操作</th>
+	    </tr>
+	    <!-- <tr th:each="batch : ${batchList}">
+	      <td th:text="${batch.batchName}"></td>
+	      <td th:text="${batch.createDate}"></td>
+	      <td>
+		      <span><a th:href="@{'/batches/migrate/'+${batch.id}}">执行批次</a></span>|
+		      <span><a th:href="@{'/batches/info/'+${batch.id}}">查看批次</a></span>|
+		      <span><a th:href="@{'/logs/batch/'+${batch.id}}">查看批次日志信息</a></span>|
+		      <span><a th:href="@{'/batches/del/'+${batch.id}}">删除批次</a></span>
+	      </td>
+	    </tr> -->
+	  </table>
+</body>
+</html>

@@ -27,9 +27,9 @@ public interface LogDao extends JpaRepository<LogModel,Long>,ILogDao{
 	/*@Query("select log.dealData from LogModel as log where log.batchLogId=?1 and log.messageType=?2 ")
 	public List<LogModel> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType);*/
 	@Query("select distinct log.dealData from LogModel as log where log.batchLogId=?1 and log.messageType=?2 ")
-	public List<Object> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable);
+	public List<Object> getDealDataListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable);
 	
-	@Query("select count(distinct log.dealData) from LogModel as log where log.batchLogId=?1 and log.messageType=?2 ")
+	@Query("select count(1) from LogModel as log where log.batchLogId=?1 and log.messageType=?2 ")
 	public Long countByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType);
 	
 	public LogModel getByDataIdAndBatchLogId(Long dataId,Long batchLogId);
@@ -45,5 +45,6 @@ public interface LogDao extends JpaRepository<LogModel,Long>,ILogDao{
 	
 	public List<LogModel> getListByTableIdAndStatusAndBatchLogIdIn(Long tableId,LogStatusEnum status,Long[] batchLogIdArr,Pageable pageable);
 	
+	public List<LogModel> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable);
 	
 }

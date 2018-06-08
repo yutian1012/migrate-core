@@ -8,13 +8,28 @@
     <meta name="content-type" content="text/html; charset=UTF-8">
     
 	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
-	<script type="text/javascript">
+	<script th:inline="javascript">
+		function checkPatent(){
+			var batchLogId=/*[[${batchLogId}]]*/ '';
+			
+			window.location.href='/patent/check/'+batchLogId;
+		}
+		
+		function exportCheckResult(){
+			var batchLogId=/*[[${batchLogId}]]*/ '';
+			
+			window.location.href='/patent/check/result/'+batchLogId;
+		}
 	</script>
   </head>
+  
   
   <body>
     <div>
   		批次信息：<span th:text="${batch.batchName}"></span>
+  		
+  		<input type="button" value="专利错误校验" onclick="checkPatent();">
+  		<input type="button" value="导出专利错误信息" onclick="exportCheckResult();">
   	</div>
     <table style="width:80%;text-align:center;" border="1px">
 	    <tr>

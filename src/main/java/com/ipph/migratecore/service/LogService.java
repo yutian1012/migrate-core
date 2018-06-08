@@ -244,9 +244,10 @@ public class LogService {
 	 * @param type
 	 * @return
 	 */
-	public List<Object> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable){
-		return logDao.getListByBatchLogIdAndMessageType(batchLogId,messageType,pageable);
+	public List<Object> getDealDataListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable){
+		return logDao.getDealDataListByBatchLogIdAndMessageType(batchLogId,messageType,pageable);
 	}
+	
 	/**
 	 * 统计数据量
 	 * @param batchLogId
@@ -255,6 +256,10 @@ public class LogService {
 	 */
 	public Long countByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType) {
 		return logDao.countByBatchLogIdAndMessageType(batchLogId,messageType);
+	}
+	
+	public List<LogModel> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable){
+		return logDao.getListByBatchLogIdAndMessageType(batchLogId,messageType,pageable);
 	}
 	
 }
