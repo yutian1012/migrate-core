@@ -103,4 +103,5 @@ public class BatchController {
 		batchService.del(batchId);
 		return "redirect:/batches/list";
 	}
+	
 }

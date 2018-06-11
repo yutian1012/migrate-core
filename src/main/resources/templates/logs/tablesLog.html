@@ -20,6 +20,12 @@
 			
 			window.location.href='/patent/check/result/'+batchLogId;
 		}
+		
+		function exportSql(tableId){
+			var batchLogId=/*[[${batchLogId}]]*/ '';
+			
+			window.location.href='/logs/exportSql/'+batchLogId+'/'+tableId;
+		}
 	</script>
   </head>
   
@@ -28,8 +34,9 @@
     <div>
   		批次信息：<span th:text="${batch.batchName}"></span>
   		
-  		<input type="button" value="专利错误校验" onclick="checkPatent();">
-  		<input type="button" value="导出专利错误信息" onclick="exportCheckResult();">
+  		<input type="button" value="国内专利错误校验" onclick="checkPatent();">
+  		<input type="button" value="导出国内专利错误信息" onclick="exportCheckResult();">
+  		<!-- <input type="button" value="导出执行sql" onclick="exportSql();"> -->
   	</div>
     <table style="width:80%;text-align:center;" border="1px">
 	    <tr>
@@ -44,7 +51,10 @@
 	      <td th:text="${table.from}"></td>
 	      <td th:text="${table.to}"></td>
 	      <td th:text="${table.note}"></td>
-	      <td><span><a th:href="@{'/logs/table/'+${batchLogId}+'/'+${table.id}}">日志</a></span></td>
+	      <td>
+	      	<span><a th:href="@{'/logs/table/'+${batchLogId}+'/'+${table.id}}">日志</a></span>|
+	      	<span><a th:onclick="'javascript:exportSql('+${table.id}+');'">导出执行sql</a></span>
+	      </td>
 	    </tr>
 	  </table>
   </body>

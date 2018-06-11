@@ -25,7 +25,7 @@
     	</fields>
     	<where>
     		<condition type="EQUAL" applyType="SOURCE">
-    			<field name="cost_type" applyType="SOURCE" valueType="FIXED" value="SQ6"></field>
+    			<field name="cost_type" applyType="SOURCE" valueType="FIXED" value="PCT授权补助"></field>
     		</condition>
     	</where>
     	<formats>

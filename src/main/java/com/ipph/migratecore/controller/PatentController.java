@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ipph.migratecore.enumeration.LogMessageEnum;
+import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.PatentInfoCheck;
 import com.ipph.migratecore.service.PatentInfoCheckService;
 
@@ -24,12 +28,26 @@ public class PatentController {
 	@Resource
 	private PatentInfoCheckService patentInfoCheckService;
 	
-	@RequestMapping("check/{batchLogId}")
-	public ModelAndView check(@PathVariable("batchLogId")Long batchLogId) {
+	@RequestMapping("/check/{batchLogId}")
+	public ModelAndView check(@PathVariable("batchLogId")Long batchLogId,
+			@RequestParam(value="size",defaultValue="20")int size,
+			@RequestParam(value="page",defaultValue="0")int page) {
 		
-		patentInfoCheckService.check(batchLogId);
+		//判断是否已经处理过了
+		boolean exists=patentInfoCheckService.existsByBatchLogId(batchLogId);
+		
+		if(!exists) {
+			patentInfoCheckService.check(batchLogId);
+		}
+		
+		//获取统计信息
+		Pageable pageable=PageRequest.of(page, size);
+		
+		List<PatentInfoCheck> result=patentInfoCheckService.getList(batchLogId, pageable);
 		
 		ModelAndView mv=new ModelAndView("/patent/check");
+		
+		mv.addObject("checkResult",result).addObject("pageable",pageable).addObject("batchLogId",batchLogId);
 		
 		return mv;
 	}

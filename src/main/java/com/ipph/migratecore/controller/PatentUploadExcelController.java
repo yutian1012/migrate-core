@@ -52,7 +52,6 @@ public class PatentUploadExcelController {
 	        	List<Map<String,String>> result=excelRead.readExcel(file);
 	        	patentUploadService.uploadXls(result);
 	        	
-	        	
 	        	result.clear();
 	        	
 	        	//转存到文件系统中

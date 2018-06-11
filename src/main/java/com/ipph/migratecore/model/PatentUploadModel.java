@@ -72,4 +72,6 @@ public class PatentUploadModel implements Serializable{
 	private String sourceType;//处理类型
 	@Column(name="errorAppNo")
 	private String errorAppNo;//错误申请号
+	@Column(name="dataId")
+	private Long dataId;//业务主键
 }

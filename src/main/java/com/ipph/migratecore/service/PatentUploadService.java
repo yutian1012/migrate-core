@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import com.ipph.migratecore.dao.PatentUploadDao;
+import com.ipph.migratecore.deal.format.JsonMethodFormater;
 import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.PatentUploadModel;
 import com.ipph.migratecore.patent.util.DateFormatUtil;
@@ -29,6 +30,19 @@ public class PatentUploadService {
 	private PatentUploadDao patentUploadDao;
 	@Resource
 	private LogService logService;
+	@Resource
+	private TableService tableService;
+	
+	//申请号信息更正
+	private String[] processPatentNo= {"sourceType","errorAppNo","patentNo","dataId","costType"};
+	//专利补录
+	private String[] processPatentInsert={"sourceType","patentNo","costType","patentName","requestDate","authDate","requestCountry","firstRequest","transferMoney","linkMan","address","linkTel","batch","createTime","status"};
+	//上传补充专利补助状态
+	private String[] processPatentSupplement={"sourceType","patentNo","dataId","costType"};
+	//批次更新--真理历史数据
+	private String[] processPatentBatch= {"sourceType","patentNo","dataId","batch"};
+	
+	private JsonMethodFormater jsonMethodFormater=new JsonMethodFormater();
 	
 	@Transactional
 	public void save(PatentUploadModel model) {
@@ -46,17 +60,38 @@ public class PatentUploadService {
 	 */
 	public void uploadXls(List<Map<String,String>> result) throws ParseException {
 		
-		//定义匹配规则
-		String[] rule= {"patentNo","costType","patentName","requestDate","authDate","requestCountry","firstRequest","transferMoney","linkMan","address","linkTel","batch","createTime","status","sourceType","errorAppNo"};
-		
 		if(null!=result) {
 			for(Map<String,String> dataRow:result) {
+				String[] rule=null;
+				if(null!=dataRow.get("0")) {
+					rule=getRuleBySourceType(dataRow.get("0"));
+				}
+				if(null==rule) {
+					continue;
+				}
         		PatentUploadModel model=getModel(rule, dataRow);
         		if(null!=model) {
         			save(model);
         		}
         	}
 		}
+	}
+	/**
+	 * 获取excel上传字段
+	 * @param sourceType
+	 * @return
+	 */
+	public String[] getRuleBySourceType(String sourceType) {
+		if("申请号更正".equals(sourceType)) {
+			return processPatentNo;
+		}else if("申请补录".equals(sourceType)) {
+			return processPatentInsert;
+		}else if("上传补充专利补助状态".equals(sourceType)) {
+			return processPatentSupplement;
+		} else if("批次更新".equals(sourceType)) {
+			return processPatentBatch;
+		}
+		return null;
 	}
 	
 	/**
@@ -83,8 +118,10 @@ public class PatentUploadService {
 							value=DateFormatUtil.parse(row.get(key),"yyyy/MM/dd");
 						}else if(field.getType() == Integer.class){
 							value=Integer.parseInt(row.get(key));
+						}else if(field.getType()==Long.class){
+							value=Long.parseLong(row.get(key));
 						}else {
-							value=formatUploadData(row.get(key),field.getName());
+							//value=formatUploadData(row.get(key),field.getName());
 						}
 						ReflectionUtils.makeAccessible(field);
 						ReflectionUtils.setField(field, model,value);
@@ -104,7 +141,7 @@ public class PatentUploadService {
 	 * @param value
 	 * @return
 	 */
-	private Object formatUploadData(String value,String fieldName) {
+	/*private Object formatUploadData(String value,String fieldName) {
 		if("costType".equals(fieldName)) {
 			if((value.indexOf("国外申请")!=-1)) {
 				return "SQ5";
@@ -117,7 +154,7 @@ public class PatentUploadService {
 			}
 		}
 		return value;
-	}
+	}*/
 	/**
 	 * 处理国家
 	 * @param model
@@ -146,6 +183,24 @@ public class PatentUploadService {
 	 * @throws FileNotFoundException 
 	 */
 	public void exportUpdateSqlByBatchLogId(Long batchLogId,Long tableId,File f,boolean isApply) throws FileNotFoundException, IOException {
+		String result=getUpdateSqlByBatchLogIdAndTableId(batchLogId, tableId, isApply);
+		if(null!=result) {
+			//写入到文件
+			try(FileOutputStream fos=new FileOutputStream(f);){
+				//fos.write(result.getBytes(), 0, result.getBytes().length);
+				fos.write(result.getBytes());
+			}
+			
+		}
+	}
+	/**
+	 * 获取update语句执行sql
+	 * @param batchLogId
+	 * @param tableId
+	 * @param isApply
+	 * @return
+	 */
+	public String getUpdateSqlByBatchLogIdAndTableId(Long batchLogId,Long tableId,boolean isApply) {
 		List<LogModel> logList=logService.getSuccessLogs(batchLogId, tableId, null);
 		if(null!=logList&&logList.size()>0) {
 			StringBuffer stringBuffer=new StringBuffer();
@@ -159,12 +214,10 @@ public class PatentUploadService {
 				
 				stringBuffer.append(" where appNumber='").append(log.getDealData()).append("';");
 			}
-			
-			//写入到文件
-			try(FileOutputStream fos=new FileOutputStream(f);){
-				fos.write(stringBuffer.toString().getBytes(), 0, stringBuffer.toString().getBytes().length);
-			}
+			return stringBuffer.toString();
 		}
+		
+		return null;
 	}
 	
 	/**
@@ -176,68 +229,194 @@ public class PatentUploadService {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void exportInsertSqlByBatchLogId(Long batchLogId,Long tableId,File f,boolean isApply) throws FileNotFoundException, IOException {
+	public void exportInsertSqlByBatchLogIdAndTableId(Long batchLogId,Long tableId,File f,boolean isApply,Boolean isSource) throws FileNotFoundException, IOException {
+		//写入到文件
+		String result=getPctInsertSqlByBatchLogIdAndTableId(batchLogId, tableId, isApply,isSource);
+		if(null!=result) {
+			try(FileOutputStream fos=new FileOutputStream(f);){
+				fos.write(result.getBytes());
+			}
+		}
+	}
+	/**
+	 * 获取pct插入sql语句
+	 * @param batchLogId
+	 * @param tableId
+	 * @param isApply
+	 * @return
+	 */
+	public String getPctInsertSqlByBatchLogIdAndTableId(Long batchLogId,Long tableId,boolean isApply,boolean isSource) {
 		List<LogModel> logList=logService.getSuccessLogs(batchLogId, tableId, null);
 		if(null!=logList&&logList.size()>0) {
 			StringBuffer stringBuffer=new StringBuffer();
 			for(LogModel log:logList) {
 				//获取专利上传对象
-				PatentUploadModel model=patentUploadDao.findById(log.getDataId()).get();
-
-				if(null!=model) {
-					stringBuffer.append("insert into wf_patent_support_foreign (id,patentName,applyNo,applyDate,authDate,country,applyer,money,statusType,type) values ( ")
-					.append(IdGenerator.getId()).append(",");
-					if(null!=model.getPatentName()) {
-						stringBuffer.append("'").append(model.getPatentName()).append("',");
-					}else {
-						stringBuffer.append("null,");
-					}
-					if(null!=model.getPatentNo()) {
-						stringBuffer.append("'").append(model.getPatentNo()).append("',");
-					}else {
-						stringBuffer.append("null,");
-					}
-					if(null!=model.getRequestDate()) {
-						stringBuffer.append("'").append(DateFormatUtil.format(model.getRequestDate())).append("',");
-					}else {
-						stringBuffer.append("null,");
-					}
-					if(null!=model.getAuthDate()) {
-						stringBuffer.append("'").append(DateFormatUtil.format(model.getAuthDate())).append("',");
-					}else {
-						stringBuffer.append("null,");
-					}
-					if(null!=model.getRequestCountry()) {
-						stringBuffer.append("'").append(model.getRequestCountry()).append("',");
-					}else {
-						stringBuffer.append("null,");
-					}
-					if(null!=model.getFirstRequest()) {
-						stringBuffer.append("'").append(model.getFirstRequest()).append("',");
-					}else {
-						stringBuffer.append("null,");
-					}
-					if(null!=model.getTransferMoney()) {
-						stringBuffer.append(model.getTransferMoney()).append(",");
-					}else {
-						stringBuffer.append("null,");
-					}
-					stringBuffer.append("1,");
-					if(isApply) {
-						stringBuffer.append("0");
-					}else {
-						stringBuffer.append("1");
-					}
-					
-					stringBuffer.append(");");
+				if(isSource) {
+					stringBuffer.append(getFromSource(tableId,log.getDataId(), isApply));
+				}else {
+					stringBuffer.append(getFromPatentUploadModel(log.getDataId(), isApply));
 				}
 			}
-			
-			//写入到文件
-			try(FileOutputStream fos=new FileOutputStream(f);){
-				fos.write(stringBuffer.toString().getBytes(), 0, stringBuffer.toString().getBytes().length);
-			}
+			return stringBuffer.toString();
 		}
+		return null;
+
+	}
+	/**
+	 * 从源库中获取信息
+	 * @param dataId
+	 * @param isApply
+	 * @return
+	 */
+	public String getFromSource(Long tableId,Long dataId,boolean isApply) {
+		StringBuffer stringBuffer=new StringBuffer();
+		Map<String,Object> result=tableService.getRecord(tableId, dataId);
+		
+		if(null!=result) {
+			stringBuffer.append("insert into wf_patent_support_foreign (id,patentName,applyNo,applyDate,authDate,country,countryCode,applyer,money,statusType,type) values ( ")
+			.append(IdGenerator.getId()).append(",");
+			
+			if(null!=result.get("patentName")) {
+				stringBuffer.append("'").append(result.get("patentName")).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=result.get("patentNo")) {
+				stringBuffer.append("'").append(result.get("patentNo")).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=result.get("requestDate")) {
+				stringBuffer.append("'").append(DateFormatUtil.format((Date)result.get("requestDate"))).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=result.get("authDate")) {
+				stringBuffer.append("'").append(DateFormatUtil.format((Date)result.get("authDate"))).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=result.get("requestCountry")) {
+				
+				String code=(String) jsonMethodFormater.format("{'QT':'CN','MG':'US','ZG':'CN','RB':'JP','OM':'EP'}", result.get("requestCountry"));
+				
+				stringBuffer.append("'").append(getCountry(code)).append("',")
+					.append("'").append(code).append("',");
+			}else {
+				stringBuffer.append("null,").append("null,");
+			}
+			
+			if(null!=result.get("firstRequest")) {
+				stringBuffer.append("'").append(result.get("firstRequest")).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=result.get("transfermoney")) {
+				stringBuffer.append(result.get("transfermoney")).append(",");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			stringBuffer.append("1,");
+			
+			if(isApply) {
+				stringBuffer.append("0");
+			}else {
+				stringBuffer.append("1");
+			}
+			
+			stringBuffer.append(");");
+		}
+		return stringBuffer.toString();
+	}
+	
+	/**
+	 * 从上传信息中获取数据
+	 * @param dataId
+	 * @param isApply
+	 * @return
+	 */
+	public String getFromPatentUploadModel(Long dataId,boolean isApply) {
+		StringBuffer stringBuffer=new StringBuffer();
+		PatentUploadModel model=patentUploadDao.findById(dataId).get();
+
+		if(null!=model) {
+			stringBuffer.append("insert into wf_patent_support_foreign (id,patentName,applyNo,applyDate,authDate,country,countryCode,applyer,money,statusType,type) values ( ")
+			.append(IdGenerator.getId()).append(",");
+			
+			if(null!=model.getPatentName()) {
+				stringBuffer.append("'").append(model.getPatentName()).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=model.getPatentNo()) {
+				stringBuffer.append("'").append(model.getPatentNo()).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=model.getRequestDate()) {
+				stringBuffer.append("'").append(DateFormatUtil.format(model.getRequestDate())).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=model.getAuthDate()) {
+				stringBuffer.append("'").append(DateFormatUtil.format(model.getAuthDate())).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=model.getRequestCountry()) {
+				stringBuffer.append("'").append(getCountry(model.getRequestCountry())).append("',")
+					.append("'").append(model.getRequestCountry()).append("',");
+			}else {
+				stringBuffer.append("null,").append("null,");
+			}
+			
+			if(null!=model.getFirstRequest()) {
+				stringBuffer.append("'").append(model.getFirstRequest()).append("',");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			if(null!=model.getTransferMoney()) {
+				stringBuffer.append(model.getTransferMoney()).append(",");
+			}else {
+				stringBuffer.append("null,");
+			}
+			
+			stringBuffer.append("1,");
+			
+			if(isApply) {
+				stringBuffer.append("0");
+			}else {
+				stringBuffer.append("1");
+			}
+			
+			stringBuffer.append(");");
+		}
+		return stringBuffer.toString();
+	}
+	
+	/**
+	 * 根据代码获取国家
+	 * @param code
+	 * @return
+	 */
+	private String getCountry(String code) {
+		if("CN".equals(code)) {
+			return "中国";
+		}else if("US".equals(code)) {
+			return "美国";
+		}
+		return null;
 	}
 	
 	/**

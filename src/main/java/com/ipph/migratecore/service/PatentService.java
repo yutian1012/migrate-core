@@ -3,6 +3,7 @@ package com.ipph.migratecore.service;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -89,8 +90,14 @@ public class PatentService {
 		@Override
 		public void run() {
 			try {
-				checkPatent(procesPatent(appNumber),oId,appNumber,batchLogId,costType);
-			} catch (ParseException e) {
+				
+				String patentNumber=null;
+				if(null!=appNumber) {
+					patentNumber=(String) formater.format(null,appNumber);
+				}
+				
+				checkPatent(procesPatent(patentNumber),oId,patentNumber,appNumber,batchLogId,costType);
+			} catch (ParseException | FormatException e) {
 				e.printStackTrace();
 			}
 		}
@@ -113,7 +120,6 @@ public class PatentService {
 						String costType=(String)result.get("costType");//获取申请类型
 						executorService.execute(new PatentRunnable(oAppNumber,logModel.getDataId(),batchLogId,costType));
 						//executorService.execute(new PatentRunnable(logModel.getDealData(),logModel.getDataId(),batchLogId));
-						
 					}
 					
 				}
@@ -206,14 +212,18 @@ public class PatentService {
 			}
 		}
 		//处理check信息
-		patentInfoCheckService.save(oId,LogMessageEnum.FORMART_EXCEPTION,stringBuilder.length()>0?stringBuilder.toString():null,batchLogId,oAppNumber,costType);
+		patentInfoCheckService.save(oId,LogMessageEnum.FORMART_EXCEPTION,stringBuilder.length()>0?stringBuilder.toString():null,batchLogId,oAppNumber,costType,null);
 	}
 	
 	@Transactional
-	public void checkPatent(PatentInfo patent,Long oId,String appNumber,Long batchLogId,String costType) {
+	public void checkPatent(PatentInfo patent,Long oId,String appNumber,String oldAppNumber,Long batchLogId,String costType) {
 		addPatent(patent, appNumber);
 		//处理check信息
-		patentInfoCheckService.save(oId,LogMessageEnum.NOFOUND_EXCEPTION,null!=patent?patent.getAppNumber():null,batchLogId,appNumber,costType);
+		String status=null;
+		if(patent!=null) {
+			status=patent.getStatus();
+		}
+		patentInfoCheckService.save(oId,LogMessageEnum.NOFOUND_EXCEPTION,null!=patent?patent.getAppNumber():null,batchLogId,appNumber,costType,status);
 	}
 	/**
 	 * 获取专利接口数据库源
@@ -318,7 +328,7 @@ public class PatentService {
 	 * @return
 	 * @throws ParseException
 	 */
-	private PatentInfo procesPatent(String appNumber) throws ParseException {
+	public PatentInfo procesPatent(String appNumber) throws ParseException {
 		//先从户籍科中获取
 		PatentInfo patent=patentDao.findByAppNumber(appNumber);
 		if(null!=patent) {
@@ -352,23 +362,59 @@ public class PatentService {
 		if(null!=appDate&&!"".equals(appDate)) {
 			stringBuilder.append(" and 申请日='").append(appDate).append("'");
 		}
-		if(null!=applicant&&!"".equals(applicant)) {
+		/*if(null!=applicant&&!"".equals(applicant)) {
 			stringBuilder.append(" and 申请（专利权）人='").append(applicant).append("'");
-		}
+		}*/
 		
 		JSONArray jsonArray=getPatentListFromInterfaceByCondtion(stringBuilder.toString(),dbType);
 		
+		List<PatentInfo> patentInfoList=null;
+		
 		if(null!=jsonArray&&jsonArray.size()>0) {
-			List<PatentInfo> patentInfoList=new ArrayList<>(jsonArray.size());
+			patentInfoList=new ArrayList<>(jsonArray.size());
 			for(int i=0;i<jsonArray.size();i++) {
 				PatentInfo patent=getPatentFromJson(jsonArray.getJSONObject(i));
 				if(null!=patent) {
 					patentInfoList.add(patent);
 				}
 			}
-			return patentInfoList;
 		}
-		return null;
+		
+		if(null!=patentInfoList&&patentInfoList.size()>0) {
+			/*for(PatentInfo patent:patentInfoList) {
+				boolean flag=false;
+				if(null!=patent) {
+					if(null!=patent.getAppDate()&&null!=appDate) {
+						if(patent.getAppDate().equals(DateFormatUtil.parse(appDate, "yyyy.MM.dd"))) {
+							flag=true;
+						}else {
+							flag=false;
+						}
+					}
+					if(flag&&null!=patent.getApplicant()&&applicant!=null&&patent.getApplicant().contains(applicant)) {
+						flag=true;
+					}
+				}
+			}*/
+			Iterator<PatentInfo> iter=patentInfoList.iterator();
+			while(iter.hasNext()) {
+				PatentInfo patent=iter.next();
+				if(null==patent) {
+					iter.remove();
+					continue;
+				}
+				/*if(null!=patent.getAppDate()&&null!=appDate&&!patent.getAppDate().equals(DateFormatUtil.parse(appDate, "yyyy.MM.dd"))){
+					iter.remove();
+					continue;
+				}*/
+				if(null!=patent.getApplicant()&&applicant!=null&&!patent.getApplicant().contains(applicant)){
+					iter.remove();
+					continue;
+				}
+			}
+		}
+		
+		return patentInfoList;
 	}
 	
 	/**

@@ -10,7 +10,7 @@
     	</fields>
     	<where>
     		<condition type="EQUAL" applyType="SOURCE">
-    			<field name="cost_type" applyType="SOURCE" valueType="FIXED" value="SQ1"></field>
+    			<field name="cost_type" applyType="SOURCE" valueType="FIXED" value="申请补助"></field>
     		</condition>
     		<condition type="EQUAL" applyType="TARGET">
     			<field name="appNumber" applyType="TARGET" valueType="FIELD" value="patent_no" ></field>

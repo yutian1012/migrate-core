@@ -64,7 +64,7 @@ public class PatentUploadServiceTest {
 			f.createNewFile();
 		}
 		
-		patentUploadService.exportInsertSqlByBatchLogId(batchLogId,tableId,f,isApply);
+		patentUploadService.exportInsertSqlByBatchLogIdAndTableId(batchLogId,tableId,f,isApply,false);
 	}
 	
 	@Test
@@ -78,7 +78,7 @@ public class PatentUploadServiceTest {
 			f.createNewFile();
 		}
 		
-		patentUploadService.exportInsertSqlByBatchLogId(batchLogId,tableId,f,isApply);
+		patentUploadService.exportInsertSqlByBatchLogIdAndTableId(batchLogId,tableId,f,isApply,false);
 	}
 	
 	@Test

@@ -1,16 +1,26 @@
 package com.ipph.migratecore.controller;
 
+import java.io.OutputStream;
+import java.util.Base64;
+import java.util.Date;
+
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
+import com.ipph.migratecore.model.TableModel;
+import com.ipph.migratecore.patent.util.DateFormatUtil;
 import com.ipph.migratecore.service.BatchLogService;
 import com.ipph.migratecore.service.BatchService;
+import com.ipph.migratecore.service.TableService;
 
 @Controller
 @RequestMapping("/logs")
@@ -19,6 +29,8 @@ public class BatchLogController {
 	private BatchLogService batchLogService;
 	@Resource
 	private BatchService batchService;
+	@Resource
+	private TableService tableService;
 	
 	/**
 	 * 批次执行日志信息
@@ -70,4 +82,85 @@ public class BatchLogController {
 		return mv;
 	}
 	
+	/**
+	 * 导出sql语句
+	 * @throws Exception 
+	 */
+	@RequestMapping("exportSql/{batchLogId}/{tableId}")
+	public void exportSql(@PathVariable("batchLogId")Long batchLogId,@PathVariable("tableId")Long tableId,
+			HttpServletRequest request,HttpServletResponse response) throws Exception {
+		
+		String fileName=null;
+		
+		TableModel table=tableService.getById(tableId);
+		if(null==table) {
+			return;
+		}
+		
+		fileName=table.getNote()+DateFormatUtil.format(new Date());
+		
+		boolean isApply=true;
+		
+		if(table.getNote().indexOf("申请")==-1) {
+			isApply=false;
+		}
+		
+		boolean isPct=true;
+		
+		if(table.getNote().indexOf("PCT")==-1) {
+			isPct=false;
+		}
+		
+		String sql=null;
+		
+		if(!isPct) {
+			sql=batchLogService.getSuccessExecuteSql(batchLogId,tableId,isApply);
+		}else {
+			//pct数据有2种来源，一种是通过补充的上传专利；另外一种是通过日志信息获取原表信息
+			boolean isSource=false;
+			if("tpatentallo".equals(table.getFrom())) {
+				isSource=true;
+			}
+			sql=batchLogService.getPctSuccessExecuteSql(batchLogId, tableId, isApply,isSource);
+		}
+		
+		OutputStream os=getOutputStream(request, response, fileName);
+		
+		if(null!=sql) {
+			os.write(sql.getBytes());
+		}
+		
+	}
+	
+	/**
+	 * 获取输出流
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public OutputStream getOutputStream(HttpServletRequest request,HttpServletResponse response,String filename) throws Exception {
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/plain; charset=utf-8");
+        response.setHeader("content-disposition","attachment;filename=" + getFileName(request.getHeader("User-Agent").toUpperCase(), filename));
+        return response.getOutputStream();
+	}
+	
+	/**
+	 * 获取文件名
+	 * @param browser
+	 * @param fileName
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getFileName(String browser,String fileName)throws Exception{
+        if(browser.indexOf("MSIE")!=-1){//IE浏览器
+            fileName = new String((fileName+".sql").getBytes("gb2312"), "ISO8859-1");
+        }else if(browser.indexOf("FIREFOX")!=-1){//google,火狐浏览器，会自动添加文件扩展名。
+            fileName = "=?UTF-8?B?" + (new String (Base64.getEncoder().encode((fileName+".sql").getBytes("UTF-8")))) + "?=";  //火狐文件名空格被截断问题
+        }else{
+            fileName = new String((fileName+".sql").getBytes("gb2312"), "ISO8859-1");
+        }
+        return fileName;
+	}
 }

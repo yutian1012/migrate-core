@@ -1,10 +1,10 @@
 package com.ipph.migratecore.controller;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,16 +36,28 @@ public class JxlsExcelView extends AbstractView{
 	@Override
 	protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Context context = new Context(model);
-		response.setCharacterEncoding("utf-8");
-		response.setContentType(getContentType());
-        response.setHeader("content-disposition","attachment;filename=" + getFileName(request.getHeader("User-Agent").toUpperCase(), exportFileName));
-        ServletOutputStream os = response.getOutputStream();
+		OutputStream os=getOutputStream(request,response,exportFileName);
         //try-with resource方式处理流资源
         try( InputStream is = this.getClass().getResourceAsStream(templatePath)){
         	//到处excel文档
     		JxlsHelper.getInstance().processTemplate(is, os, context);
     	}
 	}
+	
+	/**
+	 * 获取输出流
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public OutputStream getOutputStream(HttpServletRequest request,HttpServletResponse response,String filename) throws Exception {
+		response.setCharacterEncoding("utf-8");
+		response.setContentType(getContentType());
+        response.setHeader("content-disposition","attachment;filename=" + getFileName(request.getHeader("User-Agent").toUpperCase(), filename));
+        return response.getOutputStream();
+	}
+	
 	/**
 	 * 获取文件名
 	 * @param browser
@@ -63,5 +75,5 @@ public class JxlsExcelView extends AbstractView{
         }
         return fileName;
 	}
-
+	
 }

@@ -2,6 +2,7 @@ package com.ipph.migratecore.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.util.List;
@@ -100,6 +101,29 @@ public class PatentServiceTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void testProcessPatent() throws ParseException{
+		//String appNumber=""
+		String applicant="段立新 ";
+		String appDate="2007.03.02 ";
+		String patentName="一种治疗心脑血管疾病的药物";
+		String dbType="fmsq";
+		
+		List<PatentInfo> list=patentService.processPatent(applicant, appDate, patentName, dbType);
+		
+		assertNotNull(list);
+		
+		assertTrue(list.size()>0);
+	}
+	
+	@Test 
+	public void testProcessPatentByAppNumber() throws ParseException {
+		String appNumber="201210094444.7";
+		
+		PatentInfo patent=patentService.procesPatent(appNumber);
+		assertNotNull(patent);
 	}
 	
 }

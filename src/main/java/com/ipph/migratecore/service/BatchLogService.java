@@ -12,6 +12,7 @@ import com.ipph.migratecore.dao.BatchLogDao;
 import com.ipph.migratecore.enumeration.BatchStatusEnum;
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
+import com.ipph.migratecore.model.TableModel;
 
 @Service
 @Transactional
@@ -19,6 +20,10 @@ public class BatchLogService {
 	
 	@Resource
 	private BatchLogDao batchLogDao;
+	@Resource
+	private PatentUploadService patentUploadService;
+	@Resource
+	private TableService tableService;
 	
 	public Long save(BatchModel batch,Long parentId) {
 		
@@ -98,5 +103,26 @@ public class BatchLogService {
 	 */
 	public List<BatchLogModel> getByBatchIdAndParentId(Long batchId,Long parentId){
 		return batchLogDao.getListByParentId(parentId);
+	}
+	/**
+	 * 获取执行sql
+	 * @param batchLogId
+	 * @param tableId
+	 * @param isApply
+	 * @return
+	 */
+	public String getSuccessExecuteSql(Long batchLogId,Long tableId,boolean isApply) {
+		
+		return patentUploadService.getUpdateSqlByBatchLogIdAndTableId(batchLogId, tableId, isApply);
+	}
+	/**
+	 * 导出pct插入sql语句
+	 * @param batchLogId
+	 * @param tableId
+	 * @param isApply
+	 * @return
+	 */
+	public String getPctSuccessExecuteSql(Long batchLogId,Long tableId,boolean isApply,boolean isSource) {
+		return patentUploadService.getPctInsertSqlByBatchLogIdAndTableId(batchLogId, tableId, isApply,isSource);
 	}
 }

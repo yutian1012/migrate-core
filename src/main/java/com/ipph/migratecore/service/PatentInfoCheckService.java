@@ -33,19 +33,26 @@ public class PatentInfoCheckService {
 		return patentInfoRepository.findByBatchLogIdAndTypeAndCostTypeIn(batchLogId,type,costType,page);
 	}
 	
+	public boolean existsByBatchLogId(Long batchLogId) {
+		return patentInfoRepository.existsByBatchLogId(batchLogId);
+	}
+	
 	@Transactional
-	public PatentInfoCheck save(Long oId,LogMessageEnum type,String appNumbers,Long batchLogId,String oAppNumber,String costType) {
+	public PatentInfoCheck save(Long oId,LogMessageEnum type,String appNumbers,Long batchLogId,String oAppNumber,String costType,String status) {
 		PatentInfoCheck check=new PatentInfoCheck();
 		check.setOId(oId);
-		if(null==appNumbers) {
-			check.setStatus("接口数据未匹配成功");
+		if(null!=status) {
+			check.setStatus(status);
 		}else {
-			if(appNumbers.endsWith(",")) {
-				appNumbers=appNumbers.substring(0,appNumbers.length()-1);//去掉末尾的逗号
+			if(null==appNumbers) {
+				check.setStatus("接口数据未匹配成功");
+			}else {
+				if(appNumbers.endsWith(",")) {
+					appNumbers=appNumbers.substring(0,appNumbers.length()-1);//去掉末尾的逗号
+				}
+				check.setStatus("确认匹配的申请号是否正确");
 			}
-			check.setStatus("确认匹配的申请号是否正确");
 		}
-		
 		check.setAppNumbers(appNumbers);
 		check.setType(type);
 		check.setBatchLogId(batchLogId);

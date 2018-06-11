@@ -14,4 +14,5 @@ public interface PatentInfoRepository extends JpaRepository<PatentInfoCheck,Long
 	
 	public List<PatentInfoCheck> findByBatchLogIdAndTypeAndCostTypeIn(Long batchLogId,LogMessageEnum type,String[] costType,Pageable page);
 
+	public boolean existsByBatchLogId(Long batchLogId);
 }
