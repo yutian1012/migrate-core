@@ -1,10 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
-<title>添加迁移表规则</title>
-	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
-	<script type="text/javascript">
+<body>
+	<div id="tableDiv" class="panel panel-default">
+	  <div class="panel-heading">配置迁移表字段信息</div>
+	  <div class="panel-body">
+		  <div class="form-inline">
+			  <div class="form-group">
+				    <label for="note">迁移数据信息：</label>
+				    <input type="text" class="form-control" name="note" v-model="note">
+			  </div>
+			  <div class="form-group">
+				    <label for="from">选择源表：</label>
+				    <select class="form-control" v-model="from" name="form" v-on:change="getChangedTable">
+						<option th:each="tableName:${sourceTableList}" th:text="${tableName}" th:value="${tableName}"></option>
+					</select>
+			  </div>
+			  <div class="form-group">
+				    <label for="to">选择目标表：</label>
+				    <select class="form-control" v-model="to" name="to" v-on:change="getChangedTable">
+						<option th:each="tableName:${targetTableList}" th:text="${tableName}" th:value="${tableName}"></option>
+					</select>
+			  </div>
+		  </div>
+		  <div style="float: right;"><input class="btn btn-primary" type="button" value="添加字段" v-on:click="addField"></div>
+	  </div>
+	  <!-- 表字段配置信息 -->
+	  <table class="table table-hover">
+	  	<thead>
+	        <tr>
+	          <th>#</th>
+	          <th>目标表字段</th>
+	          <th>值来源</th>
+	          <th>数据值</th>
+	          <th>默认值</th>
+			  <th>格式化</th>
+			  <th>操作</th>
+	        </tr>
+	  	</thead>
+	  	<tbody>
+	  		<tr v-for="(field,index) in fieldModels">
+	  			<th scope="row">{{ index }}</th>
+		        <td>
+		        </td>
+		        <td>Otto</td>
+		        <td>@mdo</td>
+		        <td>Mark</td>
+		        <td>Otto</td>
+		        <td>@mdo</td>
+	  		</tr>
+          
+	  	</tbody>
+	  </table>
+	</div>
+</body>
+	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
+    <script type="text/javascript">
+	    var tableDiv = new Vue({
+	        el: "#tableDiv",
+	        data: {
+	        	note:'',//定义配置描述信息
+	        	from:'',//配置源表
+	        	to:'',//配置目标表
+	        	fieldModels:[],//配置字段转换信息
+	        	conditionModels:[],//配置关联条件
+	        	fromTableModel:{},//设置成空对象
+				toTableModel:{}
+	        },
+	        methods: {
+	            getChangedTable: function(event){
+	            	if(this.from!=''&&this.to!=''){
+	            		var result=changeTable(this.from,this.to);
+	            		if(result){
+	            			this.sourceTableModel=result["fromTable"];
+	            			this.toTableModel=result["toTable"];
+	            		}
+	            	}
+	            },
+	            addField : function(event){
+	            	if(this.from==''||this.to==''){
+	            		toastr.error('请先选择要配置的原数据表和目标数据表!', '操作失败');
+	            		return;
+	            	}
+	            	this.fieldModels.push({"name":"xxxx"});
+	            }
+	        }
+	    });
+	    
+	    function changeTable(from,to){
+	    	var url="/tables/getTable";
+	    	if(from!=''&&to!=''){
+	    		$.post(url,{fromTable:from,toTable:to},function(response){
+					if(response.rspCode=="000000"){//操作成功
+						return response.data;
+					}else{
+						toastr.error('导入配置文件失败', '操作失败');
+					}
+				});
+	    	}
+	    }
+    </script>
+	<!-- <script type="text/javascript">
 		var sourceTableModel=null;
 		var targetTableModel=null;
 		//json枚举数据
@@ -124,83 +219,5 @@
 				nextTd.append(getTableFieldValue(true,name)));
 			}
 		}
-		
-		/* //目标字段改变
-		function changeField(obj){
-			var name=$(obj).attr("name");
-			if(name.indexOf("target")!=-1){
-				//清空所有默认值
-			}
-		} */
-		
-	</script>
-</head>
-<body>
-	<form th:action="@{/tables/saveTable}" method="post">
-		<div><label>迁移数据信息：</label><input type="text" name="note"></div>
-		<div>
-			<!-- 源表必须要提供相应的主键 -->
-			<label>选择源表</label>
-			<select name="from" id="sourceTableSelect"  onchange="changeTable(true);">
-				<option>请选择</option>
-				<option th:each="tableName:${sourceTableList}" th:text="${tableName}" th:value="${tableName}"></option>
-			</select>
-		</div>
-		<div>
-			<label>选择目标表</label>
-			<select name="to" id="targetTableSelect"  onchange="changeTable(false);">
-				<option>请选择</option>
-				<option th:each="tableName:${targetTableList}" th:text="${tableName}" th:value="${tableName}"></option>
-			</select>
-		</div>
-		
-		<!-- 表信息展示区域 -->
-		<div >
-			<label>目标表表名：</label><span id="targetTableName"></span>
-			<span style="width:20px;"></span>
-			<label>备注</label>
-			<label>源表表名：</label><span id="sourceTableName"></span>
-			<span style="width:20px;"></span>
-			<label>备注</label>
-			<div>
-				<label>字段信息：</label><input type="button" value="添加字段" onclick="addField();">
-				<table id="migrateTable">
-					<tr>
-						<td>目标表字段</td>
-						<td>值来源</td>
-						<td>数据值</td>
-						<td>默认值</td>
-						<td>格式化</td>
-					</tr>
-				</table>
-			</div>
-			<div>
-				<label>关联条件</label><input type="button" value="添加字段" onclick="addConditionField();">
-				<table id="migrateCondition">
-					<tr>
-						<td>应用目标</td>
-						<td>字段</td>
-						<td>值来源</td>
-						<td>数据值</td>
-						<td>默认值</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-		
-		<div><input type="submit" value="提交"></div>
-	</form>
-	
-	<div>
-		<!-- <span style="display: none;" id="migrateFieldTemplate">
-			<tr>
-				<td>目标表字段</td>
-				<td>值来源</td>
-				<td>数据值</td>
-				<td>默认值</td>
-				<td>格式化</td>
-			</tr>
-		</span> -->
-	</div>
-</body>
+	</script> -->
 </html>

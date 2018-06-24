@@ -3,6 +3,7 @@ package com.ipph.migratecore.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ipph.migratecore.common.ExceptionMsg;
+import com.ipph.migratecore.common.Response;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.TableService;
@@ -23,11 +26,14 @@ import com.ipph.migratecore.util.XmlUtil;
 
 @Controller
 @RequestMapping("/tables")
-public class TableController {
+public class TableController extends BaseController{
 	
 	@Resource
 	private TableService tableService;
-	
+	/**
+	 * 查看table列表
+	 * @return
+	 */
 	@RequestMapping("/list")
 	public ModelAndView list(){
 		ModelAndView mv=new ModelAndView("tables/list");
@@ -37,30 +43,86 @@ public class TableController {
 		mv.addObject("tableList",tableList);
 		return mv;
 	}
-	
+	/**
+	 * 跳转上传xml页面
+	 * @return
+	 */
 	@RequestMapping("/toUploadXml")
 	public String toUploadXml(){
 		return "tables/uploadXml";
 	}
-	
+	/**
+	 * 上次xml配置文件
+	 * @param file
+	 * @return
+	 */
 	@RequestMapping("/uploadXml")
-	public String uploadXml(@RequestParam("tableFile") MultipartFile file){
-		if(!file.isEmpty()){
+	@ResponseBody
+	public Response uploadXml(@RequestParam("tableFile") MultipartFile file){
+		if(file.isEmpty()) {
+			return result(ExceptionMsg.FileEmpty);
+		}
+		
+		String fileName = file.getOriginalFilename();
+		try {
+			//解析上传的文件并保存到数据库中
+			tableService.uploadXml(file.getInputStream());
 			
-			String fileName = file.getOriginalFilename();
-	        try {
-	        	//解析上传的文件并保存到数据库中
-	        	tableService.uploadXml(file.getInputStream());
-	        	
-	        	//转存到文件系统中
-	        	File f=new File(XmlUtil.getFilePath() +fileName);
-	        	file.transferTo(f); //保存文件
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-        }
-		return "redirect:/tables/list";
+			//转存到文件系统中
+			File f=new File(XmlUtil.getFilePath() +fileName);
+			file.transferTo(f); //保存文件
+		} catch (IOException e) {
+			return result(ExceptionMsg.FAILED);
+		}
+		return result(ExceptionMsg.SUCCESS);
 	}
+	/**
+	 * 删除
+	 * @param tableId
+	 * @return
+	 */
+	@RequestMapping("/del/{tableId}")
+	@ResponseBody
+	public Response del(@PathVariable("tableId")Long tableId) {
+		if(null!=tableId&&tableId!=0L) {
+			tableService.del(tableId);
+		}
+		return result(ExceptionMsg.SUCCESS);
+	}
+	/**
+	 * 添加表配置
+	 * @return
+	 */
+	@RequestMapping("/add")
+	public ModelAndView add() {
+		
+		ModelAndView mv=new ModelAndView("/tables/add");
+		
+		mv.addObject("sourceTableList",tableService.getSourceTables()).addObject("targetTableList",tableService.getTargetTables());
+		mv.addAllObjects(getEnumeration());
+		
+		return mv;
+	}
+	/**
+	 * 查看表定义信息
+	 * @param isSourceTable
+	 * @param tableName
+	 * @return
+	 */
+	@RequestMapping("/getTable")
+	@ResponseBody
+	public Response getTable(@RequestParam("fromTable") String fromTable,@RequestParam("toTable") String toTable){
+		//获取数据对象
+		Map<String,Object> tableData=new Hashtable<>();
+		if(null!=fromTable) {
+			tableData.put("fromTable",tableService.getMetaTableByName(true,fromTable));
+		}
+		if(null!=toTable) {
+			tableData.put("toTable",tableService.getMetaTableByName(false, toTable));
+		}
+		return result(ExceptionMsg.SUCCESS,tableData);
+	}
+	
 	
 	@RequestMapping("/selectTables")
 	@ResponseBody
@@ -81,18 +143,7 @@ public class TableController {
 		}
 		return null;
 	}
-	/**
-	 * 删除
-	 * @param tableId
-	 * @return
-	 */
-	@RequestMapping("/del/{tableId}")
-	public String del(@PathVariable("tableId")Long tableId) {
-		if(null!=tableId&&tableId!=0L) {
-			tableService.del(tableId);
-		}
-		return "redirect:/tables/list";
-	}
+	
 	/**
 	 * 查看table定义信息
 	 * @param tableId
@@ -107,27 +158,8 @@ public class TableController {
 		return tableModel;
 	}
 	
-	@RequestMapping("/add")
-	public ModelAndView add() {
-		
-		ModelAndView mv=new ModelAndView("/tables/add");
-		
-		mv.addObject("sourceTableList",tableService.getSourceTables()).addObject("targetTableList",tableService.getTargetTables());
-		mv.addAllObjects(getEnumeration());
-		
-		return mv;
-	}
-	/**
-	 * 查看表定义信息
-	 * @param isSourceTable
-	 * @param tableName
-	 * @return
-	 */
-	@RequestMapping("/getTable")
-	@ResponseBody
-	public com.ipph.migratecore.table.TableMetaModel getTable(@RequestParam("isSourceTable") Boolean isSourceTable,@RequestParam("tableName") String tableName){
-		return tableService.getTableByName(isSourceTable,tableName);
-	}
+	
+	
 	/**
 	 * 保存表
 	 */
@@ -142,7 +174,6 @@ public class TableController {
 	 */
 	private Map<String,Map<?,?>> getEnumeration(){
 		Map<String,Map<?,?>> result=new HashMap<String, Map<?,?>>();
-		
 		//值来源枚举对象
 		result.put("valueType", FieldValueTypeEnum.getEnumValues());
 		

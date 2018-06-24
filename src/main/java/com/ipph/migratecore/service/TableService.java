@@ -23,6 +23,7 @@ import com.ipph.migratecore.model.SplitModel;
 import com.ipph.migratecore.model.SubtableModel;
 import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.model.WhereModel;
+import com.ipph.migratecore.table.TableMetaModel;
 import com.ipph.migratecore.util.XmlUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -206,8 +207,13 @@ public class TableService {
 	public List<String> getTargetTables(){
 		return migrateTableService.getTargetTables();
 	}
-	
-	public com.ipph.migratecore.table.TableMetaModel getTableByName(boolean isSourceTable,String tableName){
+	/**
+	 * 获取表定义信息
+	 * @param isSourceTable
+	 * @param tableName
+	 * @return
+	 */
+	public TableMetaModel getMetaTableByName(boolean isSourceTable,String tableName){
 		if(isSourceTable) {
 			return migrateTableService.getSourceTable(tableName);
 		}else {

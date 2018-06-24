@@ -1,20 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>上传配置文件</title>
-	
-    <meta name="keywords" content="keyword1,keyword2,keyword3">
-    <meta name="description" content="this is my page">
-    <meta name="content-type" content="text/html; charset=UTF-8">
-    
-    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
-
-  </head>
-  
   <body>
-    <form th:action="@{/tables/uploadXml}" method="post" enctype="multipart/form-data">
-    	<input type="file" name="tableFile" value="选择上传的配置文件" accept="*.xml">
-    	<input type="submit" value="提交">
-    </form>
+  	<div>
+  		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/list','table')" value="返回">
+  	</div>
+  	<div style="margin-top: 10px;text-align: center;">
+	    <form id="importHtmlForm" method="post" th:action="@{/tables/uploadXml}" enctype="multipart/form-data">
+	      <div class="col-md-3">
+	         <div class="panel">
+	            <div class="panel-heading">选择上传的配置文件</div>
+	            <div class="panel-body">
+	               <div class="form-group">
+	                  <input id="fileInput" name="tableFile" type="file" accept="text/xml" data-class-button="btn btn-default" data-class-input="form-control" data-button-text="" class="form-control" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);" />
+	                  <div class="bootstrap-filestyle input-group">
+	                  	<input type="text" id="fileInputName" value="" class="form-control "/> 
+	                  	<span class="group-span-filestyle input-group-btn" tabindex="0">
+		                  	<label for="fileInput" class="btn btn-default ">
+		                  		<span class="glyph glyphicon glyphicon-folder-open"></span> 
+		                  	</label>
+	                  	</span>
+	                 </div>
+	               </div>
+	            </div>
+	         </div>
+	         <a href="javascript:void(0);" id="submitBtn" class="btn btn-primary btn-block">提交</a>
+	       </div>
+	    </form>
+  	</div>
   </body>
+  <script type='text/javascript'>
+	  $(function(){
+		  toastr.options = {
+            'closeButton': true,
+            'positionClass': 'toast-top-center',
+            'timeOut': '5000',
+          };
+		  $("#fileInput").change(function(){
+			  getFileName("fileInput");
+		  });
+		  $("#submitBtn").click(function(){
+			  if($("#fileInputName").val()==""){
+				  return;
+			  }
+			  var url=$("#importHtmlForm").attr("action");
+			  $("#submitBtn").attr("disabled","disabled");
+			  $("#importHtmlForm").ajaxSubmit({
+					type: 'post',
+					async: true,
+					url: url,
+					success: function(response){
+						if(response.rspCode=="000000"){//操作成功
+							toastr.success('导入配置文件成功', '操作成功');
+							//跳转回list页面
+							locationUrl('/tables/list','table');
+						}else{
+							toastr.error('导入配置文件失败', '操作失败');
+						}
+					}
+			  });
+		  });
+	  });
+  </script>
 </html>
