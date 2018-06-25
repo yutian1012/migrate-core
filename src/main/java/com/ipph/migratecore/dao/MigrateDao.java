@@ -138,6 +138,9 @@ public class MigrateDao {
 				try {
 					data = processRowData(migrateModel, row);
 					sqlOperation.executeDest(executeSql, data);
+					
+					logService.logSql(executeSql, data);
+					
 				} catch (FormatException | DataNotFoundException | DataExistsException |RuntimeException | DataAlreadyDealedException e) {
 					messageType=migrateExceptionHandler.handle(e);
 					if(messageType==LogMessageEnum.SQL_EXCEPTION) {
@@ -167,6 +170,8 @@ public class MigrateDao {
 		try {
 			if(batchDataList.size()>0){
 				sqlOperation.executeBatchDest(executeSql, batchDataList);
+				//打印输出执行语句
+				logService.logSql(executeSql,batchDataList);
 			}
 			//保存日志
 			if(null!=logModelList&&logModelList.size()>0) {

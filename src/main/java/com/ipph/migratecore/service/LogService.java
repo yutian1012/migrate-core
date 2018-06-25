@@ -18,6 +18,7 @@ import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.LogModel;
 import com.ipph.migratecore.model.MigrateModel;
 import com.ipph.migratecore.model.TableModel;
+import com.ipph.migratecore.patent.util.DateFormatUtil;
 import com.ipph.migratecore.util.MapUtil;
 
 @Service
@@ -262,4 +263,31 @@ public class LogService {
 		return logDao.getListByBatchLogIdAndMessageType(batchLogId,messageType,pageable);
 	}
 	
+	/**
+	 * 记录执行sql
+	 * @param sql
+	 * @param batchDataList
+	 */
+	public void logSql(String sql,List<Object[]> batchDataList) {
+		for(Object[] data:batchDataList) {
+			logSql(sql, data);
+		}
+	}
+	
+	public void logSql(String sql,Object[] data) {
+		String sqltmp=sql;
+		for(int i=0;i<data.length;i++) {
+			try {
+				if(data[i] instanceof Date) {
+					sqltmp=sqltmp.replaceFirst("[?]", "'"+DateFormatUtil.format((Date)data[i], "yyyy-MM-dd")+"'");
+				}else {
+					sqltmp=sqltmp.replaceFirst("[?]","'"+data[i]+"'");
+				}
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println(sqltmp+";");
+	}
 }

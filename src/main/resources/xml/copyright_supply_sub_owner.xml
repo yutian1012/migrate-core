@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tableschema"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	 xsi:schemaLocation="http://www.migrate.org/schema/tableschema tables.xsd" >
+    <!-- 专利申请数据的更新 -->
+   <table type="MIGRATE" to="cs_copyright_owner" from="copyright_upload_model" note="软件著作权补助数据迁移-文字-著作权人-补充" skip="false" main="cs_copyright">
+    	<fields>
+    		<!-- target field list -->
+    		<field name="id" applyType="TARGET" valueType="GENCODE"></field>
+    		<field name="oid" applyType="TARGET" valueType="FIELD" value="id"/>
+    		<field name="ownerName" applyType="TARGET" valueType="FIELD" value="owner_name"/>
+    		<!-- source field list -->
+    		<field name="id" applyType="SOURCE"/>
+    		<field name="owner_name" applyType="SOURCE" forLog="true"/>
+    	</fields>
+    	<where>
+    		<condition type="ISNOTNULL" applyType="SOURCE">
+    			<field name="owner_name" applyType="SOURCE"></field>
+    		</condition>
+    		<condition type="IN" applyType="SOURCE">
+    			<field name="type" applyType="SOURCE" valueType="FIXED" value="其他,工程设计、产品设计,工程设计图 产品设计图,工程设计图、产品设计图,戏剧,文字,模型,美术,音乐,摄影"></field>
+    		</condition>
+    	</where>
+    	<constraints>
+    		<constraint type="PRIMARY" applyType="SOURCE">
+    			<field name="id" applyType="SOURCE"/>
+    		</constraint>
+    		<constraint type="PRIMARY" applyType="TARGET" value="cs_copyright">
+    			<field name="id" applyType="TARGET"/>
+    		</constraint>
+    		<!-- 子表外键 -->
+    		<constraint type="FOREIGNKEY" applyType="TARGET">
+    			<field name="oid" applyType="TARGET"/>
+    		</constraint>
+    	</constraints>
+    	<splits>
+    		<split clazz="com.ipph.migratecore.deal.split.CharacterSpliter" fieldName="copyrightman">[,;\/ :]</split>
+    	</splits>
+    </table>
+</tables>
