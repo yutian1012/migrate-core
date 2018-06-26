@@ -35,4 +35,5 @@ public class CopyrightUploadModel implements Serializable{
 	private String applyType;//申请方式
 	private String applicantName;//提交者
 	private String applyContacts;//申请联系人
+	private Integer registFee;//登记费用
 }

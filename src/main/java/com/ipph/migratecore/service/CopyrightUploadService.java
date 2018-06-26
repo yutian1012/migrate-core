@@ -17,14 +17,13 @@ import com.ipph.migratecore.model.CopyrightUploadModel;
 import com.ipph.migratecore.patent.util.DateFormatUtil;
 
 @Service
-@Transactional
 public class CopyrightUploadService {
 	
 	@Resource
 	private CopyrightUploadDao copyrightUploadDao;
 
 	public String[] copyrightInsert=new String[] {"authorName","ownerName","workName","workNo","finishDate","createDate","type","paperNo",
-			"firstPublicDate","firstPublicCity","getRightWay","RightOwnership","RightOwnershipStatus","applyType","applicantName","applyContacts"};
+			"firstPublicDate","firstPublicCity","getRightWay","RightOwnership","RightOwnershipStatus","applyType","applicantName","applyContacts","registFee"};
 	/**
 	 * 处理上传excel
 	 * @param result
@@ -53,6 +52,7 @@ public class CopyrightUploadService {
 	 * @param model
 	 * @return
 	 */
+	@Transactional
 	public CopyrightUploadModel save(CopyrightUploadModel model) {
 		return copyrightUploadDao.save(model);
 	}

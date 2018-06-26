@@ -11,8 +11,9 @@
     		<field name="copyrightType" applyType="TARGET" valueType="FIELD" value="type"/>
     		<field name="applyName" applyType="TARGET" valueType="FIELD" value="applicant_name"/>
     		<field name="applyContacts" applyType="TARGET" valueType="FIELD" value="apply_contacts"/>
-    		<field name="createDate" applyType="TARGET" valueType="FIELD" value="create_date"/>
+    		<field name="issueDate" applyType="TARGET" valueType="FIELD" value="create_date"/>
     		<field name="creatorName" applyType="TARGET" valueType="FIELD" value="author_name"/>
+    		<field name="registFee" applyType="TARGET" valueType="FIELD" value="regist_fee"/>
     		
     		<field name="supportStatus" applyType="TARGET" valueType="FIXED" value="0"/>
     		<field name="result" applyType="TARGET" valueType="FIXED" value="1"/>
@@ -27,6 +28,7 @@
     		<field name="apply_contacts" applyType="SOURCE"/>
     		<field name="author_name" applyType="SOURCE"/>
     		<field name="create_date" applyType="SOURCE"/>
+    		<field name="regist_fee" applyType="SOURCE"/>
     	</fields>
     	<where>
     		<condition type="IN" applyType="SOURCE">

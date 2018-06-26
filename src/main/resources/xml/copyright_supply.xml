@@ -6,7 +6,7 @@
     	<fields>
     		<!-- target field list -->
     		<field name="id" applyType="TARGET" valueType="FIELD" value="id"></field>
-    		<field name="copyrightNo" applyType="TARGET" valueType="FIELD" value="work_no" note="登记号"></field>
+    		<field name="batchNo" applyType="TARGET" valueType="FIELD" value="work_no" note="登记号"></field>
     		<field name="copyrightName" applyType="TARGET" valueType="FIELD" value="work_name"/>
     		<field name="copyrightType" applyType="TARGET" valueType="FIELD" value="type"/>
     		<field name="applicantName" applyType="TARGET" valueType="FIELD" value="applicant_name"/>
@@ -19,7 +19,8 @@
    			<field name="firstPublicCity" applyType="TARGET" valueType="FIELD" value="first_public_city"/>
    			<field name="firstPublicDate" applyType="TARGET" valueType="FIELD" value="first_public_date"/>
    			<field name="getRightWay" applyType="TARGET" valueType="FIELD" value="get_right_way"/>
-    		<field name="createDate" applyType="TARGET" valueType="FIELD" value="create_date"/>
+    		<field name="awardDate" applyType="TARGET" valueType="FIELD" value="create_date"/>
+    		<field name="registFee" applyType="TARGET" valueType="FIELD" value="regist_fee"/>
     		
     		<field name="supportStatus" applyType="TARGET" valueType="FIXED" value="0"/>
     		<field name="result" applyType="TARGET" valueType="FIXED" value="1"/>
@@ -42,6 +43,7 @@
     		<field name="first_public_date" applyType="SOURCE"/>
     		<field name="get_right_way" applyType="SOURCE"/>
     		<field name="create_date" applyType="SOURCE"/>
+    		<field name="regist_fee" applyType="SOURCE"/>
     	</fields>
     	<where>
     		<condition type="IN" applyType="SOURCE">

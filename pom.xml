@@ -26,10 +26,30 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+		</dependency> -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-web</artifactId>
+		    <!-- <exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions> -->
 		</dependency>
+		
+		<!-- <dependency>  
+	        <groupId>org.springframework.boot</groupId>  
+	        <artifactId>spring-boot-starter-log4j2</artifactId>  
+	    </dependency> -->
+	    
+	    <dependency>
+	        <groupId>org.codehaus.janino</groupId>
+	        <artifactId>janino</artifactId>
+	    </dependency>
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
@@ -48,11 +68,6 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>${fastjson.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -109,12 +124,12 @@
 			<artifactId>activemq-pool</artifactId>
 		</dependency> -->
 		
-		<dependency>
+		<!-- <dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-devtools</artifactId>
 		    <optional>true</optional>
 		    <scope>true</scope>
-		</dependency>
+		</dependency> -->
 		
 		<dependency>
 		    <groupId>org.apache.commons</groupId>

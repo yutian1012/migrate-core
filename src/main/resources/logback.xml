@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender"> 
+		<File>c:/logs/outsql.log</File> 
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">      
+	      <evaluator>
+	        <expression>return logger.contains("com.ipph.migratecore.service.LogService");</expression>
+	      </evaluator>
+	      <onMatch>ACCEPT</onMatch>
+      	  <onMismatch>DENY</onMismatch>
+	    </filter>
+		<!-- <layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d %p %t %c - %m%n</Pattern>
+		</layout>  -->
+		<encoder>
+	      <pattern>%msg %n</pattern>
+	    </encoder>
+	</appender> 
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+	      <level>DEBUG</level>
+	    </filter>
+	    <encoder>
+	      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+	    </encoder>
+	</appender>
+	<root level="INFO"> 
+		<appender-ref ref="STDOUT"></appender-ref>
+		<appender-ref ref="FILE"/> 
+	</root> 
+</configuration> 

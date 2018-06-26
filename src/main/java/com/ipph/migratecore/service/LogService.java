@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,8 @@ public class LogService {
 	private LogJdbcDao logJdbcDao;
 	@Resource
 	private BatchLogService batchLogService;
+	
+	private static Logger log = LoggerFactory.getLogger(LogService.class);
 	
 	/**
 	 * 更新日志
@@ -276,18 +280,23 @@ public class LogService {
 	
 	public void logSql(String sql,Object[] data) {
 		String sqltmp=sql;
-		for(int i=0;i<data.length;i++) {
-			try {
-				if(data[i] instanceof Date) {
-					sqltmp=sqltmp.replaceFirst("[?]", "'"+DateFormatUtil.format((Date)data[i], "yyyy-MM-dd")+"'");
+		try {
+			sqltmp=sqltmp.replaceAll("[?]", "%%");
+			for(int i=0;i<data.length;i++) {
+				if(null==data[i]) {//处理控制
+					sqltmp=sqltmp.replaceFirst("%%",data[i]+"");
+				}else if(data[i] instanceof Date) {
+					sqltmp=sqltmp.replaceFirst("%%", "'"+DateFormatUtil.format((Date)data[i], "yyyy-MM-dd")+"'");
 				}else {
-					sqltmp=sqltmp.replaceFirst("[?]","'"+data[i]+"'");
+					//特殊符号的过滤
+					sqltmp=sqltmp.replaceFirst("%%","'"+data[i]+"'");
 				}
-				
-			}catch(Exception e) {
-				e.printStackTrace();
 			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
-		System.out.println(sqltmp+";");
+		if(log.isInfoEnabled()) {
+			log.info(sqltmp+";");
+		}
 	}
 }
