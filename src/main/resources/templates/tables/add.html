@@ -39,8 +39,12 @@
 	  	</thead>
 	  	<tbody>
 	  		<tr v-for="(field,index) in fieldModels">
-	  			<th scope="row">{{ index }}</th>
+	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
+		        	<!-- <input type="text" v-model="field.name" name="name"> -->
+		        	<select class="form-control" v-model="field.name" name="name">
+		        		<option v-for="col in toTableModel.columnList" value="{{col.name}}">{{col.comment}}</option>
+		        	</select>
 		        </td>
 		        <td>Otto</td>
 		        <td>@mdo</td>
@@ -64,16 +68,13 @@
 	        	fieldModels:[],//配置字段转换信息
 	        	conditionModels:[],//配置关联条件
 	        	fromTableModel:{},//设置成空对象
-				toTableModel:{}
+				toTableModel:{},
+				len:0
 	        },
 	        methods: {
 	            getChangedTable: function(event){
 	            	if(this.from!=''&&this.to!=''){
-	            		var result=changeTable(this.from,this.to);
-	            		if(result){
-	            			this.sourceTableModel=result["fromTable"];
-	            			this.toTableModel=result["toTable"];
-	            		}
+	            		changeTable(this.from,this.to);
 	            	}
 	            },
 	            addField : function(event){
@@ -81,7 +82,12 @@
 	            		toastr.error('请先选择要配置的原数据表和目标数据表!', '操作失败');
 	            		return;
 	            	}
-	            	this.fieldModels.push({"name":"xxxx"});
+	            	if(this.fieldModels.length==this.len){
+	            		toastr.info('没有可添加的目标字段！', '提示信息');
+	            		return;
+	            	}
+	            	this.fieldModels.push({"name":""});
+	            	this.len++;
 	            }
 	        }
 	    });
@@ -91,7 +97,9 @@
 	    	if(from!=''&&to!=''){
 	    		$.post(url,{fromTable:from,toTable:to},function(response){
 					if(response.rspCode=="000000"){//操作成功
-						return response.data;
+						tableDiv.fromTableModel=response.data["fromTable"];
+						tableDiv.toTableModel=response.data["toTable"];
+						tableDiv.len=tableDiv.toTableModel.columnList.length;//表字段长度
 					}else{
 						toastr.error('导入配置文件失败', '操作失败');
 					}
