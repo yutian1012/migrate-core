@@ -9,9 +9,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -122,7 +125,14 @@ public class TableController extends BaseController{
 		}
 		return result(ExceptionMsg.SUCCESS,tableData);
 	}
-	
+	/**
+	 * 保存表
+	 */
+	@RequestMapping(value="/saveTable",method=RequestMethod.POST)
+	public String saveTable(TableModel table) {
+		tableService.save(table);
+		return "redirect:/tables/add";
+	}
 	
 	@RequestMapping("/selectTables")
 	@ResponseBody
@@ -158,16 +168,6 @@ public class TableController extends BaseController{
 		return tableModel;
 	}
 	
-	
-	
-	/**
-	 * 保存表
-	 */
-	@RequestMapping("/saveTable")
-	public String saveTable(TableModel table) {
-		tableService.save(table);
-		return "redirect:/tables/add";
-	}
 	/**
 	 * 获取枚举信息，在页面上使用
 	 * @return
