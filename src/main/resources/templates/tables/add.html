@@ -25,16 +25,16 @@
 		  <div style="float: right;"><input class="btn btn-primary" type="button" value="添加字段" v-on:click="addField"></div>
 	  </div>
 	  <!-- 表字段配置信息 -->
-	  <table class="table table-hover">
+	  <table class="table table-hover table-bordered">
 	  	<thead>
 	        <tr>
-	          <th>#</th>
-	          <th>目标表字段</th>
-	          <th>值来源</th>
-	          <th>数据值</th>
-	          <th>默认值</th>
-			  <th>格式化</th>
-			  <th>操作</th>
+	          <th class="col-md-1">#</th>
+	          <th class="col-md-3">目标表字段</th>
+	          <th class="col-md-1">值来源</th>
+	          <th class="col-md-3">数据值</th>
+	          <th class="col-md-1">日志字段</th>
+			  <th class="col-md-2">备注</th>
+			  <th class="col-md-1">操作</th>
 	        </tr>
 	  	</thead>
 	  	<tbody>
@@ -42,15 +42,32 @@
 	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
 		        	<!-- <input type="text" v-model="field.name" name="name"> -->
-		        	<select class="form-control" v-model="field.name" name="name">
-		        		<option v-for="col in toTableModel.columnList" value="{{col.name}}">{{col.comment}}</option>
+		        	<select class="form-control" v-model="field.name" name="name" v-on:change="testvlaue(index)">
+		        		<option v-for="(col,index) in toTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
 		        </td>
-		        <td>Otto</td>
-		        <td>@mdo</td>
-		        <td>Mark</td>
-		        <td>Otto</td>
-		        <td>@mdo</td>
+		        <td>
+		        	<select class="form-control" v-model="field.valueType" name="valueType" v-on:change="changeFieldValueType(index)">
+		        		<option value="FIXED">固定值</option>
+		        		<option value="FIELD">字段值</option>
+		        		<option value="GENCODE">自增值</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<input v-if="field.showtext" type="text" class="form-control" v-model="field.value_1" name="value_1">
+		        	<select v-if="field.showselect" class="form-control" v-model="field.value_2" name="value_2">
+		        		<option v-for="(col,index) in fromTableModel.columnList" :value="col.name">{{col.comment}}</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<checkbox name="forLog" v-model="field.forLog" class="form-control" value="1">
+				</td>
+		        <td>
+		        	<input type="text" name="note" v-model="field.note" class="form-control">
+		        </td>
+		        <td>
+		        	<a style="text-decoration: none;" v-on:click="fieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        </td>
 	  		</tr>
           
 	  	</tbody>
@@ -86,8 +103,30 @@
 	            		toastr.info('没有可添加的目标字段！', '提示信息');
 	            		return;
 	            	}
-	            	this.fieldModels.push({"name":""});
+	            	this.fieldModels.push(
+	            		{"name":"","valueType":"","value":"","value_1":"","value_2":"","showtext":false,"showselect":false,"forLog":"","note":""});
 	            	this.len++;
+	            },
+	            changeFieldValueType:function(index){
+	            	switch(this.fieldModels[index].valueType){
+	            		case "FIXED":
+	            		case "GENCODE":
+	            			this.fieldModels[index].showtext=true;
+	            			this.fieldModels[index].showselect=false;
+	            			break;
+	            		case "FIELD":
+	            			this.fieldModels[index].showtext=false;
+	            			this.fieldModels[index].showselect=true;
+	            			break;
+	            		default :
+	            			this.fieldModels[index].showtext=true;
+	            			this.fieldModels[index].showselect=false;
+	            	}
+	            },
+	            fieldRemove:function(index){
+	            	if(confirm("是否删除？")){
+	            		this.fieldModels.splice(index,1);//删除指定下标元素
+	            	}
 	            }
 	        }
 	    });
