@@ -33,7 +33,7 @@
     		</constraint>
     	</constraints>
     	<splits>
-    		<split clazz="com.ipph.migratecore.deal.split.CharacterSpliter" fieldName="copyrightman">[,;\/ :]</split>
+    		<split clazz="com.ipph.migratecore.deal.split.CharacterSpliter" fieldName="owner_name">[,; :]</split>
     	</splits>
     </table>
 </tables>

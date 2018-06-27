@@ -21,6 +21,8 @@
    			<field name="getRightWay" applyType="TARGET" valueType="FIELD" value="get_right_way"/>
     		<field name="awardDate" applyType="TARGET" valueType="FIELD" value="create_date"/>
     		<field name="registFee" applyType="TARGET" valueType="FIELD" value="regist_fee"/>
+    		<field name="ownerName" applyType="TARGET" valueType="FIELD" value="owner_name"/>
+    		<field name="remark" applyType="TARGET" valueType="FIELD" value="paper_no"/>
     		
     		<field name="supportStatus" applyType="TARGET" valueType="FIXED" value="0"/>
     		<field name="result" applyType="TARGET" valueType="FIXED" value="1"/>
@@ -44,6 +46,8 @@
     		<field name="get_right_way" applyType="SOURCE"/>
     		<field name="create_date" applyType="SOURCE"/>
     		<field name="regist_fee" applyType="SOURCE"/>
+    		<field name="owner_name" applyType="SOURCE"/>
+    		<field name="paper_no" applyType="SOURCE"/>
     	</fields>
     	<where>
     		<condition type="IN" applyType="SOURCE">

@@ -17,6 +17,9 @@ public class CharacterSpliter implements Spliter{
 			String[] arr=temp.split(separators);
 			if(arr!=null){
 				for(String s:arr){
+					if("".equals(s)) {
+						continue;
+					}
 					result.add(s);
 				}
 			}
@@ -27,6 +30,12 @@ public class CharacterSpliter implements Spliter{
 			result.add(value);
 		}
 		return result;
+	}
+	
+	public static void main(String[] args) {
+		String tt="邓爱民  周紫盈";
+		
+		System.out.println(tt.split(" ").length);
 	}
 
 }

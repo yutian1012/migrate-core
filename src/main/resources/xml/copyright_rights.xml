@@ -25,6 +25,7 @@
     		<field name="result" applyType="TARGET" valueType="FIXED" value="1"/>
     		<field name="status" applyType="TARGET" valueType="FIXED" value="1"/>
     		<field name="odata" applyType="TARGET" valueType="FIXED" value="1"/>
+    		
     		<!-- source field list -->
     		<field name="id" applyType="SOURCE"/>
     		<field name="workno" applyType="SOURCE"/>
