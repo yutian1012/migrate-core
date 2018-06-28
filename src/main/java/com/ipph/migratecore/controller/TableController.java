@@ -128,10 +128,12 @@ public class TableController extends BaseController{
 	/**
 	 * 保存表
 	 */
-	@RequestMapping(value="/saveTable",method=RequestMethod.POST)
-	public String saveTable(TableModel table) {
-		tableService.save(table);
-		return "redirect:/tables/add";
+	@RequestMapping(value="/saveTable",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public Response saveTable(@RequestBody TableModel table) {
+		tableService.saveTableJson(table);
+		//return "redirect:/tables/add";
+		return result(ExceptionMsg.SUCCESS);
 	}
 	
 	@RequestMapping("/selectTables")

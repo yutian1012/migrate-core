@@ -87,7 +87,7 @@ Component: bootstrap-reset.less
 .glyphicon.glyphicon-chevron-down:before { content: '\f078'; }
 .glyphicon.glyphicon-folder-open:before { content: '\f07c'; }
 *:focus { outline: 0 !important; }
-a { outline: none !important; }
+a { outline: none !important;text-decoration: none;cursor:pointer; }
 a.text-muted:hover, a.text-muted:focus { color: #748690; }
 hr { border-top: 1px solid #e4eaec; }
 [data-now] { display: inline-block; }

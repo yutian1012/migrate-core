@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
+	
 	<div id="tableDiv" class="panel panel-default">
+	  <div>
+  		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/list','table')" value="返回">
+  	  </div>
 	  <div class="panel-heading">配置迁移表字段信息</div>
 	  <div class="panel-body">
 		  <div class="form-inline">
@@ -63,7 +67,11 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<checkbox name="forLog" v-model="field.forLog" class="form-control" value="1">
+		        	<div class="checkbox">
+				        <label>
+				        	<input type="checkbox" name="forLog" v-model="field.forLog" value="1">
+				        </label>
+				    </div>
 				</td>
 		        <td>
 		        	<input type="text" name="note" v-model="field.note" class="form-control">
@@ -72,13 +80,13 @@
 		        	<a style="text-decoration: none;" v-on:click="fieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
 		        </td>
 	  		</tr>
-          
 	  	</tbody>
 	  </table>
 	  
 	  <div></div>
 	</div>
 </body>
+	<script src="https://cdn.bootcss.com/json2/20160511/json2.min.js"></script>
 	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
     <script type="text/javascript">
 	    var tableDiv = new Vue({
@@ -109,7 +117,7 @@
 	            		return;
 	            	}
 	            	this.fieldModels.push(
-	            		{"name":"","valueType":"","value":"","value_1":"","value_2":"","showtext":false,"showselect":false,"forLog":0,"note":""});
+	            		{"name":"","valueType":"","value":"","value_1":"","value_2":"","showtext":false,"showselect":false,"forLog":0,"note":"","applyType":"TARGET"});
 	            	this.len++;
 	            },
 	            changeFieldValueType:function(index){
@@ -149,42 +157,28 @@
 		            	}
 	            	}
 	            	
-	            	event.preventDefault();
-	            	/* let formData = new FormData();
-	                //将表单信息追加到formData中
-	                formData.append('note', this.note);
-	                formData.append('from', this.from);
-	                formData.append('to', this.to);
-	                formData.append('fieldList', this.fieldModels); */
-	                
-	                var data={"note":this.note,"from":this.from,"to":this.to,"fieldList":this.fieldModels};
-	                
-	                $.post("/tables/saveTable",data,function(response){
-	                	if(response.rspCode=="000000"){//操作成功
-                    		toastr.success('保存成功', '操作成功');
-                    		//跳转回list页面
-							locationUrl('/tables/list','table');
-    					}else{
-    						toastr.error('保存失败', '操作失败');
-    					}
-	                });
-	                
-	                /* $.ajax({
-	                	type: "POST",
-	                    url: "/tables/saveTable",
-	                    //processData: false,//使用formDate对象，一定要设置该属性
-	                    //data: formData,
-	                    data:data,
-	                    success: function(response){
-	                    	if(response.rspCode=="000000"){//操作成功
-	                    		toastr.success('保存成功', '操作成功');
-	                    		//跳转回list页面
-								locationUrl('/tables/list','table');
-	    					}else{
-	    						toastr.error('保存失败', '操作失败');
-	    					}
-	                    }
-	                  }); */
+	            	if(confirm("是否保存!")){
+		            	event.preventDefault();
+		            	
+		                var param={"note":this.note,"from":this.from,"to":this.to,"fieldList":this.fieldModels};
+		                
+		                $.ajax({
+		                	type: "POST",
+		                    url: "/tables/saveTable",
+		                    dataType: "json",
+	  						contentType: "application/json",
+		                    data:JSON.stringify( param ),
+		                    success: function(response){
+		                    	if(response.rspCode=="000000"){//操作成功
+		                    		toastr.success('保存成功', '操作成功');
+		                    		//跳转回list页面
+									locationUrl('/tables/list','table');
+		    					}else{
+		    						toastr.error('保存失败', '操作失败');
+		    					}
+		                    }
+		                });
+	            	}
 	            }
 	        }
 	    });

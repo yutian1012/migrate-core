@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+  <head>
+  	<!-- <link href="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.css" rel="stylesheet">
+  	<script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js"></script> -->
+  	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
+  	<!-- <script th:src="@{/js/pagination.js}" ></script> -->
+    <script src="https://cdn.bootcss.com/vuejs-paginator/2.0.2/vuejs-paginator.min.js"></script>
+  </head>
   <body>
   	<div>
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/toUploadXml','table')" value="上传xml文档">
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/add','table')" value="添加表定义">
   	</div>
-  	<div style="height:460px;overflow: auto;">
-  		<table class="table table-bordered table-dark">
+  	<div style="height:600px;overflow: auto;">
+  		<table class="table table-bordered table-dark table-hover">
 		  <thead class="thead-dark">
 		    <tr>
 		      <th scope="col">#</th>
@@ -31,10 +38,17 @@
 		    </tr>
 		  </tbody>
 		</table>
+		
+  	</div>
+  	
+  	<div id="app">
+  		<!-- <paginate :page-count="10" :container-class="pagination" :prev-text="prev" :next-text="next" :click-handler="clickCallback"></paginate> -->
+		<!-- <navigation :pages="pages" :current.sync="pageNo" @navpage="pageList"></navigation> -->
+		<v-paginator resource_url="api/animals" @update="updateResource"></v-paginator>
   	</div>
   	
   	<!-- 分页查看 -->
-  	<nav aria-label="Page navigation example" style="float:right">
+  	<!-- <nav aria-label="Page navigation example" style="float:right">
 	  <ul class="pagination">
 	    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
 	    <li class="page-item"><a class="page-link" href="#">1</a></li>
@@ -42,9 +56,54 @@
 	    <li class="page-item"><a class="page-link" href="#">3</a></li>
 	    <li class="page-item"><a class="page-link" href="#">Next</a></li>
 	  </ul>
-	</nav>
+	</nav> -->
   </body>
+  
+  
   <script type="text/javascript">
+  	new Vue({
+  		el: '#app',
+	    data () {
+	      return {
+	        animals: []
+	      }
+	    },
+	    components: {
+	        VPaginator: VuePaginator
+	    },
+	    methods: {
+	      updateResource(data){
+	        this.animals = data
+	      }
+	    }
+	});
+  
+	 /*  Vue.component('paginate', VuejsPaginate)
+	
+	  new Vue({
+	    el: '#app',
+	    methods: {
+	      clickCallback: function(pageNum) {
+	        console.log(pageNum)
+	      }
+	    }
+	  }) */
+    /* new Vue({
+	  el: '#app',
+	  data: {
+          pageNo: 1,
+          pages: 100
+      },
+      methods: {
+          pageList:function(curPage) {
+              //根据当前页获取数据
+              this.pageNo = curPage;
+              console.log("当前页：" + this.pageNo);
+          }
+      }
+	}); */
+    
+    
   	$(function(){
 	  toastr.options = {
          'closeButton': true,

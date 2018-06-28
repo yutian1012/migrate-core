@@ -2,6 +2,7 @@ package com.ipph.migratecore.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,8 @@ import com.alibaba.fastjson.JSON;
 import com.ipph.migratecore.dao.BatchTableDao;
 import com.ipph.migratecore.dao.TableDao;
 import com.ipph.migratecore.deal.exception.ConfigException;
+import com.ipph.migratecore.enumeration.ApplyTypeEnum;
+import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.ConstraintModel;
 import com.ipph.migratecore.model.FieldModel;
 import com.ipph.migratecore.model.FormatModel;
@@ -66,6 +69,18 @@ public class TableService {
 		return true;
 	}
 	/**
+	 * 保存由页面定义的table配置信息
+	 * @param table
+	 * @return
+	 */
+	public boolean saveTableJson(TableModel table) {
+		if(null!=table) {
+			processTableField(table);
+		}
+		return save(table);
+	}
+	
+	/**
 	 * 保存数据
 	 * @param table
 	 * @return
@@ -86,7 +101,10 @@ public class TableService {
 		
 		return false;
 	}
-	
+	/**
+	 * 设置table的json字段，用于存放到数据库中持久保存
+	 * @param table
+	 */
 	public void setTableJsonData(TableModel table){
 		if(null!=table.getFieldList()&&table.getFieldList().size()>0) {
 			table.setFieldListJson(JSON.toJSONString(table.getFieldList()));
@@ -107,7 +125,10 @@ public class TableService {
 			table.setSplitFieldListJson(JSON.toJSONString(table.getSplitFieldList()));
 		}
 	}
-	
+	/**
+	 * 用于从数据库中获取对象，并将json值解析设置到相应的数据字段上
+	 * @param table
+	 */
 	public void setTableFieldFromJson(TableModel table){
 		if(null!=table.getFieldListJson()) {
 			table.setFieldList(JSON.parseArray(table.getFieldListJson(), FieldModel.class));
@@ -126,6 +147,30 @@ public class TableService {
 		}
 		if(null!=table.getSplitFieldListJson()) {
 			table.setSplitFieldList(JSON.parseArray(table.getSplitFieldListJson(),SplitModel.class));
+		}
+	}
+	/**
+	 * 处理Table数据，页面设置的信息，并未对source字段做处理
+	 * 这里，单独处理source字段集合
+	 * @param table
+	 */
+	public void processTableField(TableModel table) {
+		if(null==table.getFieldList()||table.getFieldList().size()==0) {
+			return ;
+		}
+		
+		List<FieldModel> sourceFieldList=new ArrayList<>(table.getFieldList().size());
+		for(FieldModel fieldModel:table.getFieldList()) {
+			if(null!=fieldModel&&FieldValueTypeEnum.FIELD==fieldModel.getValueType()) {
+				FieldModel sourceFieldModel=new FieldModel();
+				sourceFieldModel.setName(fieldModel.getValue());
+				sourceFieldModel.setApplyType(ApplyTypeEnum.SOURCE);
+				sourceFieldList.add(sourceFieldModel);
+			}
+		}
+		
+		if(sourceFieldList.size()>0) {
+			table.getFieldList().addAll(sourceFieldList);
 		}
 	}
 	
