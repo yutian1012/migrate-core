@@ -34,6 +34,7 @@
 		      <td>
 		      	<a style="text-decoration: none;" th:href="@{'/tables/info/'+${table.id}}"><i class="icon-magnifier"></i>查看</a>
 		      	<a style="text-decoration: none;" th:onclick="'javascript:remove('+${table.id}+')'"><i class="icon-action-redo"></i>删除</a>
+		      	<a style="text-decoration: none;" th:onclick="'javascript:locationUrl(\'/tables/add?tableId='+${table.id}+'\')'"><i class="icon-note"></i>编辑</a>
 		      </td>
 		    </tr>
 		  </tbody>
@@ -44,7 +45,7 @@
   	<div id="app">
   		<!-- <paginate :page-count="10" :container-class="pagination" :prev-text="prev" :next-text="next" :click-handler="clickCallback"></paginate> -->
 		<!-- <navigation :pages="pages" :current.sync="pageNo" @navpage="pageList"></navigation> -->
-		<v-paginator resource_url="api/animals" @update="updateResource"></v-paginator>
+		<!-- <v-paginator resource_url="api/animals" @update="updateResource"></v-paginator> -->
   	</div>
   	
   	<!-- 分页查看 -->
@@ -61,7 +62,7 @@
   
   
   <script type="text/javascript">
-  	new Vue({
+  	/* new Vue({
   		el: '#app',
 	    data () {
 	      return {
@@ -76,7 +77,7 @@
 	        this.animals = data
 	      }
 	    }
-	});
+	}); */
   
 	 /*  Vue.component('paginate', VuejsPaginate)
 	

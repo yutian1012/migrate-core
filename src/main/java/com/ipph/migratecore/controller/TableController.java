@@ -97,11 +97,12 @@ public class TableController extends BaseController{
 	 * @return
 	 */
 	@RequestMapping("/add")
-	public ModelAndView add() {
+	public ModelAndView add(@RequestParam(value="tableId",defaultValue="0")Long tableId) {
 		
 		ModelAndView mv=new ModelAndView("/tables/add");
 		
-		mv.addObject("sourceTableList",tableService.getSourceTables()).addObject("targetTableList",tableService.getTargetTables());
+		mv.addObject("sourceTableList",tableService.getSourceTables()).addObject("targetTableList",tableService.getTargetTables())
+			.addObject("tableId",tableId);
 		mv.addAllObjects(getEnumeration());
 		
 		return mv;
@@ -136,11 +137,28 @@ public class TableController extends BaseController{
 		return result(ExceptionMsg.SUCCESS);
 	}
 	
+	/**
+	 * 查看table定义信息
+	 * @param tableId
+	 * @return
+	 */
+	@RequestMapping("/info/{tableId}")
+	@ResponseBody
+	public Response info(@PathVariable("tableId")Long tableId) {
+		
+		TableModel tableModel=tableService.getById(tableId);
+		
+		Map<String,Object> data=new HashMap<>();
+		data.put("table", tableModel);
+		return result(ExceptionMsg.SUCCESS,data);
+	}
+	
 	@RequestMapping("/selectTables")
 	@ResponseBody
 	public List<TableModel> selectTables(){
 		return tableService.getList();
 	}
+	
 	/**
 	 * 查看记录数据
 	 * @param tableId
@@ -154,20 +172,6 @@ public class TableController extends BaseController{
 			return tableService.getRecord(tableId,dataId);
 		}
 		return null;
-	}
-	
-	/**
-	 * 查看table定义信息
-	 * @param tableId
-	 * @return
-	 */
-	@RequestMapping("/info/{tableId}")
-	@ResponseBody
-	public TableModel info(@PathVariable("tableId")Long tableId) {
-		
-		TableModel tableModel=tableService.getById(tableId);
-		
-		return tableModel;
 	}
 	
 	/**
