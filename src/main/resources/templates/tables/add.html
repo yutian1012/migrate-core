@@ -4,6 +4,7 @@
 	
 	<div id="tableDiv" class="panel panel-default">
 	  <div>
+	  	<input class="btn btn-primary" type="button" value="保存" v-on:click="saveTable">
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/list','table')" value="返回">
   	  </div>
 	  <div class="panel-heading">配置迁移表字段信息</div>
@@ -25,9 +26,15 @@
 						<option th:each="tableName:${targetTableList}" th:text="${tableName}" th:value="${tableName}"></option>
 					</select>
 			  </div>
+			  <div class="form-group">
+				    <label for="to">操作类型：</label>
+				    <select class="form-control" v-model="type" name="type">
+						<option value="MIGRATE">插入到目标表</option>
+		        		<option value="UPDATE">更新字段值到目标表</option>
+					</select>
+			  </div>
 		  </div>
 		  <div style="float: right;">
-		  	<input class="btn btn-primary" type="button" value="保存" v-on:click="saveTable">
 		  	<input class="btn btn-primary" type="button" value="添加字段" v-on:click="addField">
 		  </div>
 	  </div>
@@ -45,7 +52,7 @@
 	        </tr>
 	  	</thead>
 	  	<tbody>
-	  		<tr v-for="(field,index) in fieldModels">
+	  		<tr v-for="(field,index) in fieldModels" v-if="field.applyType=='TARGET'">
 	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
 		        	<!-- <input type="text" v-model="field.name" name="name"> -->
@@ -54,7 +61,7 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="field.valueType" name="valueType" v-on:change="changeFieldValueType(index)">
+		        	<select class="form-control" v-model="field.valueType" name="valueType" v-on:change="changeFieldValueType(index,'')">
 		        		<option value="FIXED">固定值</option>
 		        		<option value="FIELD">字段值</option>
 		        		<option value="GENCODE">自增值</option>
@@ -83,13 +90,60 @@
 	  	</tbody>
 	  </table>
 	  
-	  <div class="panel-heading">配置格式化字段</div>
+	  <!-- ************************************************************************************************************************** -->
+	  
+	  <div class="panel-body">
+		  <div style="float: right;">
+		  	<input class="btn btn-primary" type="button" value="添加关联及筛选字段" v-on:click="addWhereField">
+		  </div>
+	  </div>
+	  <!-- 关联及筛选字段信息 -->
+	  <table class="table table-hover table-bordered">
+	  	<thead>
+	        <tr>
+	          <th class="col-md-1">#</th>
+	          <th class="col-md-3">条件字段（原表）</th>
+	          <th class="col-md-2">条件表达式</th>
+	          <th class="col-md-2">条件值来源</th>
+	          <th class="col-md-3">数据值</th>
+			  <th class="col-md-1">操作</th>
+	        </tr>
+	  	</thead>
+	  	<tbody>
+	  		<tr v-for="(formatField,index) in formatFields">
+	  			<th scope="row">{{ index+1 }}</th>
+		        <td>
+		        	<select class="form-control" v-model="formatField.fieldName" name="fieldName">
+		        		<option v-for="(col,index) in fieldModels" v-if="col.valueType=='FIELD'" :value="col.value_2">{{col.value_2}}</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<select class="form-control" v-model="formatField.clz" name="clz">
+		        		<option value="FIXED">固定值</option>
+		        		<option value="FIELD">字段值</option>
+		        		<option value="GENCODE">自增值</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<input type="text" name="defaultValue" v-model="formatField.defaultValue" class="form-control">
+				</td>
+		        <td>
+		        	<input type="text" name="formatParameter" v-model="formatField.formatParameter" class="form-control">
+		        </td>
+		        <td>
+		        	<a style="text-decoration: none;" v-on:click="formatFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        </td>
+	  		</tr>
+	  	</tbody>
+	  </table>
+	   <!-- 原表关联及筛选条件 -->
+	  
 	  <div class="panel-body">
 		  <div style="float: right;">
 		  	<input class="btn btn-primary" type="button" value="添加格式化字段" v-on:click="addFormatField">
 		  </div>
 	  </div>
-	  <!-- 表格式化信息 -->
+	  <!-- 原表格式化字段信息 -->
 	  <table class="table table-hover table-bordered">
 	  	<thead>
 	        <tr>
@@ -128,8 +182,6 @@
 	  		</tr>
 	  	</tbody>
 	  </table>
-	  
-	  <div></div>
 	</div>
 </body>
 	<script src="https://cdn.bootcss.com/json2/20160511/json2.min.js"></script>
@@ -147,6 +199,7 @@
 	        	note:'',//定义配置描述信息
 	        	from:'',//配置源表
 	        	to:'',//配置目标表
+	        	type:'',//操作类型
 	        	fieldModels:[],//配置字段转换信息
 	        	formatFields:[],//格式化字段信息
 	        	conditionModels:[],//配置关联条件
@@ -155,24 +208,10 @@
 				len:0
 	        },
 	        mounted: function () {//created访问数据后无法正常显示到页面上
-	        	/* if(tableId!=0){
+	        	if(tableId!=0){
 	        		//获取初始化数据
-	        		$.post("/tables/info/"+tableId,function(response){
-	        			if(response.rspCode=="000000"){//操作成功
-                    		var tableModel=response.data.table;
-	        				if(tableModel){
-	        					this.from=tableModel.from;
-	        					this.note=tableModel.note;
-	        					this.to=tableModel.to;
-	        					this.note="ssss";
-	        					this.fieldModels=tableModel.fieldList;
-	        					this.formatFields=tableModel.formatFieldList;
-	        				}
-    					}else{
-    						toastr.error('加载数据失败', '操作失败');
-    					}
-	        		});
-	        	} */
+	        		loadData(tableId);
+	        	}
 	        },
 	        methods: {
 	            getChangedTable: function(event){
@@ -193,7 +232,7 @@
 	            		{"name":"","valueType":"","value":"","value_1":"","value_2":"","showtext":false,"showselect":false,"forLog":0,"note":"","applyType":"TARGET"});
 	            	this.len++;
 	            },
-	            changeFieldValueType:function(index){
+	            changeFieldValueType:function(index,value){
 	            	switch(this.fieldModels[index].valueType){
 	            		case "FIXED":
 	            		case "GENCODE":
@@ -207,6 +246,14 @@
 	            		default :
 	            			this.fieldModels[index].showtext=true;
 	            			this.fieldModels[index].showselect=false;
+	            	}
+	            	
+	            	if(value!=''){
+	            		if(this.fieldModels[index].showtext){
+	            			this.fieldModels[index].value_1=value;
+	            		}else{
+	            			this.fieldModels[index].value_2=value;
+	            		}
 	            	}
 	            },
 	            fieldRemove:function(index){
@@ -282,6 +329,37 @@
 					}
 				});
 	    	}
+	    }
+	    
+	    function loadData(tableId){
+	    	$.post("/tables/info/"+tableId,function(response){
+    			if(response.rspCode=="000000"){//操作成功
+            		var tableModel=response.data.table;
+            		tableDiv.fromTableModel=response.data.fromTable;
+            		tableDiv.toTableModel=response.data.toTable;
+
+   					if(tableModel){
+   						tableDiv.note=tableModel.note;
+   						tableDiv.from=tableModel.from;
+   						tableDiv.to=tableModel.to;
+   						//字段配置信息
+   						if(tableModel.fieldList){
+	   						tableDiv.fieldModels=tableModel.fieldList;
+	   						tableDiv.len=tableModel.fieldList.length;
+	    					//关联字段设置
+	    					for(var index=0;index<tableModel.fieldList.length;index++){
+	    						tableDiv.changeFieldValueType(index,tableModel.fieldList[index].value);
+	    					}
+   						}
+   						//格式化字段配置信息
+   						if(tableModel.formatFieldList){
+	   						tableDiv.formatFields=tableModel.formatFieldList;
+   						}
+    				}
+				}else{
+					toastr.error('加载数据失败', '操作失败');
+				}
+    		});
 	    }
     </script>
 	<!-- <script type="text/javascript">

@@ -3,6 +3,7 @@ package com.ipph.migratecore.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -219,6 +220,25 @@ public class TableService {
 		}
 		return table;
 	}
+	/**
+	 * 编辑页面获取
+	 * @param tableId
+	 * @return
+	 */
+	public TableModel get2EditById(Long tableId) {
+		TableModel table=getById(tableId);
+		if(null!=table&&null!=table.getFieldList()) {
+			Iterator<FieldModel> iter=table.getFieldList().iterator();
+			while(iter.hasNext()) {
+				FieldModel fieldModel=iter.next();
+				if(ApplyTypeEnum.SOURCE==fieldModel.getApplyType()) {
+					iter.remove();
+				}
+			}
+		}
+		return table;
+	}
+	
 	/**
 	 * 获取表记录详细数据
 	 * @param tableId

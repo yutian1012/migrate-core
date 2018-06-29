@@ -147,9 +147,13 @@ public class TableController extends BaseController{
 	public Response info(@PathVariable("tableId")Long tableId) {
 		
 		TableModel tableModel=tableService.getById(tableId);
-		
 		Map<String,Object> data=new HashMap<>();
-		data.put("table", tableModel);
+		if(null!=tableModel) {
+			//获取from表和to表信息
+			data.put("fromTable",tableService.getMetaTableByName(true,tableModel.getFrom()));
+			data.put("toTable",tableService.getMetaTableByName(false,tableModel.getTo()));
+			data.put("table", tableModel);
+		}
 		return result(ExceptionMsg.SUCCESS,data);
 	}
 	
