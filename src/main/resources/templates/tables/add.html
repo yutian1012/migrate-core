@@ -110,33 +110,41 @@
 	        </tr>
 	  	</thead>
 	  	<tbody>
-	  		<tr v-for="(formatField,index) in formatFields">
+	  		<tr v-for="(conditionField,index) in conditionFieldList">
 	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
-		        	<select class="form-control" v-model="formatField.fieldName" name="fieldName">
-		        		<option v-for="(col,index) in fieldModels" v-if="col.valueType=='FIELD'" :value="col.value_2">{{col.value_2}}</option>
+		        	<select class="form-control" v-model="conditionField.fieldName" name="fieldName">
+		        		<option v-for="(col,index) in toTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="formatField.clz" name="clz">
+		        	<select class="form-control" v-model="conditionField.type" name="type">
+		        		<option value="LIKE">like</option>
+		        		<option value="LLIKE">Llike</option>
+		        		<option value="RLIKE">Rlike</option>
+		        		<option value="EQUAL">equal</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<select class="form-control" v-model="conditionField.valueType" name="valueType" v-on:change="changeConditionFieldValueType(index,'')">
 		        		<option value="FIXED">固定值</option>
 		        		<option value="FIELD">字段值</option>
-		        		<option value="GENCODE">自增值</option>
+		        	</select>
+				</td>
+		        <td>
+		        	<input v-if="conditionField.showCondtionText" type="text" class="form-control" v-model="conditionField.value_1" name="value_1">
+		        	<select v-if="conditionField.showConditionSelect" class="form-control" v-model="conditionField.value_2" name="value_2">
+		        		<option v-for="(col,index) in fromTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
 		        </td>
 		        <td>
-		        	<input type="text" name="defaultValue" v-model="formatField.defaultValue" class="form-control">
-				</td>
-		        <td>
-		        	<input type="text" name="formatParameter" v-model="formatField.formatParameter" class="form-control">
-		        </td>
-		        <td>
-		        	<a style="text-decoration: none;" v-on:click="formatFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        	<a style="text-decoration: none;" v-on:click="conditionFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
 		        </td>
 	  		</tr>
 	  	</tbody>
 	  </table>
-	   <!-- 原表关联及筛选条件 -->
+	  
+	  <!-- ***************************************************************************************************************************************** -->
 	  
 	  <div class="panel-body">
 		  <div style="float: right;">
@@ -201,6 +209,7 @@
 	        	to:'',//配置目标表
 	        	type:'',//操作类型
 	        	fieldModels:[],//配置字段转换信息
+	        	conditionFieldList:[],//条件字段
 	        	formatFields:[],//格式化字段信息
 	        	conditionModels:[],//配置关联条件
 	        	fromTableModel:{},//设置成空对象
@@ -256,9 +265,38 @@
 	            		}
 	            	}
 	            },
+	            changeConditionFieldValueType:function(index,value){
+	            	switch(this.conditionFieldList[index].valueType){
+	            		case "FIXED":
+	            		case "GENCODE":
+	            			this.conditionFieldList[index].showCondtionText=true;
+	            			this.conditionFieldList[index].showConditionSelect=false;
+	            			break;
+	            		case "FIELD":
+	            			this.conditionFieldList[index].showCondtionText=false;
+	            			this.conditionFieldList[index].showConditionSelect=true;
+	            			break;
+	            		default :
+	            			this.conditionFieldList[index].showCondtionText=true;
+	            			this.conditionFieldList[index].showConditionSelect=false;
+	            	}
+	            	
+	            	if(value!=''){
+	            		if(this.conditionFieldList[index].showCondtionText){
+	            			this.conditionFieldList[index].value_1=value;
+	            		}else{
+	            			this.conditionFieldList[index].value_2=value;
+	            		}
+	            	}
+	            },
 	            fieldRemove:function(index){
 	            	if(confirm("是否删除？")){
 	            		this.fieldModels.splice(index,1);//删除指定下标元素
+	            	}
+	            },
+	            conditionFieldRemove:function(){
+	            	if(confirm("是否删除？")){
+	            		this.conditionFieldList.splice(index,1);//删除指定下标元素
 	            	}
 	            },
 	            addFormatField:function(event){
@@ -273,6 +311,19 @@
 	            	if(confirm("是否删除？")){
 	            		this.formatFields.splice(index,1);//删除指定下标元素
 	            	}
+	            },
+	            addWhereField:function(event){
+	            	if(this.from==''||this.to==''){
+	            		toastr.error('请先选择要配置的原数据表和目标数据表!', '操作失败');
+	            		return;
+	            	}
+	            	if(this.conditionFieldList.length==this.len){
+	            		toastr.info('没有可添加的目标字段！', '提示信息');
+	            		return;
+	            	}
+	            	this.conditionFieldList.push(
+	            		{"fieldName":"","type":"","valueType":"","value":"","value_1":"","value_2":"","showCondtionText":false,"showConditionSelect":false});
+	            	this.len++;
 	            },
 	            saveTable:function(event){//保存表单
 	            	//设置字段的value值
@@ -362,125 +413,4 @@
     		});
 	    }
     </script>
-	<!-- <script type="text/javascript">
-		var sourceTableModel=null;
-		var targetTableModel=null;
-		//json枚举数据
-		/*<![CDATA[*/
-		  var valueType = /*[[${valueType}]]*/ '';
-		/*]]>*/
-		
-		function changeTable(source){
-			var tableName='';
-			if(source){
-				tableName=$("#sourceTableSelect").val();
-			}else{
-				tableName=$("#targetTableSelect").val();
-			}
-			
-			if(tableName==''){
-				if(source){
-					sourceTableModel=null;
-				}else{
-					targetTableModel=null;
-				}
-				return false;
-			}
-			$.post("/tables/getTable",{ "isSourceTable" : source , "tableName" : tableName }, function(data){
-		          if(data){
-		        	  if(source){
-		        		  sourceTableModel=data;
-		        	  }else{
-		        		  targetTableModel=data;
-		        	  }
-		          }
-		    });
-		}
-		
-		function displayTable(){
-			if(sourceTableModel){
-      		  	//清空源表显示信息
-      		  	$("#sourceTable").empty();//清空内容
-				for(var index=0;index<sourceTableModel.columnList.length;index++){
-	      		  	var column=sourceTableModel.columnList[index];
-	      			$("#sourceTable").append("<tr><td>"+column["name"]+"</td></tr>");
-	      	  	}
-			}
-		}
-		
-		function addTable(){
-			window.location.href='/tables/add';
-		}
-		
-		//添加转换字段
-		function addField(){
-			if(targetTableModel==null||sourceTableModel==null){
-				alert("请先选择待迁移的数据表!!!");
-				return false;
-			}
-			
-			var table=$("#migrateTable");
-			
-			var index=$("#migrateTable tr").length-1;
-			
-			var html=$("<tr></tr>");//创建行数据
-			//目标表字段
-			html.append($("<td></td>").append(getTableFieldColumn(targetTableModel,"filedList["+index+"].name")));
-			//值来源
-			html.append($("<td></td>").append(getValueType("filedList["+index+"].valueType")));
-			//数据值
-			html.append($("<td></td>").append(getTableFieldValue(true,"filedList["+index+"].value")));
-			//默认值
-			html.append($("<td></td>").append("")));
-			//格式化
-			html.append("<td></td>");
-			
-			$("#migrateTable").append(html);
-		}
-		//获取表字段选项
-		function getTableFieldColumn(table,name){
-			var select=$("<select name='"+name+"'></select>");//设置name字段值
-			if(table!=null){
-				for(var index=0;index<table.columnList.length;index++){
-	      		  	var column=table.columnList[index];
-	      			select.append("<option>"+column["name"]+"</option>");
-	      	  	}
-			}
-			return select;
-		}
-		//获取表字段数据值
-		function getTableFieldValue(fixed,name){
-			if(fixed){//固定值，由用户输入
-				return $("<input type='text' name='"+name+"'>");
-			}else{//字段值，从源表中选择
-				return getTableFieldColumn(sourceTableModel,name);
-			}
-		}
-		//获取值来源字段值
-		function getValueType(name){
-			var select=$("<select name='"+name+"' onchange='changValueType(this)'></select>");//设置name字段值
-			for(var key in valueType){
-				select.append("<option value='"+key+"'>"+valueType[key]+"</option>");
-			}
-			return select;
-		}
-		//获取表字段默认值
-		function getTableFieldDefaultValue(name){
-			return $("<input type='text'>");
-		}
-		
-		//修改值来源选项
-		function changValueType(obj){
-			//联动改变数据值控件
-			var value=$(obj).val();
-			//首先清空
-			var nextTd=$(obj).parent("td").next();
-			var name=nextTd.children("select").attr("name");
-			nextTd.empty();
-			//从新设置内容
-			if(value=='FIXED'){
-				nextTd.append(getTableFieldValue(true,name)));
-			}
-		}
-	</script> -->
 </html>

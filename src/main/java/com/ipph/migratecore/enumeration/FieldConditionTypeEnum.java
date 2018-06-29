@@ -11,7 +11,7 @@ public enum FieldConditionTypeEnum {
 		public Condition getConditionHandler() {
 			return ConditionDefaultImpl.getInstance();
 		}
-	},LLike("like") {
+	},LLIKE("like") {
 		@Override
 		public Condition getConditionHandler() {
 			return null;
