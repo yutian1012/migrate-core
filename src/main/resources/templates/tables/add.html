@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-	
 	<div id="tableDiv" class="panel panel-default">
 	  <div>
 	  	<input class="btn btn-primary" type="button" value="保存" v-on:click="saveTable">
@@ -43,19 +42,18 @@
 	  	<thead>
 	        <tr>
 	          <th class="col-md-1">#</th>
-	          <th class="col-md-3">目标表字段</th>
-	          <th class="col-md-1">值来源</th>
-	          <th class="col-md-3">数据值</th>
+	          <th class="col-md-2">目标表字段</th>
+	          <th class="col-md-2">值来源</th>
+	          <th class="col-md-2">数据值</th>
 	          <th class="col-md-1">日志字段</th>
-			  <th class="col-md-2">备注</th>
+			  <th class="col-md-3">备注</th>
 			  <th class="col-md-1">操作</th>
 	        </tr>
 	  	</thead>
 	  	<tbody>
-	  		<tr v-for="(field,index) in fieldModels" v-if="field.applyType=='TARGET'">
+	  		<tr v-for="(field,index) in fieldList" v-if="field.applyType=='TARGET'">
 	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
-		        	<!-- <input type="text" v-model="field.name" name="name"> -->
 		        	<select class="form-control" v-model="field.name" name="name">
 		        		<option v-for="(col,index) in toTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
@@ -68,8 +66,8 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<input v-if="field.showtext" type="text" class="form-control" v-model="field.value_1" name="value_1">
-		        	<select v-if="field.showselect" class="form-control" v-model="field.value_2" name="value_2">
+		        	<input v-if="field.showText" type="text" class="form-control" v-model="field.textValue" name="textValue">
+		        	<select v-if="field.showSelect" class="form-control" v-model="field.fieldValue" name="fieldValue">
 		        		<option v-for="(col,index) in fromTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
 		        </td>
@@ -91,10 +89,10 @@
 	  </table>
 	  
 	  <!-- ************************************************************************************************************************** -->
-	  
-	  <div class="panel-body">
+	  <!-- 原表应用条件设置 -->
+	   <div class="panel-body">
 		  <div style="float: right;">
-		  	<input class="btn btn-primary" type="button" value="添加关联及筛选字段" v-on:click="addWhereField">
+		  	<input class="btn btn-primary" type="button" value="添加原表关联及筛选字段" v-on:click="addSourceWhereField">
 		  </div>
 	  </div>
 	  <!-- 关联及筛选字段信息 -->
@@ -110,10 +108,59 @@
 	        </tr>
 	  	</thead>
 	  	<tbody>
-	  		<tr v-for="(conditionField,index) in conditionFieldList">
+	  		<tr v-for="(conditionField,index) in conditionFieldList" v-if="conditionField.applyType=='SOURCE'">
 	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
-		        	<select class="form-control" v-model="conditionField.fieldName" name="fieldName">
+		        	<select class="form-control" v-model="conditionField.name" name="name">
+		        		<option v-for="(col,index) in fromTableModel.columnList" :value="col.name">{{col.comment}}</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<select class="form-control" v-model="conditionField.type" name="type">
+		        		<option value="LIKE">like</option>
+		        		<option value="LLIKE">Llike</option>
+		        		<option value="RLIKE">Rlike</option>
+		        		<option value="EQUAL">equal</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<select class="form-control" v-model="conditionField.valueType" name="valueType">
+		        		<option value="FIXED">固定值</option>
+		        	</select>
+				</td>
+		        <td>
+		        	<input type="text" class="form-control" v-model="conditionField.textValue" name="textValue">
+		        </td>
+		        <td>
+		        	<a style="text-decoration: none;" v-on:click="conditionFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        </td>
+	  		</tr>
+	  	</tbody>
+	  </table>
+	  
+	  <!-- 目标表应用条件设置 -->
+	  <div class="panel-body">
+		  <div style="float: right;">
+		  	<input class="btn btn-primary" type="button" value="添加目标表关联及筛选字段" v-on:click="addTargetWhereField">
+		  </div>
+	  </div>
+	  <!-- 关联及筛选字段信息 -->
+	  <table class="table table-hover table-bordered">
+	  	<thead>
+	        <tr>
+	          <th class="col-md-1">#</th>
+	          <th class="col-md-3">条件字段（目标表）</th>
+	          <th class="col-md-2">条件表达式</th>
+	          <th class="col-md-2">条件值来源</th>
+	          <th class="col-md-3">数据值</th>
+			  <th class="col-md-1">操作</th>
+	        </tr>
+	  	</thead>
+	  	<tbody>
+	  		<tr v-for="(conditionField,index) in conditionFieldList" v-if="conditionField.applyType=='TARGET'">
+	  			<th scope="row">{{ index+1 }}</th>
+		        <td>
+		        	<select class="form-control" v-model="conditionField.name" name="name">
 		        		<option v-for="(col,index) in toTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
 		        </td>
@@ -132,8 +179,8 @@
 		        	</select>
 				</td>
 		        <td>
-		        	<input v-if="conditionField.showCondtionText" type="text" class="form-control" v-model="conditionField.value_1" name="value_1">
-		        	<select v-if="conditionField.showConditionSelect" class="form-control" v-model="conditionField.value_2" name="value_2">
+		        	<input v-if="conditionField.showText" type="text" class="form-control" v-model="conditionField.textValue" name="textValue">
+		        	<select v-if="conditionField.showSelect" class="form-control" v-model="conditionField.fieldValue" name="fieldValue">
 		        		<option v-for="(col,index) in fromTableModel.columnList" :value="col.name">{{col.comment}}</option>
 		        	</select>
 		        </td>
@@ -164,11 +211,12 @@
 	        </tr>
 	  	</thead>
 	  	<tbody>
-	  		<tr v-for="(formatField,index) in formatFields">
+	  		<tr v-for="(formatField,index) in formatFieldList">
 	  			<th scope="row">{{ index+1 }}</th>
 		        <td>
-		        	<select class="form-control" v-model="formatField.fieldName" name="fieldName">
-		        		<option v-for="(col,index) in fieldModels" v-if="col.valueType=='FIELD'" :value="col.value_2">{{col.value_2}}</option>
+		        	<!-- 这里格式化的是原表中的字段 -->
+		        	<select class="form-control" v-model="formatField.filedName" name="filedName">
+		        		<option v-for="(col,index) in fieldList" v-if="col.valueType=='FIELD'" :value="col.fieldValue">{{col.fieldValue}}</option>
 		        	</select>
 		        </td>
 		        <td>
@@ -190,6 +238,7 @@
 	  		</tr>
 	  	</tbody>
 	  </table>
+	  <input type="hidden" name="id" v-model="id">
 	</div>
 </body>
 	<script src="https://cdn.bootcss.com/json2/20160511/json2.min.js"></script>
@@ -204,16 +253,16 @@
 	    var tableDiv = new Vue({
 	        el: "#tableDiv",
 	        data: {
+	        	id:'',//业务数据主键
 	        	note:'',//定义配置描述信息
 	        	from:'',//配置源表
 	        	to:'',//配置目标表
 	        	type:'',//操作类型
-	        	fieldModels:[],//配置字段转换信息
+	        	fieldList:[],//配置字段转换信息
 	        	conditionFieldList:[],//条件字段
-	        	formatFields:[],//格式化字段信息
-	        	conditionModels:[],//配置关联条件
-	        	fromTableModel:{},//设置成空对象
-				toTableModel:{},
+	        	formatFieldList:[],//格式化字段信息
+	        	fromTableModel:{},//原表信息，设置成空对象
+				toTableModel:{},//目标表信息
 				len:0
 	        },
 	        mounted: function () {//created访问数据后无法正常显示到页面上
@@ -223,96 +272,45 @@
 	        	}
 	        },
 	        methods: {
+	        	//原、目标表的选择
 	            getChangedTable: function(event){
 	            	if(this.from!=''&&this.to!=''){
 	            		changeTable(this.from,this.to);
 	            	}
 	            },
+	            
+	            //******************************************************************************************************
 	            addField : function(event){
 	            	if(this.from==''||this.to==''){
 	            		toastr.error('请先选择要配置的原数据表和目标数据表!', '操作失败');
 	            		return;
 	            	}
-	            	if(this.fieldModels.length==this.len){
+	            	if(this.fieldList.length==this.len){
 	            		toastr.info('没有可添加的目标字段！', '提示信息');
 	            		return;
 	            	}
-	            	this.fieldModels.push(
-	            		{"name":"","valueType":"","value":"","value_1":"","value_2":"","showtext":false,"showselect":false,"forLog":0,"note":"","applyType":"TARGET"});
+	            	this.fieldList.push(
+	            		{"name":"","valueType":"","textValue":"","fieldValue":"","value":"","showText":false,"showSelect":false,"forLog":0,"note":"","applyType":"TARGET"});
 	            	this.len++;
 	            },
 	            changeFieldValueType:function(index,value){
-	            	switch(this.fieldModels[index].valueType){
-	            		case "FIXED":
-	            		case "GENCODE":
-	            			this.fieldModels[index].showtext=true;
-	            			this.fieldModels[index].showselect=false;
-	            			break;
-	            		case "FIELD":
-	            			this.fieldModels[index].showtext=false;
-	            			this.fieldModels[index].showselect=true;
-	            			break;
-	            		default :
-	            			this.fieldModels[index].showtext=true;
-	            			this.fieldModels[index].showselect=false;
-	            	}
-	            	
-	            	if(value!=''){
-	            		if(this.fieldModels[index].showtext){
-	            			this.fieldModels[index].value_1=value;
-	            		}else{
-	            			this.fieldModels[index].value_2=value;
-	            		}
-	            	}
-	            },
-	            changeConditionFieldValueType:function(index,value){
-	            	switch(this.conditionFieldList[index].valueType){
-	            		case "FIXED":
-	            		case "GENCODE":
-	            			this.conditionFieldList[index].showCondtionText=true;
-	            			this.conditionFieldList[index].showConditionSelect=false;
-	            			break;
-	            		case "FIELD":
-	            			this.conditionFieldList[index].showCondtionText=false;
-	            			this.conditionFieldList[index].showConditionSelect=true;
-	            			break;
-	            		default :
-	            			this.conditionFieldList[index].showCondtionText=true;
-	            			this.conditionFieldList[index].showConditionSelect=false;
-	            	}
-	            	
-	            	if(value!=''){
-	            		if(this.conditionFieldList[index].showCondtionText){
-	            			this.conditionFieldList[index].value_1=value;
-	            		}else{
-	            			this.conditionFieldList[index].value_2=value;
-	            		}
-	            	}
+	            	changeValueType(this.fieldList,index,value);
 	            },
 	            fieldRemove:function(index){
-	            	if(confirm("是否删除？")){
-	            		this.fieldModels.splice(index,1);//删除指定下标元素
-	            	}
+	            	removeField(this.fieldList,index);
+	            	/* if(confirm("是否删除？")){
+	            		this.fieldList.splice(index,1);//删除指定下标元素
+	            	} */
 	            },
-	            conditionFieldRemove:function(){
-	            	if(confirm("是否删除？")){
-	            		this.conditionFieldList.splice(index,1);//删除指定下标元素
-	            	}
+	            
+	            //********************************************************************************************************
+	            addTargetWhereField:function(event){
+	            	this.addWhereField(event,false)
 	            },
-	            addFormatField:function(event){
-	            	if(this.fieldModels.length==0){
-	            		toastr.info('没有可格式化的数据源字段！', '提示信息');
-	            		return;
-	            	}
-	            	this.formatFields.push(
-	            		{"fieldName":"","clz":"","defaultValue":"","formatParameter":""});
+	            addSourceWhereField:function(event){
+	            	this.addWhereField(event,true);
 	            },
-	            formatFieldRemove:function(index){
-	            	if(confirm("是否删除？")){
-	            		this.formatFields.splice(index,1);//删除指定下标元素
-	            	}
-	            },
-	            addWhereField:function(event){
+	            addWhereField:function(event,isSource){
 	            	if(this.from==''||this.to==''){
 	            		toastr.error('请先选择要配置的原数据表和目标数据表!', '操作失败');
 	            		return;
@@ -321,52 +319,55 @@
 	            		toastr.info('没有可添加的目标字段！', '提示信息');
 	            		return;
 	            	}
-	            	this.conditionFieldList.push(
-	            		{"fieldName":"","type":"","valueType":"","value":"","value_1":"","value_2":"","showCondtionText":false,"showConditionSelect":false});
+	            	
+	            	var value={"name":"","type":"","valueType":"","textValue":"","fieldValue":"","value":"","showText":false,"showSelect":false};
+	            	if(isSource){
+	            		value.applyType="SOURCE";
+	            	}else{
+	            		value.applyType="TARGET";
+	            	}
+	            	
+	            	this.conditionFieldList.push(value);
 	            	this.len++;
 	            },
-	            saveTable:function(event){//保存表单
-	            	//设置字段的value值
-	            	for(var i=0;i<this.fieldModels.length;i++){
-	            		switch(this.fieldModels[i].valueType){
-		            		case "FIXED":
-		            		case "GENCODE":
-		            			this.fieldModels[i].value=this.fieldModels[i].value_1;
-		            			break;
-		            		case "FIELD":
-		            			this.fieldModels[i].value=this.fieldModels[i].value_2;
-		            			break;
-		            		default :
-		            			this.fieldModels[i].value=this.fieldModels[i].value_1;
-		            	}
+	            changeConditionFieldValueType:function(index,value){
+	            	changeValueType(this.conditionFieldList,index,value);
+	            },
+	            conditionFieldRemove:function(index){
+	            	removeField(this.conditionFieldList,index);
+	            	/* if(confirm("是否删除？")){
+	            		this.conditionFieldList.splice(index,1);//删除指定下标元素
+	            	} */
+	            },
+	            
+	            //********************************************************************************************************
+	            addFormatField:function(event){
+	            	if(this.fieldList.length==0){
+	            		toastr.info('没有可格式化的数据源字段！', '提示信息');
+	            		return;
 	            	}
+	            	this.formatFieldList.push({"filedName":"","clz":"","defaultValue":"","formatParameter":""});
+	            },
+	            formatFieldRemove:function(index){
+	            	removeField(this.formatFieldList,index);
+	            	/* if(confirm("是否删除？")){
+	            		this.formatFieldList.splice(index,1);//删除指定下标元素
+	            	} */
+	            },
+	            
+	            //********************************************************************************************************
+	            saveTable:function(event){//保存表单
 	            	
 	            	if(confirm("是否保存!")){
 		            	event.preventDefault();
 		            	
-		                var param={"note":this.note,"from":this.from,"to":this.to,"fieldList":this.fieldModels};
-		                
-		                $.ajax({
-		                	type: "POST",
-		                    url: "/tables/saveTable",
-		                    dataType: "json",
-	  						contentType: "application/json",
-		                    data:JSON.stringify( param ),
-		                    success: function(response){
-		                    	if(response.rspCode=="000000"){//操作成功
-		                    		toastr.success('保存成功', '操作成功');
-		                    		//跳转回list页面
-									locationUrl('/tables/list','table');
-		    					}else{
-		    						toastr.error('保存失败', '操作失败');
-		    					}
-		                    }
-		                });
+		            	saveData();
 	            	}
 	            }
 	        }
 	    });
 	    
+	    //更改原表或目标表
 	    function changeTable(from,to){
 	    	var url="/tables/getTable";
 	    	if(from!=''&&to!=''){
@@ -381,7 +382,40 @@
 				});
 	    	}
 	    }
-	    
+	    //更改值来源,该方法即用在初始化数据渲染页面，同时也应用在保持数据设置value值上
+	    function changeValueType(fieldList,index,value){
+	    	if(fieldList){
+	    		if(value!=''){//渲染页面，设置控件的值
+            		if(fieldList[index].showText){
+            			fieldList[index].textValue=value;
+            		}else{
+            			fieldList[index].fieldValue=value;
+            		}
+            	}
+	    		
+	        	switch(fieldList[index].valueType){
+		        	case "FIELD":
+		    			fieldList[index].showText=false;
+		    			fieldList[index].showSelect=true;
+		    			fieldList[index].value=fieldList[index].fieldValue;//保存数据时，设置value值
+		    			break;
+		    			
+		    		case "FIXED":
+		    		case "GENCODE":
+		    		default :
+		    			fieldList[index].showText=true;
+		    			fieldList[index].showSelect=false;
+		    			fieldList[index].value=fieldList[index].textValue;
+		    	}
+	    	}
+	    }
+	    //删除字段配置
+	    function removeField(fieldList,index){
+	    	if(confirm("是否删除？")){
+        		fieldList.splice(index,1);//删除指定下标元素
+        	}
+	    }
+	    //加载数据展示到空间中
 	    function loadData(tableId){
 	    	$.post("/tables/info/"+tableId,function(response){
     			if(response.rspCode=="000000"){//操作成功
@@ -390,27 +424,103 @@
             		tableDiv.toTableModel=response.data.toTable;
 
    					if(tableModel){
-   						tableDiv.note=tableModel.note;
+            			tableDiv.id=tableModel.id;
    						tableDiv.from=tableModel.from;
    						tableDiv.to=tableModel.to;
-   						//字段配置信息
-   						if(tableModel.fieldList){
-	   						tableDiv.fieldModels=tableModel.fieldList;
+   						tableDiv.note=tableModel.note;
+   						tableDiv.type=tableModel.type;
+   						
+   						//**********************************************************
+   						if(tableModel.fieldList){//页面显示fieldList字段
+	    					for(var index=0;index<tableModel.fieldList.length;){
+	    						//防止页面上删除设置字段，而不能删除applyType为Source的字段，保存数据时，后台会自动添加上相关的Source字段
+	    						if(tableModel.fieldList[index].applyType=='SOURCE'){
+	    							tableModel.fieldList.splice(index,1);//删除指定下标元素
+	    						}else{//删除字段使用splice会动态改变数组的长度，因此index自增不能放到for循环体中
+	    							index++;
+	    						}
+	    					}
+
+   							tableDiv.fieldList=tableModel.fieldList;
 	   						tableDiv.len=tableModel.fieldList.length;
-	    					//关联字段设置
-	    					for(var index=0;index<tableModel.fieldList.length;index++){
-	    						tableDiv.changeFieldValueType(index,tableModel.fieldList[index].value);
+	   						for(var index=0;index<tableDiv.fieldList.length;index++){
+	   							tableDiv.changeFieldValueType(index,tableDiv.fieldList[index].value);
 	    					}
    						}
+   						
+   						//**********************************************************
+   						if(tableModel.whereModel&&tableModel.whereModel.conditionList){
+   							for(var index=0;index<tableModel.whereModel.conditionList.length;index++){
+   								var condition=tableModel.whereModel.conditionList[index];
+   								var conditionField=condition.field;
+   								tableDiv.conditionFieldList.push({"type":condition.type,"applyType":condition.applyType,
+   										"name":conditionField.name,"valueType":conditionField.valueType,"textValue":"","fieldValue":"","value":conditionField.value,"showText":false,"showSelect":false});
+   								
+   							}
+							for(var index=0;index<tableDiv.conditionFieldList.length;index++){
+		   						tableDiv.changeConditionFieldValueType(index,tableDiv.conditionFieldList[index].value);
+		    				}
+   						}
+   						
+   					   	//**********************************************************
+   						
    						//格式化字段配置信息
    						if(tableModel.formatFieldList){
-	   						tableDiv.formatFields=tableModel.formatFieldList;
+	   						tableDiv.formatFieldList=tableModel.formatFieldList;
    						}
     				}
 				}else{
 					toastr.error('加载数据失败', '操作失败');
 				}
     		});
+	    }
+	    
+	    //格式化保存参数数据
+	    function saveData(){
+	    	
+	    	var param={"id":tableDiv.id,"note":tableDiv.note,"from":tableDiv.from,"to":tableDiv.to,"type":tableDiv.type};
+	    	
+	    	//****************************************************************
+	    	//设置字段的value值
+        	for(var i=0;i<tableDiv.fieldList.length;i++){
+        		changeValueType(tableDiv.fieldList,i,tableDiv.fieldList[i].value);
+        	}
+	    	param.fieldList=tableDiv.fieldList;
+	    	
+	    	//****************************************************************
+	    	
+        	//where条件
+        	var whereModel={}
+        	if(tableDiv.conditionFieldList.length>0){
+        		whereModel.conditionList=[];
+        		for(var i=0;i<tableDiv.conditionFieldList.length;i++){
+        			var conditionField=tableDiv.conditionFieldList[i];
+        			
+        			var field={"name":conditionField.name,"applyType":conditionField.applyType,"valueType":conditionField.valueType,"value":conditionField.value};
+        			whereModel.conditionList.push({"type":conditionField.type,"applyType":conditionField.applyType,"field":field})
+        		}
+        	}
+	    	param.whereModel=whereModel;
+	    	//*****************************************************************
+	    	param.formatFieldList=tableDiv.formatFieldList;
+	    	
+        	//*****************************************************************
+            $.ajax({
+            	type: "POST",
+                url: "/tables/saveTable",
+                dataType: "json",
+					contentType: "application/json",
+                data:JSON.stringify( param ),
+                success: function(response){
+                	if(response.rspCode=="000000"){//操作成功
+                		toastr.success('保存成功', '操作成功');
+                		//跳转回list页面
+						locationUrl('/tables/list','table');
+					}else{
+						toastr.error('保存失败', '操作失败');
+					}
+                }
+            });
 	    }
     </script>
 </html>

@@ -25,7 +25,7 @@ import lombok.Setter;
 //@JsonIgnoreProperties(value={"handler","hibernateLazyInitializer"})
 public class TableModel implements Serializable{
 	@Id
-    @GeneratedValue
+	@GeneratedValue
 	private Long id;
 	@Column
 	private TableOperationEnum type;

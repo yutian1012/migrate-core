@@ -24,7 +24,9 @@ import com.ipph.migratecore.common.ExceptionMsg;
 import com.ipph.migratecore.common.Response;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.TableModel;
+import com.ipph.migratecore.model.view.TableViewModel;
 import com.ipph.migratecore.service.TableService;
+import com.ipph.migratecore.transformer.TableTransformer;
 import com.ipph.migratecore.util.XmlUtil;
 
 @Controller
@@ -33,6 +35,8 @@ public class TableController extends BaseController{
 	
 	@Resource
 	private TableService tableService;
+	@Resource
+	private TableTransformer tableTransformer;
 	/**
 	 * 查看table列表
 	 * @return
@@ -133,9 +137,18 @@ public class TableController extends BaseController{
 	@ResponseBody
 	public Response saveTable(@RequestBody TableModel table) {
 		tableService.saveTableJson(table);
-		//return "redirect:/tables/add";
 		return result(ExceptionMsg.SUCCESS);
 	}
+	
+	/*@RequestMapping(value="/saveTable",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public Response saveTable(@RequestBody TableViewModel tableViewModel) {
+		
+		TableModel table=tableTransformer.transform(tableViewModel);
+		tableService.saveTableJson(table);
+		
+		return result(ExceptionMsg.SUCCESS);
+	}*/
 	
 	/**
 	 * 查看table定义信息
@@ -147,6 +160,9 @@ public class TableController extends BaseController{
 	public Response info(@PathVariable("tableId")Long tableId) {
 		
 		TableModel tableModel=tableService.getById(tableId);
+		/*if(null!=tableModel) {
+			tableTransformer.parseTable(tableModel);
+		}*/
 		Map<String,Object> data=new HashMap<>();
 		if(null!=tableModel) {
 			//获取from表和to表信息

@@ -23,7 +23,4 @@ public class FieldModel implements Serializable{
 	private ApplyTypeEnum applyType;
 	private FieldValueTypeEnum valueType;
 	private boolean forLog;
-	public void setForLog(boolean forLog) {
-		this.forLog=forLog;
-	}
 }
