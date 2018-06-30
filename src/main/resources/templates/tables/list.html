@@ -1,109 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-  	<!-- <link href="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.css" rel="stylesheet">
-  	<script src="https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js"></script> -->
+  	<link th:href="@{/css/vue-pagination.css}" rel="stylesheet">
   	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
-  	<!-- <script th:src="@{/js/pagination.js}" ></script> -->
-    <script src="https://cdn.bootcss.com/vuejs-paginator/2.0.2/vuejs-paginator.min.js"></script>
+    <script th:src="@{/js/vue-pagination.js}" ></script>
   </head>
   <body>
   	<div>
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/toUploadXml','table')" value="上传xml文档">
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/add','table')" value="添加表定义">
   	</div>
-  	<div style="height:600px;overflow: auto;">
-  		<table class="table table-bordered table-dark table-hover">
-		  <thead class="thead-dark">
-		    <tr>
-		      <th scope="col">#</th>
-		      <th scope="col">源表</th>
-		      <th scope="col">目标表</th>
-		      <th scope="col">描述</th>
-		      <th scope="col">操作类型</th>
-		      <th scope="col">操作</th>
-		    </tr>
-		  </thead>
-		  <tbody>
-		    <tr th:each="table,index: ${tableList}">
-		      <th scope="row" th:text="${index.count}"></th>
-		      <td th:text="${table.from}"></td>
-		      <td th:text="${table.to}"></td>
-		      <td th:text="${table.note}"></td>
-		      <td th:text="${table.type}"></td>
-		      <td>
-		      	<a style="text-decoration: none;" th:href="@{'/tables/info/'+${table.id}}"><i class="icon-magnifier"></i>查看</a>
-		      	<a style="text-decoration: none;" th:onclick="'javascript:remove('+${table.id}+')'"><i class="icon-action-redo"></i>删除</a>
-		      	<a style="text-decoration: none;" th:onclick="'javascript:locationUrl(\'/tables/add?tableId='+${table.id}+'\')'"><i class="icon-note"></i>编辑</a>
-		      </td>
-		    </tr>
-		  </tbody>
-		</table>
-		
-  	</div>
-  	
   	<div id="app">
-  		<!-- <paginate :page-count="10" :container-class="pagination" :prev-text="prev" :next-text="next" :click-handler="clickCallback"></paginate> -->
-		<!-- <navigation :pages="pages" :current.sync="pageNo" @navpage="pageList"></navigation> -->
-		<!-- <v-paginator resource_url="api/animals" @update="updateResource"></v-paginator> -->
+	  	<div style="overflow: auto;">
+	  		<table class="table table-bordered table-dark table-hover">
+			  <thead class="thead-dark">
+			    <tr>
+			      <th scope="col">#</th>
+			      <th scope="col">源表</th>
+			      <th scope="col">目标表</th>
+			      <th scope="col">描述</th>
+			      <th scope="col">操作类型</th>
+			      <th scope="col">操作</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			  	<tr v-for="(tableModel,index) in tableList">
+			  		<th scope="row" >{{index+1}}</th>
+			  		<td>{{tableModel.from}}</td>
+			  		<td>{{tableModel.to}}</td>
+				    <td>{{tableModel.note}}</td>
+				    <td>{{tableModel.type}}</td>
+				    <td>
+				      	<a style="text-decoration: none;" v-on:click="locationUrl('/tables/info/'+tableModel.id,'table')"><i class="icon-magnifier"></i>查看</a>
+				      	<a style="text-decoration: none;" v-on:click="remove(tableModel.id)"><i class="icon-action-redo"></i>删除</a>
+				      	<a style="text-decoration: none;" v-on:click="locationUrl('/tables/add?tableId='+tableModel.id,'table')"><i class="icon-note"></i>编辑</a>
+			      </td>
+			  	</tr>
+			    <!-- <tr th:each="table,index: ${tableList}">
+			      <th scope="row" th:text="${index.count}"></th>
+			      <td th:text="${table.from}"></td>
+			      <td th:text="${table.to}"></td>
+			      <td th:text="${table.note}"></td>
+			      <td th:text="${table.type}"></td>
+			      <td>
+			      	<a style="text-decoration: none;" th:href="@{'/tables/info/'+${table.id}}"><i class="icon-magnifier"></i>查看</a>
+			      	<a style="text-decoration: none;" th:onclick="'javascript:remove('+${table.id}+')'"><i class="icon-action-redo"></i>删除</a>
+			      	<a style="text-decoration: none;" th:onclick="'javascript:locationUrl(\'/tables/add?tableId='+${table.id}+'\')'"><i class="icon-note"></i>编辑</a>
+			      </td>
+			    </tr> -->
+			  </tbody>
+			</table>
+			
+	  	</div>
+	  	
+	  	<div style="float:right;">
+	  		<vue-pager :currentpage.sync="currentpage" :totlepage.sync="totlepage" :visiblepage.sync="visiblepage" v-on:page-change="listen"></vue-pager>
+	  	</div>
   	</div>
-  	
-  	<!-- 分页查看 -->
-  	<!-- <nav aria-label="Page navigation example" style="float:right">
-	  <ul class="pagination">
-	    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-	    <li class="page-item"><a class="page-link" href="#">1</a></li>
-	    <li class="page-item"><a class="page-link" href="#">2</a></li>
-	    <li class="page-item"><a class="page-link" href="#">3</a></li>
-	    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-	  </ul>
-	</nav> -->
   </body>
   
-  
   <script type="text/javascript">
-  	/* new Vue({
-  		el: '#app',
-	    data () {
-	      return {
-	        animals: []
+	 var app = new Vue({
+	      el: '#app',
+	      data:{
+	    	tableList:[],//数据集合
+	    	//分页信息
+	        currentpage: 1,
+	        totlepage: 28,
+	        visiblepage:10,
+	        pageSize:20
+	      },
+	      components:{
+	        'vue-pager': vuePager  //子组件
+	      },
+	      mounted:function(){
+	    	   loadData(this.currentpage,this.pageSize);//加载第一页数据
+	      },
+	      methods:{
+	        listen:function(page){
+	            //console.log('你点击了'+page+ '页');
+	            this.currentpage=page;
+	        	loadData(page,this.pageSize);
+	        }
 	      }
-	    },
-	    components: {
-	        VPaginator: VuePaginator
-	    },
-	    methods: {
-	      updateResource(data){
-	        this.animals = data
-	      }
-	    }
-	}); */
-  
-	 /*  Vue.component('paginate', VuejsPaginate)
-	
-	  new Vue({
-	    el: '#app',
-	    methods: {
-	      clickCallback: function(pageNum) {
-	        console.log(pageNum)
-	      }
-	    }
-	  }) */
-    /* new Vue({
-	  el: '#app',
-	  data: {
-          pageNo: 1,
-          pages: 100
-      },
-      methods: {
-          pageList:function(curPage) {
-              //根据当前页获取数据
-              this.pageNo = curPage;
-              console.log("当前页：" + this.pageNo);
-          }
-      }
-	}); */
-    
+	 });
     
   	$(function(){
 	  toastr.options = {
@@ -120,13 +100,28 @@
 					if(response.rspCode=="000000"){//操作成功
 						toastr.success('导入配置文件成功', '操作成功');
 						//跳转回list页面
-						locationUrl('/tables/list','table');
+						locationUrl('/tables/toList','table');
 					}else{
 						toastr.error('导入配置文件失败', '操作失败');
 					}
 				});
 			}
 		}
+	}
+	
+	//加载数据
+	function loadData(pageNum,pageSize){
+		
+		var param={"pageNum":pageNum,"pageSize":pageSize};
+		
+		$.post("/tables/list",param,function(response){
+           	if(response.rspCode=="000000"){//操作成功
+           		app.totlepage=response.data.totalPage;
+           		app.tableList=response.data.tableList;
+			}else{
+				toastr.error('数据加载失败', '操作失败');
+			}
+         });
 	}
   </script>
 </html>

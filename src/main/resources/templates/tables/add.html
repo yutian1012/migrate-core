@@ -4,7 +4,7 @@
 	<div id="tableDiv" class="panel panel-default">
 	  <div>
 	  	<input class="btn btn-primary" type="button" value="保存" v-on:click="saveTable">
-  		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/list','table')" value="返回">
+  		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/toList','table')" value="返回">
   	  </div>
 	  <div class="panel-heading">配置迁移表字段信息</div>
 	  <div class="panel-body">
@@ -220,10 +220,9 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="formatField.clz" name="clz">
-		        		<option value="FIXED">固定值</option>
-		        		<option value="FIELD">字段值</option>
-		        		<option value="GENCODE">自增值</option>
+		        	<select class="form-control" v-model="formatField.clazz" name="clazz">
+		        		<option value="com.ipph.migratecore.deal.format.JsonMethodFormater">JSON格式化处理类</option>
+		        		<option value="com.ipph.migratecore.deal.format.PatentNoFormater">申请号格式化处理类</option>
 		        	</select>
 		        </td>
 		        <td>
@@ -346,7 +345,7 @@
 	            		toastr.info('没有可格式化的数据源字段！', '提示信息');
 	            		return;
 	            	}
-	            	this.formatFieldList.push({"filedName":"","clz":"","defaultValue":"","formatParameter":""});
+	            	this.formatFieldList.push({"filedName":"","clazz":"","defaultValue":"","formatParameter":""});
 	            },
 	            formatFieldRemove:function(index){
 	            	removeField(this.formatFieldList,index);
@@ -509,13 +508,13 @@
             	type: "POST",
                 url: "/tables/saveTable",
                 dataType: "json",
-					contentType: "application/json",
+				contentType: "application/json",
                 data:JSON.stringify( param ),
                 success: function(response){
                 	if(response.rspCode=="000000"){//操作成功
                 		toastr.success('保存成功', '操作成功');
                 		//跳转回list页面
-						locationUrl('/tables/list','table');
+						locationUrl('/tables/toList','table');
 					}else{
 						toastr.error('保存失败', '操作失败');
 					}

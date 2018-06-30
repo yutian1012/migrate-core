@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -46,9 +48,14 @@ public class TableService {
 	@Resource
 	private MigrateTableService migrateTableService;
 	
+	public Page<TableModel> getList(Pageable pageable){
+		return tableDao.findAll(pageable);
+	}
+	
+	/*
 	public List<TableModel> getList(){
 		return tableDao.findAll();
-	}
+	}*/
 	/**
 	 * 上传table定义的xml文档
 	 * @param in
@@ -169,6 +176,8 @@ public class TableService {
 				sourceFieldList.add(sourceFieldModel);
 			}
 		}
+		
+		
 		
 		if(sourceFieldList.size()>0) {
 			table.getFieldList().addAll(sourceFieldList);

@@ -9,6 +9,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,18 +40,36 @@ public class TableController extends BaseController{
 	private TableService tableService;
 	@Resource
 	private TableTransformer tableTransformer;
+	
+	/**
+	 * 跳转list页面
+	 * @return
+	 */
+	@RequestMapping("/toList")
+	public String toList(){
+		return "tables/list";
+	}
 	/**
 	 * 查看table列表
 	 * @return
 	 */
 	@RequestMapping("/list")
-	public ModelAndView list(){
-		ModelAndView mv=new ModelAndView("tables/list");
+	@ResponseBody
+	public Response list(@RequestParam(value="pageNum",defaultValue="0")Integer pageNum,@RequestParam(value="pageSize",defaultValue="20")Integer pageSize){
 		
-		List<TableModel> tableList=tableService.getList();
+		Pageable pageable=PageRequest.of(pageNum-1, pageSize);
+		//ModelAndView mv=new ModelAndView("tables/list");
 		
-		mv.addObject("tableList",tableList);
-		return mv;
+		Page<TableModel> result=tableService.getList(pageable);
+		
+		/*mv.addObject("tableList",tableList);
+		return mv;*/
+		Map<String,Object> response=new HashMap<>();
+		response.put("totalPage", result.getTotalPages());//总页数
+		response.put("tableList", result.getContent());//获取数据集
+		
+		return result(ExceptionMsg.SUCCESS,response);
+		
 	}
 	/**
 	 * 跳转上传xml页面
@@ -173,11 +194,11 @@ public class TableController extends BaseController{
 		return result(ExceptionMsg.SUCCESS,data);
 	}
 	
-	@RequestMapping("/selectTables")
+	/*@RequestMapping("/selectTables")
 	@ResponseBody
 	public List<TableModel> selectTables(){
 		return tableService.getList();
-	}
+	}*/
 	
 	/**
 	 * 查看记录数据

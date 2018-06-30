@@ -16,6 +16,7 @@ import lombok.Setter;
 public class FormatModel implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private Class<?> clazz;
+	//private String clz;//格式化类字符串
 	private String formatParameter;
 	private String filedName;
 	private String defaultValue;
