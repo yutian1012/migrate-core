@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <body>
   	<div>
-  		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/list','table')" value="返回">
+  		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/toList','table')" value="返回">
   	</div>
   	<div style="margin-top: 10px;text-align: center;">
 	    <form id="importHtmlForm" method="post" th:action="@{/tables/uploadXml}" enctype="multipart/form-data">
@@ -52,7 +52,7 @@
 						if(response.rspCode=="000000"){//操作成功
 							toastr.success('导入配置文件成功', '操作成功');
 							//跳转回list页面
-							locationUrl('/tables/list','table');
+							locationUrl('/tables/toList','table');
 						}else{
 							toastr.error('导入配置文件失败', '操作失败');
 						}

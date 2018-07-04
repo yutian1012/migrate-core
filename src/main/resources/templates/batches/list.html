@@ -1,40 +1,119 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <title>批次置列表项</title>
-	
-    <meta name="keywords" content="keyword1,keyword2,keyword3">
-    <meta name="description" content="this is my page">
-    <meta name="content-type" content="text/html; charset=UTF-8">
-    
-	<script src="/webjars/jquery/3.2.0/dist/jquery.min.js"></script>
-	<script type="text/javascript">
-		function add(){
-			window.location.href='/batches/toAdd';
-		}	
-	</script>
+    <head>
+  	<link th:href="@{/css/vue-pagination.css}" rel="stylesheet">
+  	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
+    <script th:src="@{/js/vue-pagination.js}" ></script>
+    <script th:src="@{/js/vue-dateFormat.js}" ></script>
   </head>
   
   <body>
   	<div>
-  		<input type="button" onclick="add();" value="新建批次">
+  		<input class="btn btn-primary" type="button" onclick="locationUrl('/batches/toAdd','batch')" value="新建批次">
   	</div>
-    <table style="width:80%;text-align:center;" border="1px">
-	    <tr>
-	      <th>批次名</th>
-	      <th>批次创建时间</th>
-	      <th>操作</th>
-	    </tr>
-	    <tr th:each="batch : ${batchList}">
-	      <td th:text="${batch.batchName}"></td>
-	      <td th:text="${batch.createDate}"></td>
-	      <td>
-		      <span><a th:href="@{'/batches/migrate/'+${batch.id}}">执行批次</a></span>|
-		      <span><a th:href="@{'/batches/info/'+${batch.id}}">查看批次</a></span>|
-		      <span><a th:href="@{'/logs/batch/'+${batch.id}}">查看批次日志信息</a></span>|
-		      <span><a th:href="@{'/batches/del/'+${batch.id}}">删除批次</a></span>
-	      </td>
-	    </tr>
-	  </table>
+  	
+  	<div id="app">
+	  	<div style="overflow: auto;">
+	  		<table class="table table-bordered table-dark table-hover">
+			  <thead class="thead-dark">
+			    <tr>
+			      <th scope="col">#</th>
+			      <th scope="col">批次名称</th>
+			      <th scope="col">创建时间</th>
+			      <th scope="col">操作</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			  	<tr v-for="(batch,index) in batchList">
+			  		<th scope="row" >{{index+1}}</th>
+			  		<td>{{batch.batchName}}</td>
+			  		<td>{{batch.createDate | formatDate}}</td>
+				    <td>
+				      	<a style="text-decoration: none;" v-on:click="locationUrl('/batch/info/'+batch.id,'batch')"><i class="icon-magnifier"></i>查看</a>
+				      	<a style="text-decoration: none;" v-on:click="remove(batch.id)"><i class="icon-action-redo"></i>删除</a>
+				      	<a style="text-decoration: none;" v-on:click="locationUrl('/batch/toAdd?batchId='+batch.id,'batch')"><i class="icon-note"></i>编辑</a>
+			      </td>
+			  	</tr>
+			  </tbody>
+			</table>
+			
+	  	</div>
+	  	
+	  	<div style="float:right;">
+	  		<vue-pager :currentpage.sync="currentpage" :totlepage.sync="totlepage" :visiblepage.sync="visiblepage" v-on:page-change="listen"></vue-pager>
+	  	</div>
+  	</div>
   </body>
+  <script type="text/javascript">
+	 var app = new Vue({
+	      el: '#app',
+	      data:{
+	    	batchList:[],//数据集合
+	    	//分页信息
+	        currentpage: 1,
+	        totlepage: 28,
+	        visiblepage:10,
+	        pageSize:20
+	      },
+	      components:{
+	        'vue-pager': vuePager  //子组件
+	      },
+	      filters:{
+	    	  formatDate:function(date){
+	    		  var date=new Date(date);
+	    		  return formatDate(date,"yyyy-MM-dd")
+	    	  }
+	      },
+	      mounted:function(){
+	    	   loadData(this.currentpage,this.pageSize);//加载第一页数据
+	      },
+	      methods:{
+	        listen:function(page){
+	            this.currentpage=page;
+	        	loadData(page,this.pageSize);
+	        }
+	      }
+	 });
+    
+  	$(function(){
+	  toastr.options = {
+         'closeButton': true,
+         'positionClass': 'toast-top-center',
+         'timeOut': '5000',
+       };
+  	});
+  	
+	function remove(batchId){
+		if(batchId){
+			if(confirm("是否删除选择行")){
+				var url="/batches/del/"+batchId;
+				$.post(url,function(response){
+					if(response.rspCode=="000000"){//操作成功
+						toastr.success('批次数据删除成功', '操作成功');
+						//跳转回list页面
+						locationUrl('/batches/toList','table');
+					}else{
+						toastr.error('批次数据删除失败', '操作失败');
+					}
+				});
+			}
+		}
+	}
+	
+	//加载数据
+	function loadData(pageNum,pageSize){
+		
+		var param={"pageNum":pageNum,"pageSize":pageSize};
+		
+		$.post("/batches/list",param,function(response){
+           	if(response.rspCode=="000000"){//操作成功
+           		app.totlepage=response.data.totalPage;
+           		app.batchList=response.data.batchList;
+			}else{
+				toastr.error('数据加载失败', '操作失败');
+			}
+         });
+	}
+  </script>
 </html>

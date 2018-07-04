@@ -1,30 +1,58 @@
 package com.ipph.migratecore.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ipph.migratecore.common.ExceptionMsg;
+import com.ipph.migratecore.common.Response;
+import com.ipph.migratecore.model.BatchModel;
+import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.BatchService;
 
 @Controller
 @RequestMapping("/batches")
-public class BatchController {
+public class BatchController extends BaseController{
 	
 	@Resource
 	private BatchService batchService;
+	
+	/**
+	 * 跳转list页面
+	 * @return
+	 */
+	@RequestMapping("/toList")
+	public String toList(){
+		return "batches/list";
+	}
 	/**
 	 * 批次列表展示
 	 * @return
 	 */
 	@RequestMapping("/list")
-	public ModelAndView list() {
-		ModelAndView mv=new ModelAndView("batches/list");
+	@ResponseBody
+	public Response list(@RequestParam(value="pageNum",defaultValue="0")Integer pageNum,@RequestParam(value="pageSize",defaultValue="20")Integer pageSize) {
 		
-		mv.addObject("batchList",batchService.getList());
-		return mv;
+		Pageable pageable=PageRequest.of(pageNum-1, pageSize);
+		
+		Page<BatchModel> result=batchService.getList(pageable);
+		
+		Map<String,Object> response=new HashMap<>();
+		response.put("totalPage", result.getTotalPages());//总页数
+		response.put("batchList", result.getContent());//获取数据集
+		
+		return result(ExceptionMsg.SUCCESS,response);
 	}
 	/**
 	 * 跳转连接
@@ -32,7 +60,6 @@ public class BatchController {
 	 */
 	@RequestMapping("/toAdd")
 	public String toAdd() {
-		
 		return "batches/add";
 	}
 	/**

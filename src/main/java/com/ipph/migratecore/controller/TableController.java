@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -27,7 +26,6 @@ import com.ipph.migratecore.common.ExceptionMsg;
 import com.ipph.migratecore.common.Response;
 import com.ipph.migratecore.enumeration.FieldValueTypeEnum;
 import com.ipph.migratecore.model.TableModel;
-import com.ipph.migratecore.model.view.TableViewModel;
 import com.ipph.migratecore.service.TableService;
 import com.ipph.migratecore.transformer.TableTransformer;
 import com.ipph.migratecore.util.XmlUtil;
@@ -58,12 +56,9 @@ public class TableController extends BaseController{
 	public Response list(@RequestParam(value="pageNum",defaultValue="0")Integer pageNum,@RequestParam(value="pageSize",defaultValue="20")Integer pageSize){
 		
 		Pageable pageable=PageRequest.of(pageNum-1, pageSize);
-		//ModelAndView mv=new ModelAndView("tables/list");
 		
 		Page<TableModel> result=tableService.getList(pageable);
 		
-		/*mv.addObject("tableList",tableList);
-		return mv;*/
 		Map<String,Object> response=new HashMap<>();
 		response.put("totalPage", result.getTotalPages());//总页数
 		response.put("tableList", result.getContent());//获取数据集
@@ -161,16 +156,6 @@ public class TableController extends BaseController{
 		return result(ExceptionMsg.SUCCESS);
 	}
 	
-	/*@RequestMapping(value="/saveTable",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
-	@ResponseBody
-	public Response saveTable(@RequestBody TableViewModel tableViewModel) {
-		
-		TableModel table=tableTransformer.transform(tableViewModel);
-		tableService.saveTableJson(table);
-		
-		return result(ExceptionMsg.SUCCESS);
-	}*/
-	
 	/**
 	 * 查看table定义信息
 	 * @param tableId
@@ -193,13 +178,6 @@ public class TableController extends BaseController{
 		}
 		return result(ExceptionMsg.SUCCESS,data);
 	}
-	
-	/*@RequestMapping("/selectTables")
-	@ResponseBody
-	public List<TableModel> selectTables(){
-		return tableService.getList();
-	}*/
-	
 	/**
 	 * 查看记录数据
 	 * @param tableId

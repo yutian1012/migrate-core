@@ -7,6 +7,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.BatchDao;
@@ -28,6 +30,10 @@ public class BatchService {
 	private TableService tableService;
 	@Resource
 	private BatchLogService batchLogService;
+	
+	public Page<BatchModel> getList(Pageable pageable){
+		return batchDao.findAll(pageable);
+	}
 	
 	public List<BatchModel> getList(){
 		return batchDao.findAll();
