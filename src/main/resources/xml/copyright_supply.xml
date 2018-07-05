@@ -51,11 +51,11 @@
     	</fields>
     	<where>
     		<condition type="IN" applyType="SOURCE">
-    			<field name="type" applyType="SOURCE" valueType="FIXED" value="其他,工程设计、产品设计,工程设计图 产品设计图,工程设计图、产品设计图,戏剧,文字,模型,美术,音乐,摄影"></field>
+    			<field name="type" applyType="SOURCE" valueType="FIXED" value="美术,音乐,文字,类似摄制电影方法创作的作品,其他作品,工程设计图、产品设计图,摄影,电影,戏剧,模型,其他"></field>
     		</condition>
     	</where>
     	<formats>
-    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="type">{'工程设计、产品设计':'图形','工程设计图 产品设计图':'图形','工程设计图、产品设计图':'图形','其他':'其他','戏剧':'戏剧','文字':'文字','模型':'模型','美术':'美术','音乐':'音乐','摄影':'摄影'}</format>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="type">{'美术':'美术','音乐':'音乐','文字':'文字','类似摄制电影方法创作的作品':'电影和类似摄制电影方法创作的作品','其他作品':'其他','工程设计图、产品设计图':'图形','摄影':'摄影','电影':'电影和类似摄制电影方法创作的作品','戏剧':'戏剧','模型':'模型','其他':'其他'}</format>
     		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="apply_type">{'由著作人申请':'由著作权人申请','由著作权人申请':'由著作权人申请','由代理人申请':'由代理人申请'}</format>
     		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="get_right_way" defaultValue="其他">{'原始':'原始','继承':'继承','承受':'承受','其他':'其他'}</format>
     	</formats>

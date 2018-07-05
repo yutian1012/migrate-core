@@ -17,7 +17,7 @@
     			<field name="owner_name" applyType="SOURCE"></field>
     		</condition>
     		<condition type="IN" applyType="SOURCE">
-    			<field name="type" applyType="SOURCE" valueType="FIXED" value="其他,工程设计、产品设计,工程设计图 产品设计图,工程设计图、产品设计图,戏剧,文字,模型,美术,音乐,摄影"></field>
+    			<field name="type" applyType="SOURCE" valueType="FIXED" value="美术,音乐,文字,类似摄制电影方法创作的作品,其他作品,工程设计图、产品设计图,摄影,电影,戏剧,模型,其他"></field>
     		</condition>
     	</where>
     	<constraints>

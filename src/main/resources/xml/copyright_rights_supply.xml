@@ -34,11 +34,11 @@
     	</fields>
     	<where>
     		<condition type="IN" applyType="SOURCE">
-    			<field name="type" applyType="SOURCE" valueType="FIXED" value="类似摄制电影方法创作,类似摄制电影方法,录像,电影,录音,类似摄制电影方法创作的作品,录音制品,录像制品"></field>
+    			<field name="type" applyType="SOURCE" valueType="FIXED" value="录像制品,录音制品"></field>
     		</condition>
     	</where>
     	<formats>
-    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="type" >{'类似摄制电影方法创作':'录像制品','类似摄制电影方法':'录像制品','录像':'录像制品','电影':'录像制品','录音':'录音制品','类似摄制电影方法创作的作品':'录像制品','录音制品':'录音制品','录像制品':'录像制品'}</format>
+    		<format clazz="com.ipph.migratecore.deal.format.JsonMethodFormater" fieldName="type" >{'录音制品':'录音制品','录像制品':'录像制品'}</format>
     	</formats>
     	<constraints>
     		<constraint type="PRIMARY" applyType="SOURCE">
