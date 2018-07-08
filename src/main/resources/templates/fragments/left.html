@@ -26,11 +26,33 @@
                      <span>数据迁移配置</span>
                   </a>
                </li>
-               <li class=" " id="explore" >
-                  <a title="数据迁移批次" href="javascript:void(0);"  onclick="locationUrl('/batches/toList','batch')">
+               <li class=" ">
+                  <!-- <a title="数据迁移批次" href="javascript:void(0);"  onclick="locationUrl('/batches/toList','batch')">
                      <em class="icon-compass"></em>
                      <span>数据迁移批次</span>
+                  </a> -->
+                  <a data-toggle="collapse" title="数据迁移批次" href="#batch">
+                     <em class="icon-folder"></em>
+                     <span>数据迁移批次</span>
                   </a>
+                  <ul class="nav sidebar-subnav collapse" id="batch">
+                     <li class="sidebar-subnav-header">批次</li>
+                     <li id="batches" class=" ">
+                        <a title="批次配置" href="javascript:void(0);" onclick="locationUrl('/batches/toList','batches')">
+                           <span>批次配置</span>
+                        </a>
+                     </li>
+                     <li id="batchLog" class="">
+                        <a title="+ 正在执行批次" href="javascript:void(0);" onclick="locationUrl('/logs/toBatchLog','batchLog')">
+                           <span>+ 正在执行批次</span>
+                        </a>
+                     </li>
+                     <li id="batchLoged" class="">
+                        <a title="+ 已执行的批次" href="javascript:void(0);" onclick="locationUrl('/logs/toBatchLoged','newFavortes')">
+                           <span>+ 已执行的批次</span>
+                        </a>
+                     </li>
+                  </ul>
                </li>
                <li class="nav-heading ">更多</li>
                <li class=" " id="import">

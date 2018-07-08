@@ -163,3 +163,5 @@ footer > p
 
     height: 0;
 }
+/* vue加载数据闪屏问题 */
+[v-cloak]{ display: none; }

@@ -6,13 +6,9 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
-
-import com.ipph.migratecore.enumeration.BatchStatusEnum;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +23,8 @@ public class BatchModel implements Serializable{
     private Long id;
 	@Column
 	private String batchName;
+	@Column(length=128)
+	private String note;
 	@Column
 	private Date createDate;
 	@Transient//多对多的情况

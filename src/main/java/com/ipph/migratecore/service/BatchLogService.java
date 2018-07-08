@@ -6,13 +6,14 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.BatchLogDao;
 import com.ipph.migratecore.enumeration.BatchStatusEnum;
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
-import com.ipph.migratecore.model.TableModel;
 
 @Service
 @Transactional
@@ -25,6 +26,15 @@ public class BatchLogService {
 	@Resource
 	private TableService tableService;
 	
+	/**
+	 * 获取批次集合
+	 * @param pageable
+	 * @return
+	 */
+	public Page<BatchLogModel> getList(Pageable pageable){
+		return batchLogDao.findAll(pageable);
+	}
+	
 	public Long save(BatchModel batch,Long parentId) {
 		
 		BatchLogModel batchLogModel=new BatchLogModel();
@@ -32,9 +42,10 @@ public class BatchLogService {
 			batchLogModel.setParentId(parentId);
 		}
 		batchLogModel.setBatchId(batch.getId());
+		batchLogModel.setBatchName(batch.getBatchName());
 		batchLogModel.setBatchNo(System.currentTimeMillis()/1000+"");
 		batchLogModel.setCreateDate(new Date());
-		batchLogModel.setStatus(BatchStatusEnum.FAIL);
+		batchLogModel.setStatus(BatchStatusEnum.PROCESSING);//处理中
 		
 		batchLogDao.save(batchLogModel);
 		

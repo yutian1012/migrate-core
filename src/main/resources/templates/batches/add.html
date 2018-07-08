@@ -1,89 +1,155 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>添加批次</title>
-	
-    <meta name="keywords" content="keyword1,keyword2,keyword3">
-    <meta name="description" content="this is my page">
-    <meta name="content-type" content="text/html; charset=UTF-8">
-    
-    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
-    <script src="/webjars/jquery/2.0.0/jquery.min.js"></script>
-    
+<body>
+	<div id="app" class="panel panel-default">
+	  <div>
+	  	<input class="btn btn-primary" type="button" value="保存" v-on:click="saveBatch">
+  		<input class="btn btn-primary" type="button" onclick="locationUrl('/batches/toList','batches')" value="返回">
+  	  </div>
+	  <div class="panel-heading">配置批次</div>
+	  <div class="panel-body">
+		  <div class="form-inline">
+			  <div class="form-group">
+				    <label for="note">批次名称：</label>
+				    <input type="text" class="form-control" name="batchName" v-model="batchName">
+			  </div>
+			  <div class="form-group">
+				    <label for="from">备注信息</label>
+				    <textarea rows="1" cols="50" class="form-control" name="note" v-model="note"></textarea>
+			  </div>
+		  </div>
+		  <div style="float: right;">
+		  	<input class="btn btn-primary" type="button" value="添加迁移数据" v-on:click="addTable">
+		  </div>
+	  </div>
+	  <!-- 表字段配置信息 -->
+	  <table class="table table-hover table-bordered">
+	  	<thead>
+	        <tr>
+	          <th class="col-md-1">#</th>
+	          <th class="col-md-2">源表</th>
+	          <th class="col-md-2">目标表</th>
+	          <th class="col-md-2">操作类型</th>
+			  <th class="col-md-1">操作</th>
+	        </tr>
+	  	</thead>
+	  	<tbody>
+	  		<tr v-for="(table,index) in tableList" v-cloak>
+	  			<th scope="row">{{ index+1 }}</th>
+		        <td>{{table.from}} </td>
+		        <td>{{table.to}}</td>
+		        <td>{{table.type}}</td>
+		        <td>
+		        	<a style="text-decoration: none;" v-on:click="tableRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        </td>
+	  		</tr>
+	  	</tbody>
+	  </table>
+	  <input type="hidden" name="id" v-model="id">
+	</div>
+</body>
+	<script src="https://cdn.bootcss.com/json2/20160511/json2.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js" ></script>
+	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
+	<!-- 拖动功能 -->
+	<script src="https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script th:inline="javascript">
-		function addTables(){
-			//显示一个选择对话框
-			var url=/*[[@{/tables/selectTables}]]*/ '';
-			$.post(url,function(data){
-				if(data&&data.length>0){
-					
-					$("#tables").show();//显示表格
-					
-					//设置表格内容
-					for (var i=0;i<data.length;i++){
-						var tr=$("[name='table_tr']").clone().removeAttr("name");
-						tr.find("td:nth-child(1)").html('<input type="checkbox" name="tableId" value="'+data[i]["id"]+'">');
-						tr.find("td:nth-child(2)").html(data[i]["note"]);
-						tr.find("td:nth-child(3)").html(data[i]["from"]);
-						tr.find("td:nth-child(4)").html(data[i]["to"]);
-						tr.find("td:nth-child(5)").html(data[i]["type"]);
-						
-						tr.insertBefore("#tables tr:last");
-					}
-				}
-			});
-		}
-		
-		function selectTables(){
-			
-			var tableIds="";
-			var tableNames="";
-			
-			$("[name='tableId']:checked").each(function(){
-				tableIds+=$(this).val()+";";
-				tableNames+=$(this).closest("tr").find("td:nth-child(2)").text()+";";
-			});
-			
-			$("#tableList").text(tableNames);
-			$("[name='tables']").val(tableIds);
-			
-			$("#tables tr").each(function(i){
-				if(i!=0){
-					if($(this).attr("name")!='last'){
-						$(this).remove();
-					}
-				}
-			});
-			$("#tables").hide();
-		}
+	    /*<![CDATA[*/
+	      var batchId = /*[[${batchId}]]*/ '0';
+	    /*]]>*/
 	</script>
-
-  </head>
-  
-  <body>
-    <form th:action="@{/batches/add}" method="post">
-    
-    	<label>批次名：</label><input type="text" name="batchName"><br/>
-    	<label>迁移表集合：</label><span id="tableList"></span><input type="button" value="选择" onclick="addTables()">
-    	<input type="submit" value="提交">
-
-    	<input type="hidden" name="tables"><br/>
-    </form>
-    
-    
-    <div id="tables" style="display:none;">
-    	<table>
-    		<tr name="table_tr">
-    			<td></td>
-    			<td>描述</td>
-    			<td>源表</td>
-    			<td>目标表</td>
-    			<td>操作类型</td>
-    		</tr>
-    		<tr name="last">
-    			<td colspan="4"><input type="button" value="选择" onclick="selectTables()"></td>
-    		</tr>
-    	</table>
-    </div>
-  </body>
+    <script type="text/javascript">
+	    var app = new Vue({
+	        el: "#app",
+	        data: {
+	        	id:'',
+	        	batchName:'',
+	        	note:'',
+	        	tableList:[]
+	        },
+	        mounted: function () {//created访问数据后无法正常显示到页面上
+	        	if(batchId!=0){
+	        		//获取初始化数据
+	        		loadData(batchId);
+	        	}
+	        },
+	        methods: {
+	        	saveBatch:function(event){
+	        		if(confirm("是否保存!")){
+		            	event.preventDefault();
+		            	saveData();
+	            	}
+	        	},
+	        	addTable:function(){
+	        	    var dialog = bootbox.dialog({
+	        	        title: '选择数据表',
+	        	        message: '<p><i class="fa fa-spin fa-spinner"></i> Loading data...</p>',
+	        		    buttons: {
+        			        cancel: {
+        			            label: '关闭',
+        			            className: 'btn-danger'
+        			        }
+        			    },
+        			    onEscape: function() {
+        				    //alert('关闭了alert');
+        			    }
+	        	    });
+	        	    dialog.init(function(){
+	        	        $(".modal-dialog").draggable();
+	        	    	dialog.find('.bootbox-body').css("height","300px");
+	        	    	dialog.find('.bootbox-body').html('<iframe src="batches/addTables" style="border:none;width:100%;height:100%"></iframe>');
+	        	    });
+	        	},
+	        	tableRemove:function(index){
+	        		if(confirm("是否删除？")){
+	        			this.tableList.splice(index,1);//删除指定下标元素
+	            	}
+	        		
+	        	}
+	        }
+	    });
+	    /*保存数据*/
+	    function saveData(){
+			var param={"id":app.id,"note":app.note,"batchName":app.batchName};
+	    	
+	    	if(app.tableList.length==0){
+	    		toastr.error('未选择迁移的数据表！', '操作失败');
+	    		return false;
+	    	}
+	    	
+	    	param.tableList=app.tableList;
+	    	
+            $.ajax({
+            	type: "POST",
+                url: "/batches/saveBatch",
+                dataType: "json",
+				contentType: "application/json",
+                data:JSON.stringify( param ),
+                success: function(response){
+                	if(response.rspCode=="000000"){//操作成功
+                		toastr.success('保存成功', '操作成功');
+                		//跳转回list页面
+						locationUrl('/batches/toList','batches');
+					}else{
+						toastr.error('保存失败', '操作失败');
+					}
+                }
+            });
+	    }
+	    function loadData(batchId){
+	    	$.post("/batches/info/"+batchId,function(response){
+    			if(response.rspCode=="000000"){//操作成功
+            		var batch=response.data.batch;
+    				if(batch){
+    					app.id=batch.id;
+    					app.batchName=batch.batchName;
+    					app.note=batch.note;
+    					app.tableList=batch.tableList;
+    				}
+				}else{
+					toastr.error('加载数据失败', '操作失败');
+				}
+    		});
+	    }
+    </script>
 </html>

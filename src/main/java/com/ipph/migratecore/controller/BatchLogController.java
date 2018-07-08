@@ -3,17 +3,25 @@ package com.ipph.migratecore.controller;
 import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ipph.migratecore.common.ExceptionMsg;
+import com.ipph.migratecore.common.Response;
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.BatchModel;
 import com.ipph.migratecore.model.TableModel;
@@ -24,13 +32,50 @@ import com.ipph.migratecore.service.TableService;
 
 @Controller
 @RequestMapping("/logs")
-public class BatchLogController {
+public class BatchLogController extends BaseController{
 	@Resource
 	private BatchLogService batchLogService;
 	@Resource
 	private BatchService batchService;
 	@Resource
 	private TableService tableService;
+	
+	/**
+	 * 跳转到正在执行批次列表
+	 * @return
+	 */
+	@RequestMapping("/toBatchLog")
+	public String toBatchLog() {
+		return "logs/batchLog";
+	}
+	/**
+	 * 获取正在执行的批次集合
+	 * @return
+	 */
+	@RequestMapping("batchLog/list")
+	@ResponseBody
+	private Response batchLogList(@RequestParam(value="pageNum",defaultValue="0")Integer pageNum,@RequestParam(value="pageSize",defaultValue="20")Integer pageSize) {
+		Pageable pageable=PageRequest.of(pageNum-1, pageSize);
+		
+		Page<BatchLogModel> result=batchLogService.getList(pageable);
+		
+		Map<String,Object> response=new HashMap<>();
+		if(null!=result) {
+			response.put("totalPage", result.getTotalPages());//总页数
+			response.put("batchLogList", result.getContent());//获取数据集
+		}
+		
+		return result(ExceptionMsg.SUCCESS,response);
+	}
+	
+	/**
+	 * 跳转到已执行的批次列表
+	 * @return
+	 */
+	@RequestMapping("/toBatchLoged")
+	public String toBatchLoged() {
+		return "logs/batchLoged";
+	}
 	
 	/**
 	 * 批次执行日志信息

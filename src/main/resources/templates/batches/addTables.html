@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+  	<link th:href="@{/css/vue-pagination.css}" rel="stylesheet">
+  	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
+    <script th:src="@{/js/vue-pagination.js}" ></script>
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+    <link rel="stylesheet" th:href="@{/media/css/bootstrap.css}" />
+    <link rel="stylesheet" th:href="@{/vendor/fontawesome/css/font-awesome.min.css}" />
+  </head>
+  <body>
+  	<div id="app">
+	  	<div style="overflow: auto;">
+	  		<table class="table table-bordered table-dark table-hover">
+			  <thead class="thead-dark">
+			    <tr>
+			      <th scope="col">#</th>
+			      <th scope="col">源表</th>
+			      <th scope="col">目标表</th>
+			      <th scope="col">描述</th>
+			      <th scope="col">操作类型</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			  	<tr v-for="(tableModel,index) in tableList">
+			  		<th scope="row" ><input type="checkbox" v-on:click="checkTable(index)"/></th>
+			  		<td>{{tableModel.from}}</td>
+			  		<td>{{tableModel.to}}</td>
+				    <td>{{tableModel.note}}</td>
+				    <td>{{tableModel.type}}</td>
+			  	</tr>
+			  </tbody>
+			</table>
+			
+	  	</div>
+	  	
+	  	<div style="float:right;">
+	  		<vue-pager :currentpage.sync="currentpage" :totlepage.sync="totlepage" :visiblepage.sync="visiblepage" v-on:page-change="listen"></vue-pager>
+	  	</div>
+  	</div>
+  </body>
+  
+  <script type="text/javascript">
+	 var app = new Vue({
+	      el: '#app',
+	      data:{
+	    	tableList:[],//数据集合
+	    	//分页信息
+	        currentpage: 1,
+	        totlepage: 28,
+	        visiblepage:10,
+	        pageSize:20
+	      },
+	      components:{
+	        'vue-pager': vuePager  //子组件
+	      },
+	      mounted:function(){
+	    	   loadData(this.currentpage,this.pageSize);//加载第一页数据
+	      },
+	      methods:{
+	        listen:function(page){
+	            this.currentpage=page;
+	        	loadData(page,this.pageSize);
+	        },
+	        checkTable:function(index){
+	        	//alert(parent.app.batchName);
+	        	//添加行数据
+	        	if(parent.app){
+		        	parent.app.tableList.push(this.tableList[index]);
+		        	this.tableList.splice(index,1);
+	        	}
+	        }
+	      }
+	 });
+	
+	//加载数据
+	function loadData(pageNum,pageSize){
+		var param={"pageNum":pageNum,"pageSize":pageSize};
+		$.post("/tables/list",param,function(response){
+           	if(response.rspCode=="000000"){//操作成功
+           		app.totlepage=response.data.totalPage;
+           		cleanParentList(response.data.tableList);
+           		app.tableList=response.data.tableList;
+			}
+         });
+	}
+	//晴空父页面已选择的数据
+	function cleanParentList(tableList){
+		if(!tableList||tableList.length<=0){
+			return ;
+		}
+		if(parent.app&&parent.app.tableList.length>0){
+       		for(var index=0;index<tableList.length;index++){
+       			for(var j=0;j<parent.app.tableList.length;j++){
+       				if(tableList[index].id=parent.app.tableList[j].id){
+       					tableList.splice(index,1);
+       					break;
+       				}
+       			}
+       		}
+       	}
+	}
+  </script>
+</html>

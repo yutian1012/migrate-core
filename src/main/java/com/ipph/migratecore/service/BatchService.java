@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.BatchDao;
-import com.ipph.migratecore.dao.BatchTableDao;
 import com.ipph.migratecore.model.BatchModel;
 import com.ipph.migratecore.model.BatchTableModel;
 import com.ipph.migratecore.model.TableModel;
@@ -25,7 +24,7 @@ public class BatchService {
 	private BatchDao batchDao;
 	//中间表
 	@Resource
-	private BatchTableDao batchTableDao;
+	private BatchTableService batchTableService;
 	@Resource
 	private TableService tableService;
 	@Resource
@@ -43,23 +42,17 @@ public class BatchService {
 	 * @param batchName
 	 * @param tables
 	 */
-	public void add(String batchName,String[] tables) {
-		//保存对象
-		BatchModel batchModel=new BatchModel();
-		batchModel.setBatchName(batchName);
+	public void saveBatch(BatchModel batchModel) {
 		batchModel.setCreateDate(new Date());
 		
-		batchDao.save(batchModel);
-		
-		Long batchId=batchModel.getId();
-		
-		//添加数据到中间表
-		for(String tableId:tables) {
-			BatchTableModel batchTableModel =new BatchTableModel();
-			batchTableModel.setBatchId(batchId);
-			batchTableModel.setTableId(Long.parseLong(tableId));
-			batchTableDao.save(batchTableModel);
+		//删除中间表数据
+		if(null!=batchModel.getId()) {
+			batchTableService.delByBatchId(batchModel.getId());
 		}
+		
+		batchDao.save(batchModel);
+		batchTableService.save(batchModel);
+		
 	}
 	/**
 	 * 获取批次
@@ -68,24 +61,32 @@ public class BatchService {
 	 */
 	public BatchModel getBatch(Long batchId) {
 		
-		BatchModel batchModel=batchDao.getOne(batchId);
+		BatchModel batchModel=batchDao.findById(batchId).get();
 		
 		if(null!=batchModel) {
 			
 			List<TableModel> tableList=new ArrayList<TableModel>();
 			
 			//中间表数据获取
-			List<BatchTableModel> batchTableList=batchTableDao.getListByBatchId(batchId);
+			List<BatchTableModel> batchTableList=batchTableService.getListByBatchId(batchId);
 			
 			for(BatchTableModel batchTable:batchTableList) {
 				tableList.add(tableService.getById(batchTable.getTableId()));
 			}
 			
 			batchModel.setTableList(tableList);
-			
 		}
 		
 		return batchModel;
+	}
+	/**
+	 * 执行批次
+	 * @param batchIdArr
+	 */
+	public void migrate(Long[] batchIdArr) {
+		for(Long batchId:batchIdArr) {
+			migrate(batchId);
+		}
 	}
 	/**
 	 * 执行批次
@@ -126,7 +127,7 @@ public class BatchService {
 	 */
 	public void del(Long batchId) {
 		//中间数据删除
-		batchTableDao.deleteByBatchId(batchId);
+		batchTableService.delByBatchId(batchId);
 		batchDao.deleteById(batchId);
 	}
 }

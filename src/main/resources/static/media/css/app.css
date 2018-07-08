@@ -2051,3 +2051,6 @@ body, .popover, .tooltip { font-family: 'Source Sans Pro', Helvetica, Tahoma, Ar
 .collect-tab-body .sort a:hover,.collect-tab-body .sort a:focus,.collect-tab-body .sort a:active{ text-decoration: none;}
 .collect-tab-body .sort a.active{ color: #fff; background: #37bc9b;}
 .collect-tab-body .folder{ overflow: hidden; margin-top: 15px;}
+
+/* vue加载数据闪屏问题 */
+[v-cloak]{ display: none; }

@@ -8,9 +8,12 @@ import javax.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.ipph.migratecore.common.ExceptionMsg;
 import com.ipph.migratecore.common.Response;
 import com.ipph.migratecore.model.BatchModel;
-import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.BatchService;
 
 @Controller
@@ -59,8 +61,11 @@ public class BatchController extends BaseController{
 	 * @return
 	 */
 	@RequestMapping("/toAdd")
-	public String toAdd() {
-		return "batches/add";
+	public ModelAndView toAdd(@RequestParam(value="batchId",defaultValue="0")Long batchId) {
+		
+		ModelAndView mv=new ModelAndView("batches/add");
+		mv.addObject("batchId",batchId);
+		return mv;
 	}
 	/**
 	 * 新建批次
@@ -68,31 +73,57 @@ public class BatchController extends BaseController{
 	 * @param tables
 	 * @return
 	 */
-	@RequestMapping("/add")
-	public String add(String batchName,String tables) {
+	@RequestMapping(value="/saveBatch",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public Response saveBatch(@RequestBody BatchModel batchModel) {
 		
-		if(null==batchName||"".equals(batchName.trim())||null==tables||"".equals(tables.trim())) {
-			//校验错误
-		}
-		String[] tableList=tables.split(";");
+		batchService.saveBatch(batchModel);
 		
-		batchService.add(batchName, tableList);
-		
-		return "redirect:/batches/list";
+		return result(ExceptionMsg.SUCCESS);
 	}
-	
+	/**
+	 * 跳转addTables页面(选择对话框列表)
+	 * @return
+	 */
+	@RequestMapping("/addTables")
+	public String addTables(){
+		return "batches/addTables";
+	}
+	/**
+	 * 删除批次
+	 * @param batchId
+	 * @return
+	 */
+	@RequestMapping("/del/{batchId}")
+	@ResponseBody
+	public Response del(@PathVariable("batchId")Long batchId) {
+		batchService.del(batchId);
+		return result(ExceptionMsg.SUCCESS);
+	}
 	/**
 	 * 查看批次信息
 	 * @param batchId
 	 * @return
 	 */
 	@RequestMapping("/info/{batchId}")
-	public ModelAndView getBatch(@PathVariable("batchId")Long batchId) {
-		ModelAndView mv=new ModelAndView("batches/info");
+	@ResponseBody
+	public Response info(@PathVariable("batchId")Long batchId) {
 		
-		mv.addObject("batch",batchService.getBatch(batchId));
+		BatchModel batchModel=batchService.getBatch(batchId);
+		Map<String,Object> data=new HashMap<>();
 		
-		return mv;
+		if(null!=batchModel) {
+			data.put("batch", batchModel);
+		}
+		return result(ExceptionMsg.SUCCESS,data);
+	}
+	
+	@RequestMapping(value="/migrate",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public Response migreate(@RequestBody Long[] batchId) {
+		
+		batchService.migrate(batchId);
+		return result(ExceptionMsg.SUCCESS);
 	}
 	
 	/**
@@ -119,16 +150,6 @@ public class BatchController extends BaseController{
 		batchService.migrate(batchId,parentId,tableId);
 		
 		return "redirect:/batches/info/"+batchId;
-	}
-	/**
-	 * 删除批次
-	 * @param batchId
-	 * @return
-	 */
-	@RequestMapping("/del/{batchId}")
-	public String del(@PathVariable("batchId")Long batchId) {
-		batchService.del(batchId);
-		return "redirect:/batches/list";
 	}
 	
 }

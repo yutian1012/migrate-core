@@ -52,10 +52,6 @@ public class TableService {
 		return tableDao.findAll(pageable);
 	}
 	
-	/*
-	public List<TableModel> getList(){
-		return tableDao.findAll();
-	}*/
 	/**
 	 * 上传table定义的xml文档
 	 * @param in
@@ -68,7 +64,9 @@ public class TableService {
 			if(null!=tableList&&tableList.size()>0){
 				
 				for(TableModel table :tableList){
-					save(table);
+					if(validateTableModel(table)) {
+						save(table);
+					}
 				}
 			}
 		} catch (ParserConfigurationException | SAXException | IOException e) {
@@ -107,7 +105,7 @@ public class TableService {
 	 */
 	private boolean validateTableModel(TableModel table) {
 		
-		return false;
+		return true;
 	}
 	/**
 	 * 设置table的json字段，用于存放到数据库中持久保存

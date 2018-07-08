@@ -24,7 +24,7 @@
 			    </tr>
 			  </thead>
 			  <tbody>
-			  	<tr v-for="(tableModel,index) in tableList">
+			  	<tr v-for="(tableModel,index) in tableList" v-cloak>
 			  		<th scope="row" >{{index+1}}</th>
 			  		<td>{{tableModel.from}}</td>
 			  		<td>{{tableModel.to}}</td>

@@ -27,6 +27,8 @@ public class BatchLogModel implements Serializable{
 	@Column
 	private Long batchId;//关联批次信息
 	@Column
+	private String batchName;
+	@Column
 	private Long parentId;
 	@Column
 	private String batchNo;//批次号

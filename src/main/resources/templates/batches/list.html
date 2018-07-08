@@ -6,14 +6,15 @@
   	<script th:src="@{/webjars/vue/2.1.3/vue.min.js}"></script>
     <script th:src="@{/js/vue-pagination.js}" ></script>
     <script th:src="@{/js/vue-dateFormat.js}" ></script>
+    <script src="https://cdn.bootcss.com/json2/20160511/json2.min.js"></script>
   </head>
   
   <body>
-  	<div>
-  		<input class="btn btn-primary" type="button" onclick="locationUrl('/batches/toAdd','batch')" value="新建批次">
-  	</div>
-  	
   	<div id="app">
+	  	<div>
+	  		<input class="btn btn-primary" type="button" onclick="locationUrl('/batches/toAdd','batches')" value="新建批次">
+	  		<input class="btn btn-primary" type="button" value="执行批次" v-on:click="migrate">
+	  	</div>
 	  	<div style="overflow: auto;">
 	  		<table class="table table-bordered table-dark table-hover">
 			  <thead class="thead-dark">
@@ -25,19 +26,19 @@
 			    </tr>
 			  </thead>
 			  <tbody>
-			  	<tr v-for="(batch,index) in batchList">
-			  		<th scope="row" >{{index+1}}</th>
+			  	<tr v-for="(batch,index) in batchList" v-cloak>
+			  		<!-- batchId并不在batch实体对象中，这里只是模拟 -->
+			  		<th scope="row" ><input type="checkbox" name="batchId" :value="batch.id" v-model="batchId" class="form-control"></th>
 			  		<td>{{batch.batchName}}</td>
 			  		<td>{{batch.createDate | formatDate}}</td>
 				    <td>
-				      	<a style="text-decoration: none;" v-on:click="locationUrl('/batch/info/'+batch.id,'batch')"><i class="icon-magnifier"></i>查看</a>
+				      	<!-- <a style="text-decoration: none;" v-on:click="locationUrl('/batches/info/'+batch.id,'batch')"><i class="icon-magnifier"></i>查看</a> -->
 				      	<a style="text-decoration: none;" v-on:click="remove(batch.id)"><i class="icon-action-redo"></i>删除</a>
-				      	<a style="text-decoration: none;" v-on:click="locationUrl('/batch/toAdd?batchId='+batch.id,'batch')"><i class="icon-note"></i>编辑</a>
+				      	<a style="text-decoration: none;" v-on:click="locationUrl('/batches/toAdd?batchId='+batch.id,'batches')"><i class="icon-note"></i>编辑</a>
 			      </td>
 			  	</tr>
 			  </tbody>
 			</table>
-			
 	  	</div>
 	  	
 	  	<div style="float:right;">
@@ -54,7 +55,8 @@
 	        currentpage: 1,
 	        totlepage: 28,
 	        visiblepage:10,
-	        pageSize:20
+	        pageSize:20,
+	        batchId:[]//记录选中的批次
 	      },
 	      components:{
 	        'vue-pager': vuePager  //子组件
@@ -72,6 +74,27 @@
 	        listen:function(page){
 	            this.currentpage=page;
 	        	loadData(page,this.pageSize);
+	        },
+	        migrate:function(event){//执行选中批次
+	        	if(this.batchId.length==0){
+	        		toastr.error('未选择要执行的批次！', '操作失败');
+	        		return false;
+	        	}
+	        	//执行批次
+	        	$.ajax({
+	            	type: "POST",
+	                url: "/batches/migrate",
+	                dataType: "json",
+					contentType: "application/json",
+	                data:JSON.stringify( this.batchId ),
+	                success: function(response){
+	                	if(response.rspCode=="000000"){//操作成功
+	                		toastr.success('保存成功', '操作成功');
+						}else{
+							toastr.error('保存失败', '操作失败');
+						}
+	                }
+	            });
 	        }
 	      }
 	 });
@@ -92,7 +115,7 @@
 					if(response.rspCode=="000000"){//操作成功
 						toastr.success('批次数据删除成功', '操作成功');
 						//跳转回list页面
-						locationUrl('/batches/toList','table');
+						locationUrl('/batches/toList','batches');
 					}else{
 						toastr.error('批次数据删除失败', '操作失败');
 					}
