@@ -83,7 +83,7 @@
 	//加载数据
 	function loadData(pageNum,pageSize){
 		
-		var param={"pageNum":pageNum,"pageSize":pageSize};
+		var param={"pageNum":pageNum,"pageSize":pageSize,"isProcessing":true};
 		
 		$.post("/logs/batchLog/list",param,function(response){
            	if(response.rspCode=="000000"){//操作成功

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ipph.migratecore.dao.BatchDao;
+import com.ipph.migratecore.jms.JmsSender;
+import com.ipph.migratecore.jms.MigrateMessageModel;
 import com.ipph.migratecore.model.BatchModel;
 import com.ipph.migratecore.model.BatchTableModel;
 import com.ipph.migratecore.model.TableModel;
@@ -29,6 +31,8 @@ public class BatchService {
 	private TableService tableService;
 	@Resource
 	private BatchLogService batchLogService;
+	@Resource
+	private JmsSender jmsSender;
 	
 	public Page<BatchModel> getList(Pageable pageable){
 		return batchDao.findAll(pageable);
@@ -112,13 +116,18 @@ public class BatchService {
 			if(null!=tableList&&tableList.size()>0) {
 				for(TableModel table:tableList) {
 					if(null==tableId||table.getId().longValue()==tableId) {
-						tableService.migrateTable(table,batchLogId,parentId);
+						//tableService.migrateTable(table,batchLogId,parentId);
+						jmsSender.sendMigrateTableInfoByQueue(
+							new MigrateMessageModel()
+								.setBatchLogId(batchLogId)
+								.setParentId(parentId)
+								.setTableId(tableId));
 					}
 				}
 			}
 			
 			//执行批次后更新记录
-			batchLogService.update(batchLogId);
+			//batchLogService.update(batchLogId);
 		}
 	}
 	/**

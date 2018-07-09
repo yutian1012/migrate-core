@@ -54,10 +54,11 @@ public class BatchLogController extends BaseController{
 	 */
 	@RequestMapping("batchLog/list")
 	@ResponseBody
-	private Response batchLogList(@RequestParam(value="pageNum",defaultValue="0")Integer pageNum,@RequestParam(value="pageSize",defaultValue="20")Integer pageSize) {
+	private Response batchLogList(@RequestParam(value="pageNum",defaultValue="0")Integer pageNum,@RequestParam(value="pageSize",defaultValue="20")Integer pageSize,
+			@RequestParam(value="isProcessing",defaultValue="false")boolean isProcessing) {
 		Pageable pageable=PageRequest.of(pageNum-1, pageSize);
 		
-		Page<BatchLogModel> result=batchLogService.getList(pageable);
+		Page<BatchLogModel> result=batchLogService.getList(isProcessing,pageable);
 		
 		Map<String,Object> response=new HashMap<>();
 		if(null!=result) {

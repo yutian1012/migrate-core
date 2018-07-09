@@ -1,5 +1,6 @@
 package com.ipph.migratecore.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,8 +32,17 @@ public class BatchLogService {
 	 * @param pageable
 	 * @return
 	 */
-	public Page<BatchLogModel> getList(Pageable pageable){
-		return batchLogDao.findAll(pageable);
+	public Page<BatchLogModel> getList(boolean isProcessing,Pageable pageable){
+		
+		List<BatchStatusEnum> statusList=new ArrayList<>();
+		if(isProcessing) {
+			statusList.add(BatchStatusEnum.PROCESSING);
+		}else {
+			statusList.add(BatchStatusEnum.FAIL);
+			statusList.add(BatchStatusEnum.SUCCESS);
+		}
+		
+		return batchLogDao.getListByStatusIn(statusList, pageable);
 	}
 	
 	public Long save(BatchModel batch,Long parentId) {

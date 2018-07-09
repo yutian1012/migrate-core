@@ -20,7 +20,6 @@ import com.ipph.migratecore.enumeration.LogMessageEnum;
 import com.ipph.migratecore.enumeration.LogStatusEnum;
 import com.ipph.migratecore.model.BatchLogModel;
 import com.ipph.migratecore.model.LogModel;
-import com.ipph.migratecore.model.TableModel;
 import com.ipph.migratecore.service.BatchLogService;
 import com.ipph.migratecore.service.BatchService;
 import com.ipph.migratecore.service.LogService;
