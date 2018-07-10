@@ -10,7 +10,7 @@
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/toUploadXml','table')" value="上传xml文档">
   		<input class="btn btn-primary" type="button" onclick="locationUrl('/tables/add','table')" value="添加表定义">
   	</div>
-  	<div id="app">
+  	<div id="app" style="margin-bottom: 100px;">
 	  	<div style="overflow: auto;">
 	  		<table class="table table-bordered table-dark table-hover">
 			  <thead class="thead-dark">
@@ -36,18 +36,6 @@
 				      	<a style="text-decoration: none;" v-on:click="locationUrl('/tables/add?tableId='+tableModel.id,'table')"><i class="icon-note"></i>编辑</a>
 			      </td>
 			  	</tr>
-			    <!-- <tr th:each="table,index: ${tableList}">
-			      <th scope="row" th:text="${index.count}"></th>
-			      <td th:text="${table.from}"></td>
-			      <td th:text="${table.to}"></td>
-			      <td th:text="${table.note}"></td>
-			      <td th:text="${table.type}"></td>
-			      <td>
-			      	<a style="text-decoration: none;" th:href="@{'/tables/info/'+${table.id}}"><i class="icon-magnifier"></i>查看</a>
-			      	<a style="text-decoration: none;" th:onclick="'javascript:remove('+${table.id}+')'"><i class="icon-action-redo"></i>删除</a>
-			      	<a style="text-decoration: none;" th:onclick="'javascript:locationUrl(\'/tables/add?tableId='+${table.id}+'\')'"><i class="icon-note"></i>编辑</a>
-			      </td>
-			    </tr> -->
 			  </tbody>
 			</table>
 			

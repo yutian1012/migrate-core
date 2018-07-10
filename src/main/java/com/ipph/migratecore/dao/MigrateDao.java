@@ -104,6 +104,12 @@ public class MigrateDao {
 		
 		String executeSql=null;
 		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
 		TableModel table=migrateModel.getTableModel();
 		
 		if(table.getType()==TableOperationEnum.UPDATE) {

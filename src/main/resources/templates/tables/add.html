@@ -121,6 +121,7 @@
 		        		<option value="LLIKE">Llike</option>
 		        		<option value="RLIKE">Rlike</option>
 		        		<option value="EQUAL">equal</option>
+		        		<option value="IN">in</option>
 		        	</select>
 		        </td>
 		        <td>
@@ -170,6 +171,7 @@
 		        		<option value="LLIKE">Llike</option>
 		        		<option value="RLIKE">Rlike</option>
 		        		<option value="EQUAL">equal</option>
+		        		<option value="IN">in</option>
 		        	</select>
 		        </td>
 		        <td>
@@ -384,28 +386,33 @@
 	    //更改值来源,该方法即用在初始化数据渲染页面，同时也应用在保持数据设置value值上
 	    function changeValueType(fieldList,index,value){
 	    	if(fieldList){
-	    		if(value!=''){//渲染页面，设置控件的值
-            		if(fieldList[index].showText){
-            			fieldList[index].textValue=value;
-            		}else{
-            			fieldList[index].fieldValue=value;
-            		}
-            	}
 	    		
-	        	switch(fieldList[index].valueType){
+	    		switch(fieldList[index].valueType){
 		        	case "FIELD":
 		    			fieldList[index].showText=false;
 		    			fieldList[index].showSelect=true;
-		    			fieldList[index].value=fieldList[index].fieldValue;//保存数据时，设置value值
 		    			break;
-		    			
 		    		case "FIXED":
 		    		case "GENCODE":
 		    		default :
 		    			fieldList[index].showText=true;
 		    			fieldList[index].showSelect=false;
-		    			fieldList[index].value=fieldList[index].textValue;
 		    	}
+	    		
+	    		if(fieldList[index].showText){
+	    			if(value!=''){//页面渲染
+	        			fieldList[index].textValue=value;
+	    			}else{//保存表单
+	    				fieldList[index].value=fieldList[index].textValue;
+	    			}
+        		}else{
+        			if(value!=''){
+	        			fieldList[index].fieldValue=value;
+        			}else{
+        				fieldList[index].value=fieldList[index].fieldValue;
+        			}
+        		}
+	        	
 	    	}
 	    }
 	    //删除字段配置

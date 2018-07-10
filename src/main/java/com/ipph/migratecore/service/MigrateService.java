@@ -48,8 +48,6 @@ public class MigrateService {
 			migrateModel.setStart(index);
 			migrateModel.setSize(MigrateService.SIZE);
 			
-			//jmsSender.sendmigrateModelByQueue(migrateModel);
-
 			handleMessagModel(migrateModel);
 		}
 	}
@@ -58,7 +56,6 @@ public class MigrateService {
     	
     	if(null!=migrateModel.getTableModel()) {
     		
-    		//MigrationTask task=new MigrationTask(migrateDao, migrateModel.getTableModel(), migrateModel.getBatchLogId(), migrateModel.getParentLogId(), migrateModel.getStart(), migrateModel.getSize());
     		MigrateTask task=new MigrateTask(migrateDao,migrateModel);
     		
     		ThreadPool.addTask(task);
