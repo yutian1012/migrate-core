@@ -33,9 +33,11 @@ public class BatchLogModel implements Serializable{
 	@Column
 	private String batchNo;//批次号
 	@Column
-	private int size;
+	private Long size;
 	@Column
-	private int success;
+	private Long total;
+	@Column
+	private Long num;//更新次数，如果次数大于10，而size不发生变动，则证明批次已经终止了
 	@Column
 	private Date createDate;
 	@Column

@@ -25,6 +25,8 @@ public class MigrateService {
 	private MigrateDao migrateDao;
 	@Resource
 	private ThreadPool ThreadPool;
+	@Resource
+	private BatchLogService batchLogService;
 	
 	public void migrateTable(TableModel table,Long batchLogId,Long parentLogId) throws ConfigException{
 		
@@ -35,6 +37,9 @@ public class MigrateService {
 		}
 		
 		long total=migrateDao.getTotal(table);
+		
+		//更新批次信息表的执行总量
+		batchLogService.updateTotal(batchLogId,total);
 		
 		//发送消息实现异步处理
 		for(int index=0;index<total;index+=MigrateService.SIZE){

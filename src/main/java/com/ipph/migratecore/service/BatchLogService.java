@@ -32,6 +32,16 @@ public class BatchLogService {
 	 * @param pageable
 	 * @return
 	 */
+	public List<BatchLogModel> getList(boolean isProcessing){
+		Page<BatchLogModel> page= getList(isProcessing, null);
+		return page.getContent();
+	}
+	
+	/**
+	 * 获取批次集合
+	 * @param pageable
+	 * @return
+	 */
 	public Page<BatchLogModel> getList(boolean isProcessing,Pageable pageable){
 		
 		List<BatchStatusEnum> statusList=new ArrayList<>();
@@ -44,7 +54,48 @@ public class BatchLogService {
 		
 		return batchLogDao.getListByStatusIn(statusList, pageable);
 	}
-	
+	/**
+	 * 更新总数据量
+	 * @param batchLogId
+	 * @param total
+	 */
+	public void updateTotal(Long batchLogId,long total) {
+		
+		BatchLogModel batchLog=getById(batchLogId);
+		
+		if(null!=batchLog) {
+			batchLog.setTotal(total);
+			batchLogDao.save(batchLog);
+		}
+		
+	}
+	/**
+	 * 更新执行量
+	 * @param batchLogId
+	 * @param size
+	 */
+	public void updateSize(Long batchLogId,long size,long num) {
+		BatchLogModel batchLog=getById(batchLogId);
+		
+		if(null!=batchLog) {
+			batchLog.setSize(size);
+			batchLog.setNum(num);
+			batchLogDao.save(batchLog);
+		}
+	}
+	/**
+	 * 更新状态
+	 * @param batchLogId
+	 */
+	public void updateStatus(Long batchLogId,BatchStatusEnum status) {
+		BatchLogModel batchLogModel=getById(batchLogId);
+		
+		if(null!=batchLogModel) {
+			batchLogModel.setStatus(status);
+			
+			batchLogDao.save(batchLogModel);
+		}
+	}
 	public Long save(BatchModel batch,Long parentId) {
 		
 		BatchLogModel batchLogModel=new BatchLogModel();
@@ -63,14 +114,7 @@ public class BatchLogService {
 		
 	}
 	
-	public void update(Long batchLogId) {
-		BatchLogModel batchLogModel=batchLogDao.getOne(batchLogId);
-		
-		batchLogModel.setStatus(BatchStatusEnum.SUCCESS);
-		
-		
-		batchLogDao.save(batchLogModel);
-	}
+	
 	/**
 	 * 批次执行日志信息
 	 * @param batchId
@@ -85,7 +129,7 @@ public class BatchLogService {
 	}
 	
 	public BatchLogModel getById(Long id) {
-		return batchLogDao.getOne(id);
+		return batchLogDao.findById(id).get();
 	}
 	
 	/**

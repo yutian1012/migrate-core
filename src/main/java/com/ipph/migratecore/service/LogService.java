@@ -69,6 +69,14 @@ public class LogService {
 		}
 		return logDao.getListByBatchLogIdAndTableId(batchLogId, tableId, pageable);
 	}
+	/**
+	 * 获取批次执行的数量
+	 * @param batchLogId
+	 * @return
+	 */
+	public long countByBatchLogId(Long batchLogId) {
+		return logDao.countByBatchLogId(batchLogId);
+	}
 	
 	/**
 	 * 获取批次处理的正确数据（包括子批次的处理数据）

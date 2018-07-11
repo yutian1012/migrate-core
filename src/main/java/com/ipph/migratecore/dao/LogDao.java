@@ -47,4 +47,5 @@ public interface LogDao extends JpaRepository<LogModel,Long>,ILogDao{
 	
 	public List<LogModel> getListByBatchLogIdAndMessageType(Long batchLogId,LogMessageEnum messageType,Pageable pageable);
 	
+	public Long countByBatchLogId(Long batchLogId);
 }

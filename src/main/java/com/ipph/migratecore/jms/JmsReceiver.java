@@ -25,7 +25,6 @@ public class JmsReceiver {
     		try {
 				handleMessagModel(messageModel);
 			} catch (ConfigException | SQLException e) {
-				e.printStackTrace();
 			}
     	}
     }
