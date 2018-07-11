@@ -30,7 +30,7 @@ public class BatchLogProcessingTask {
 	private LogService logService;
 	
 	//延迟3秒执行，指方法执行完成后过3秒再次执行
-	@Scheduled(fixedDelay=3*100)
+	//@Scheduled(fixedDelay=5*1000)
 	public void execute() {
 		
 		List<BatchLogModel> batchLogList=batchLogService.getList(true);//获取正在执行的批次
@@ -53,22 +53,35 @@ public class BatchLogProcessingTask {
 			return;
 		}
 		
+		long size=0L;
+		long num=0L;
+		long dbSize=0L;
+		
+		//更新size字段
 		if(null==batchLog.getSize()||batchLog.getTotal().longValue()!=batchLog.getSize().longValue()) {
 			
-			long size=logService.countByBatchLogId(batchLog.getBatchId());
+			size=logService.countByBatchLogId(batchLog.getId());
 			
-			long num=null==batchLog.getNum()?0L:batchLog.getNum();
+			num=null==batchLog.getNum()?0L:batchLog.getNum().longValue();
 			
-			if(batchLog.getSize().longValue()==size&&num>10) {
-				batchLogService.updateStatus(batchLog.getBatchId(), BatchStatusEnum.FAIL);
-				return;
+			dbSize=null==batchLog.getSize()?0L:batchLog.getSize().longValue();
+			
+			if(dbSize==size) {
+				if(num>10) {
+					batchLogService.updateStatus(batchLog.getId(), BatchStatusEnum.FAIL);
+					return;
+				}else {
+					batchLogService.updateSize(batchLog.getId(), size,++num);
+					return;
+				}
 			}
 			
-			batchLogService.updateSize(batchLog.getBatchId(), size,num++);
+			batchLogService.updateSize(batchLog.getId(), size,0);
 			return;
 		}
 		
-		batchLogService.updateStatus(batchLog.getBatchId(), BatchStatusEnum.SUCCESS);
+		
+		batchLogService.updateStatus(batchLog.getId(), BatchStatusEnum.SUCCESS);
 		
 	}
 }

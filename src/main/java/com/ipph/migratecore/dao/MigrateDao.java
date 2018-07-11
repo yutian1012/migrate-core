@@ -30,7 +30,7 @@ import com.ipph.migratecore.sql.SqlOperation;
 
 @Repository
 public class MigrateDao {
-	protected static final int NUM=50;
+	protected static final int NUM=1;//50;
 	
 	@Resource
 	protected SqlOperation sqlOperation;
@@ -71,6 +71,12 @@ public class MigrateDao {
 			List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
 			//处理查询结果集
 			if(null!=result&&result.size()>0) {
+				try {
+					Thread.currentThread().sleep(10*1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				process(migrateModel, result);
 				result.clear();
 			}

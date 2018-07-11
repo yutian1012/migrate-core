@@ -115,14 +115,14 @@ public class BatchService {
 			
 			if(null!=tableList&&tableList.size()>0) {
 				for(TableModel table:tableList) {
-					if(null==tableId||table.getId().longValue()==tableId) {
-						//tableService.migrateTable(table,batchLogId,parentId);
-						jmsSender.sendMigrateTableInfoByQueue(
+					jmsSender.sendMigrateTableInfoByQueue(
 							new MigrateMessageModel()
-								.setBatchLogId(batchLogId)
-								.setParentId(parentId)
-								.setTableId(tableId));
-					}
+							.setBatchLogId(batchLogId)
+							.setParentId(parentId)
+							.setTableId(table.getId()));
+					/*if(null==tableId||table.getId().longValue()==tableId) {
+						//tableService.migrateTable(table,batchLogId,parentId);
+					}*/
 				}
 			}
 			
