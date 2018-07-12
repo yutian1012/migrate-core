@@ -30,7 +30,7 @@
 			  		<td>{{batchLog.batchName}}</td>
 			  		<td>{{batchLog.createDate | formatDate}}</td>
 				    <td>
-						<div id="batchId" class="progress" style="width:70%">
+						<div v-bind:id="batchLog.batchNo" class="progress" style="width:70%">
 						    <div class="progress-bar" role="progressbar" aria-valuenow="0" 
 						        aria-valuemin="0" aria-valuemax="100">
 						        <span class="sr-only">40% 完成</span>
@@ -100,30 +100,57 @@
 			}
            	
            	if(app.batchLogList.length>0){
-           		batchProcessing();
+           		batchProcessing(param);
            	}
          });
 	}
 	
 	//定时查询数据
 	var timer;
-	var value=0;
-	function batchProcessing(){
+	function batchProcessing(param){
 	    timer=setTimeout(function(){
 	        //查询获取数据设置进度条
-	        value+=10;
+	        $.post("/logs/batchLog/list",param,function(response){
+	        	if(response.rspCode=="000000"){//操作成功
+	        		processing(response.data.batchLogList);
+				}
+	        });
 	        
-	        $("#batchId div").css("width",value+'%');
-	        console.log(value);
+	        $("div.progress div").each(function(){
+	        	if($(this).attr("aria-valuenow")!='100'){
+	        		batchProcessing(param);
+	        		return false;
+	        	}
+	        });
 	        
-	        if(value!=100){
-	        	batchProcessing();
-	        }
-	    },2000)
+	    },3000);
 	}
 	
-	function processing(){
-		
+	//显示数据进度信息到页面
+	function processing(batchLogList){
+		if(batchLogList&&batchLogList.length>0){
+			for(var i=0;i<batchLogList.length;i++){
+				var batchLog=batchLogList[i];
+				
+				if(batchLog.total==null){
+					continue;
+				}
+				
+				var size=0;
+				if(batchLog.size!=null){
+					size=batchLog.size;
+				}
+				
+				var value=size*100/batchLog.total;
+				
+				$("#"+batchLog.batchNo+" div").css("width",value+'%');
+				
+				if(size==batchLog.total){
+					//标识是否结束
+					$("#"+batchLog.batchNo+" div").attr("aria-valuenow","100");
+				}
+			}
+		}
 	}
   </script>
 </html>

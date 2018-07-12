@@ -91,6 +91,7 @@ public class BatchLogController extends BaseController{
 		
 		return mv;
 	}
+	
 	/**
 	 * 子批次查询记录
 	 * @param batchId
