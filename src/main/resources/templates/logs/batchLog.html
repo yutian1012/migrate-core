@@ -110,6 +110,7 @@
 	function batchProcessing(param){
 	    timer=setTimeout(function(){
 	        //查询获取数据设置进度条
+	        //返回的json数据中包含了进度信息，分别为size和total两个字段.size表示执行的数据量，total表示需要执行的总量
 	        $.post("/logs/batchLog/list",param,function(response){
 	        	if(response.rspCode=="000000"){//操作成功
 	        		processing(response.data.batchLogList);
