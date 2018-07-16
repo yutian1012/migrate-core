@@ -71,12 +71,6 @@ public class MigrateDao {
 			List<Map<String,Object>> result=sqlOperation.getSourceData(select+limit ,migrateRowDataHandler.handleSourceFieldCondition(table));
 			//处理查询结果集
 			if(null!=result&&result.size()>0) {
-				try {
-					Thread.currentThread().sleep(10*1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				process(migrateModel, result);
 				result.clear();
 			}
@@ -109,12 +103,6 @@ public class MigrateDao {
 	private void process(MigrateModel migrateModel,List<Map<String,Object>> result){
 		
 		String executeSql=null;
-		
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
 		
 		TableModel table=migrateModel.getTableModel();
 		

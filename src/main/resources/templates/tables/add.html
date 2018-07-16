@@ -117,11 +117,19 @@
 		        </td>
 		        <td>
 		        	<select class="form-control" v-model="conditionField.type" name="type">
-		        		<option value="LIKE">like</option>
-		        		<option value="LLIKE">Llike</option>
-		        		<option value="RLIKE">Rlike</option>
-		        		<option value="EQUAL">equal</option>
-		        		<option value="IN">in</option>
+		        		<option value="LIKE">LIKE匹配</option>
+		        		<option value="LLIKE">左LIKE匹配</option>
+		        		<option value="RLIKE">右RLIKE匹配</option>
+		        		<option value="EQUAL">等于</option>
+		        		<option value="NEQUAL">不等于</option>
+		        		<option value="IN">包含</option>
+		        		<option value="NOTIN">不包含</option>
+		        		<option value="GT">大于</option>
+		        		<option value="GE">大于等于</option>
+		        		<option value="LT">小于</option>
+		        		<option value="LE">小于等于</option>
+		        		<option value="ISNULL">为空</option>
+		        		<option value="ISNOTNULL">不为空</option>
 		        	</select>
 		        </td>
 		        <td>
@@ -167,11 +175,19 @@
 		        </td>
 		        <td>
 		        	<select class="form-control" v-model="conditionField.type" name="type">
-		        		<option value="LIKE">like</option>
-		        		<option value="LLIKE">Llike</option>
-		        		<option value="RLIKE">Rlike</option>
-		        		<option value="EQUAL">equal</option>
-		        		<option value="IN">in</option>
+		        		<option value="LIKE">LIKE匹配</option>
+		        		<option value="LLIKE">左LIKE匹配</option>
+		        		<option value="RLIKE">右RLIKE匹配</option>
+		        		<option value="EQUAL">等于</option>
+		        		<option value="NEQUAL">不等于</option>
+		        		<option value="IN">包含</option>
+		        		<option value="NOTIN">不包含</option>
+		        		<option value="GT">大于</option>
+		        		<option value="GE">大于等于</option>
+		        		<option value="LT">小于</option>
+		        		<option value="LE">小于等于</option>
+		        		<option value="ISNULL">为空</option>
+		        		<option value="ISNOTNULL">不为空</option>
 		        	</select>
 		        </td>
 		        <td>
@@ -239,6 +255,85 @@
 	  		</tr>
 	  	</tbody>
 	  </table>
+	  
+	   <!-- ***************************************************************************************************************************************** -->
+	  
+	  <div class="panel-body">
+		  <div style="float: right;">
+		  	<input class="btn btn-primary" type="button" value="添加源表限制字段" v-on:click="addSourceConstraintField">
+		  </div>
+	  </div>
+	  <!-- 原表格式化字段信息 -->
+	  <table class="table table-hover table-bordered">
+	  	<thead>
+	        <tr>
+	          <th class="col-md-1">#</th>
+	          <th class="col-md-3">限制字段（原表）</th>
+	          <th class="col-md-2">限制类型</th>
+			  <th class="col-md-1">操作</th>
+	        </tr>
+	  	</thead>
+	  	<tbody>
+	  		<tr v-for="(constraintField,index) in constraintFieldList" v-if="constraintField.applyType=='SOURCE'">
+	  			<th scope="row">{{ index+1 }}</th>
+		        <td>
+		        	<!-- 这里格式化的是原表中的字段 -->
+		        	<select class="form-control" v-model="constraintField.fieldName" name="fieldName">
+		        		<option v-for="(col,index) in fromTableModel.columnList" :value="col.name">{{col.comment}}</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<select class="form-control" v-model="constraintField.type" name="type">
+		        		<option value="PRIMARY">PRIMARY</option>
+		        		<option value="FOREIGNKEY">FOREIGNKEY</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<a style="text-decoration: none;" v-on:click="constraintFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        </td>
+	  		</tr>
+	  	</tbody>
+	  </table>
+	  
+	   <!-- ***************************************************************************************************************************************** -->
+	  
+	  <div class="panel-body">
+		  <div style="float: right;">
+		  	<input class="btn btn-primary" type="button" value="添加目标表限制字段" v-on:click="addTargetConstraintField">
+		  </div>
+	  </div>
+	  <!-- 原表格式化字段信息 -->
+	  <table class="table table-hover table-bordered">
+	  	<thead>
+	        <tr>
+	          <th class="col-md-1">#</th>
+	          <th class="col-md-3">限制字段（原表）</th>
+	          <th class="col-md-2">限制类型</th>
+			  <th class="col-md-1">操作</th>
+	        </tr>
+	  	</thead>
+	  	<tbody>
+	  		<tr v-for="(constraintField,index) in constraintFieldList" v-if="constraintField.applyType=='TARGET'">
+	  			<th scope="row">{{ index+1 }}</th>
+		        <td>
+		        	<!-- 这里格式化的是原表中的字段 -->
+		        	<select class="form-control" v-model="constraintField.fieldName" name="fieldName">
+		        		<option v-for="(col,index) in toTableModel.columnList" :value="col.name">{{col.comment}}</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<select class="form-control" v-model="constraintField.type" name="type">
+		        		<option value="PRIMARY">PRIMARY</option>
+		        		<option value="FOREIGNKEY">FOREIGNKEY</option>
+		        	</select>
+		        </td>
+		        <td>
+		        	<a style="text-decoration: none;" v-on:click="constraintFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
+		        </td>
+	  		</tr>
+	  	</tbody>
+	  </table>
+	  
 	  <input type="hidden" name="id" v-model="id">
 	</div>
 </body>
@@ -262,6 +357,7 @@
 	        	fieldList:[],//配置字段转换信息
 	        	conditionFieldList:[],//条件字段
 	        	formatFieldList:[],//格式化字段信息
+	        	constraintFieldList:[],//限定字段信息
 	        	fromTableModel:{},//原表信息，设置成空对象
 				toTableModel:{},//目标表信息
 				len:0
@@ -286,10 +382,10 @@
 	            		toastr.error('请先选择要配置的原数据表和目标数据表!', '操作失败');
 	            		return;
 	            	}
-	            	if(this.fieldList.length==this.len){
+	            	/* if(this.fieldList.length==this.len){
 	            		toastr.info('没有可添加的目标字段！', '提示信息');
 	            		return;
-	            	}
+	            	} */
 	            	this.fieldList.push(
 	            		{"name":"","valueType":"","textValue":"","fieldValue":"","value":"","showText":false,"showSelect":false,"forLog":0,"note":"","applyType":"TARGET"});
 	            	this.len++;
@@ -299,9 +395,6 @@
 	            },
 	            fieldRemove:function(index){
 	            	removeField(this.fieldList,index);
-	            	/* if(confirm("是否删除？")){
-	            		this.fieldList.splice(index,1);//删除指定下标元素
-	            	} */
 	            },
 	            
 	            //********************************************************************************************************
@@ -336,9 +429,6 @@
 	            },
 	            conditionFieldRemove:function(index){
 	            	removeField(this.conditionFieldList,index);
-	            	/* if(confirm("是否删除？")){
-	            		this.conditionFieldList.splice(index,1);//删除指定下标元素
-	            	} */
 	            },
 	            
 	            //********************************************************************************************************
@@ -351,9 +441,27 @@
 	            },
 	            formatFieldRemove:function(index){
 	            	removeField(this.formatFieldList,index);
-	            	/* if(confirm("是否删除？")){
-	            		this.formatFieldList.splice(index,1);//删除指定下标元素
-	            	} */
+	            },
+	            
+	          	//********************************************************************************************************
+	          	addTargetConstraintField:function(event){
+	          		this.addConstraintField(event,false);
+	          	},
+	          	addSourceConstraintField:function(event){
+	            	this.addConstraintField(event,true);
+	            },
+	          	addConstraintField:function(event,isSource){
+	          		var value={"filedName":"","applyType":"","type":""};
+	            	if(isSource){
+	            		value.applyType="SOURCE";
+	            	}else{
+	            		value.applyType="TARGET";
+	            	}
+	            	
+	            	this.constraintFieldList.push(value);
+	          	},
+	            constraintFieldRemove:function(index){
+	            	removeField(this.constraintFieldList,index);
 	            },
 	            
 	            //********************************************************************************************************
@@ -394,6 +502,9 @@
 		    			break;
 		    		case "FIXED":
 		    		case "GENCODE":
+		    			fieldList[index].showText=false;
+		    			fieldList[index].showSelect=false;
+		    			break;
 		    		default :
 		    			fieldList[index].showText=true;
 		    			fieldList[index].showSelect=false;
@@ -468,6 +579,16 @@
 		    				}
    						}
    						
+   						//**********************************************************
+   						//限定条件
+   						if(tableModel.constraintList){
+   							for(var index=0;index<tableModel.constraintList.length;index++){
+   								var constraintField=tableModel.constraintList[index];
+   								var field=constraintField.field;
+   								tableDiv.constraintFieldList.push({"type":constraintField.type,"applyType":constraintField.applyType,"fieldName":field.name});
+   							}
+   						}
+   						
    					   	//**********************************************************
    						
    						//格式化字段配置信息
@@ -502,6 +623,8 @@
         		for(var i=0;i<tableDiv.conditionFieldList.length;i++){
         			var conditionField=tableDiv.conditionFieldList[i];
         			
+        			tableDiv.changeConditionFieldValueType(i,'');
+        			
         			var field={"name":conditionField.name,"applyType":conditionField.applyType,"valueType":conditionField.valueType,"value":conditionField.value};
         			whereModel.conditionList.push({"type":conditionField.type,"applyType":conditionField.applyType,"field":field})
         		}
@@ -509,6 +632,19 @@
 	    	param.whereModel=whereModel;
 	    	//*****************************************************************
 	    	param.formatFieldList=tableDiv.formatFieldList;
+	    	
+	    	//*****************************************************************
+	    	//constraint限定
+	    	var constraintList=[];
+	    	if(tableDiv.constraintFieldList.length>0){
+	    		for(var i=0;i<tableDiv.constraintFieldList.length;i++){
+	    			var constraintField=tableDiv.constraintFieldList[i];
+	    			var field={"name":constraintField.fieldName,"applyType":constraintField.applyType};
+	    			constraintList.push({"type":constraintField.type,"applyType":constraintField.applyType,"field":field});
+	    		}
+	    	}
+	    	
+	    	param.constraintList=constraintList;
 	    	
         	//*****************************************************************
             $.ajax({

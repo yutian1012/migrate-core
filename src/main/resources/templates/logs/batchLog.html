@@ -31,9 +31,8 @@
 			  		<td>{{batchLog.createDate | formatDate}}</td>
 				    <td>
 						<div v-bind:id="batchLog.batchNo" class="progress" style="width:70%">
-						    <div class="progress-bar" role="progressbar" aria-valuenow="0" 
-						        aria-valuemin="0" aria-valuemax="100">
-						        <span class="sr-only">40% 完成</span>
+						    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+						      0% <!--  <span class="sr-only">0%</span> -->
 						    </div>
 						</div>
 				      	<a style="text-decoration: none;" v-on:click="locationUrl('/logs/tables/'+batchLog.id,'batchLog')"><i class="icon-magnifier"></i>查看执行进度</a>
@@ -116,13 +115,17 @@
 	        		processing(response.data.batchLogList);
 				}
 	        });
-	        
-	        $("div.progress div").each(function(){
-	        	if($(this).attr("aria-valuenow")!='100'){
-	        		batchProcessing(param);
-	        		return false;
+	        var flag=false;
+	        $("div.progress div").each(function(index){
+	        	if($(this).attr("aria-valuenow")=='100'){
+	        		app.batchLogList.splice(index,1);//删除指定下标元素
+	        	}else{
+	        		flag=true;
 	        	}
 	        });
+	        if(flag){
+	        	batchProcessing(param);
+	        }
 	        
 	    },3000);
 	}
@@ -142,9 +145,10 @@
 					size=batchLog.size;
 				}
 				
-				var value=size*100/batchLog.total;
+				var value=parseInt(size*100/batchLog.total);
 				
 				$("#"+batchLog.batchNo+" div").css("width",value+'%');
+				$("#"+batchLog.batchNo+" div").text(value+'%');
 				
 				if(size==batchLog.total){
 					//标识是否结束

@@ -30,7 +30,7 @@ public class BatchLogProcessingTask {
 	private LogService logService;
 	
 	//延迟3秒执行，指方法执行完成后过3秒再次执行
-	//@Scheduled(fixedDelay=5*1000)
+	@Scheduled(fixedDelay=5*1000)
 	public void execute() {
 		
 		List<BatchLogModel> batchLogList=batchLogService.getList(true);//获取正在执行的批次

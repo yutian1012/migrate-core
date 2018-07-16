@@ -64,7 +64,8 @@ public class BatchLogService {
 		BatchLogModel batchLog=getById(batchLogId);
 		
 		if(null!=batchLog) {
-			batchLog.setTotal(total);
+			long size=null==batchLog.getTotal()?0L:batchLog.getTotal();//针对一个批次中包含多个数据表时，总量是累加的
+			batchLog.setTotal(total+size);
 			batchLogDao.save(batchLog);
 		}
 		

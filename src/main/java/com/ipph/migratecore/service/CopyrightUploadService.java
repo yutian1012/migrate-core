@@ -23,7 +23,7 @@ public class CopyrightUploadService {
 	private CopyrightUploadDao copyrightUploadDao;
 
 	public String[] copyrightInsert=new String[] {"authorName","ownerName","workName","workNo","finishDate","createDate","type","paperNo",
-			"firstPublicDate","firstPublicCity","getRightWay","RightOwnership","RightOwnershipStatus","applyType","applicantName","applyContacts","registFee"};
+			"firstPublicDate","firstPublicCity","getRightWay","RightOwnership","RightOwnershipStatus","applyType","applicantName","applyContacts","registFee","area","park","note"};
 	/**
 	 * 处理上传excel
 	 * @param result
