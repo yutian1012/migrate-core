@@ -33,6 +33,10 @@
 					</select>
 			  </div>
 		  </div>
+		  
+		  <!-- 如果为子表数据，需要设置管理的主表，并配置外键字段 -->
+		  
+		  
 		  <div style="float: right;">
 		  	<input class="btn btn-primary" type="button" value="添加字段" v-on:click="addField">
 		  </div>
@@ -116,7 +120,7 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="conditionField.type" name="type">
+		        	<select class="form-control" v-model="conditionField.type" name="type" v-on:change="changeConditionFieldType(index)">
 		        		<option value="LIKE">LIKE匹配</option>
 		        		<option value="LLIKE">左LIKE匹配</option>
 		        		<option value="RLIKE">右RLIKE匹配</option>
@@ -133,12 +137,12 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="conditionField.valueType" name="valueType">
+		        	<select v-if="conditionField.showValueType" class="form-control" v-model="conditionField.valueType" name="valueType" v-on:change="changeConditionFieldValueType(index,'')">
 		        		<option value="FIXED">固定值</option>
 		        	</select>
 				</td>
 		        <td>
-		        	<input type="text" class="form-control" v-model="conditionField.textValue" name="textValue">
+		        	<input v-if="conditionField.showText" type="text" class="form-control" v-model="conditionField.textValue" name="textValue">
 		        </td>
 		        <td>
 		        	<a style="text-decoration: none;" v-on:click="conditionFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
@@ -174,7 +178,7 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="conditionField.type" name="type">
+		        	<select class="form-control" v-model="conditionField.type" name="type" v-on:change="changeConditionFieldType(index)">
 		        		<option value="LIKE">LIKE匹配</option>
 		        		<option value="LLIKE">左LIKE匹配</option>
 		        		<option value="RLIKE">右RLIKE匹配</option>
@@ -191,7 +195,7 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="conditionField.valueType" name="valueType" v-on:change="changeConditionFieldValueType(index,'')">
+		        	<select v-if="conditionField.showValueType" class="form-control" v-model="conditionField.valueType" name="valueType" v-on:change="changeConditionFieldValueType(index,'')">
 		        		<option value="FIXED">固定值</option>
 		        		<option value="FIELD">字段值</option>
 		        	</select>
@@ -283,7 +287,7 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="constraintField.type" name="type">
+		        	<select class="form-control" v-model="constraintField.type" name="type" v-on:change="changeConstraintType(index)">
 		        		<option value="PRIMARY">PRIMARY</option>
 		        		<option value="FOREIGNKEY">FOREIGNKEY</option>
 		        	</select>
@@ -307,7 +311,7 @@
 	  	<thead>
 	        <tr>
 	          <th class="col-md-1">#</th>
-	          <th class="col-md-3">限制字段（原表）</th>
+	          <th class="col-md-2">限制字段（目标表）</th>
 	          <th class="col-md-2">限制类型</th>
 			  <th class="col-md-1">操作</th>
 	        </tr>
@@ -322,11 +326,16 @@
 		        	</select>
 		        </td>
 		        <td>
-		        	<select class="form-control" v-model="constraintField.type" name="type">
+		        	<select class="form-control" v-model="constraintField.type" name="type" v-on:change="changeConstraintType(index)">
 		        		<option value="PRIMARY">PRIMARY</option>
 		        		<option value="FOREIGNKEY">FOREIGNKEY</option>
 		        	</select>
 		        </td>
+		       <!--  <td>
+		        	<select v-if="constraintField.showSelect" class="form-control" v-model="constraintField.value" name="value">
+		        		<option v-for="(col,index) in toTableModel.columnList" :value="col.name">{{col.comment}}</option>
+		        	</select>
+		        </td> -->
 		        <td>
 		        	<a style="text-decoration: none;" v-on:click="constraintFieldRemove(index)"><i class="icon-action-redo"></i>删除</a>
 		        </td>
@@ -414,7 +423,7 @@
 	            		return;
 	            	}
 	            	
-	            	var value={"name":"","type":"","valueType":"","textValue":"","fieldValue":"","value":"","showText":false,"showSelect":false};
+	            	var value={"name":"","type":"","valueType":"","textValue":"","fieldValue":"","value":"","showText":false,"showSelect":false,"showValueType":false};
 	            	if(isSource){
 	            		value.applyType="SOURCE";
 	            	}else{
@@ -426,6 +435,29 @@
 	            },
 	            changeConditionFieldValueType:function(index,value){
 	            	changeValueType(this.conditionFieldList,index,value);
+	            },
+	            changeConditionFieldType:function(index){
+	            	switch(this.conditionFieldList[index].type){
+		            	case "LIKE":
+		            	case "LLIKE":
+		            	case "RLIKE":
+		            	case "EQUAL":
+		            	case "NEQUAL":
+		            	case "IN":
+		            	case "NOTIN":
+		            	case "GT":
+		            	case "GE":
+		            	case "LT":
+		            	case "LE":
+			    			this.conditionFieldList[index].showValueType=true;
+			    			break;
+			    		case "ISNULL":
+			    		case "ISNOTNULL":
+			    		default :
+			    			this.conditionFieldList[index].valueType='';
+			    			this.conditionFieldList[index].showValueType=false;
+		            }
+	            	this.changeConditionFieldValueType(index,'');//联动问题
 	            },
 	            conditionFieldRemove:function(index){
 	            	removeField(this.conditionFieldList,index);
@@ -450,7 +482,19 @@
 	          	addSourceConstraintField:function(event){
 	            	this.addConstraintField(event,true);
 	            },
+	           /*  changeConstraintType:function(index){
+	            	switch(this.constraintFieldList[index].type){
+			        	case "PRIMARY":
+			        		this.constraintFieldList[index].showSelect=false;
+			        		this.constraintFieldList[index].value="";			    			
+			    			break;
+			    		case "FOREIGNKEY":
+			    		default :
+			    			this.constraintFieldList[index].showSelect=true;
+			    	}
+	            }, */
 	          	addConstraintField:function(event,isSource){
+	          		//var value={"filedName":"","applyType":"","type":"",showSelect:false,"value":""};
 	          		var value={"filedName":"","applyType":"","type":""};
 	            	if(isSource){
 	            		value.applyType="SOURCE";
@@ -501,12 +545,15 @@
 		    			fieldList[index].showSelect=true;
 		    			break;
 		    		case "FIXED":
+		    			fieldList[index].showText=true;
+		    			fieldList[index].showSelect=false;
+		    			break;
 		    		case "GENCODE":
 		    			fieldList[index].showText=false;
 		    			fieldList[index].showSelect=false;
 		    			break;
 		    		default :
-		    			fieldList[index].showText=true;
+		    			fieldList[index].showText=false;
 		    			fieldList[index].showSelect=false;
 		    	}
 	    		
@@ -571,10 +618,11 @@
    								var condition=tableModel.whereModel.conditionList[index];
    								var conditionField=condition.field;
    								tableDiv.conditionFieldList.push({"type":condition.type,"applyType":condition.applyType,
-   										"name":conditionField.name,"valueType":conditionField.valueType,"textValue":"","fieldValue":"","value":conditionField.value,"showText":false,"showSelect":false});
+   										"name":conditionField.name,"valueType":conditionField.valueType,"textValue":"","fieldValue":"","value":conditionField.value,"showText":false,"showSelect":false,"showValueType":false});
    								
    							}
 							for(var index=0;index<tableDiv.conditionFieldList.length;index++){
+		   						tableDiv.changeConditionFieldType(index);
 		   						tableDiv.changeConditionFieldValueType(index,tableDiv.conditionFieldList[index].value);
 		    				}
    						}
@@ -585,6 +633,11 @@
    							for(var index=0;index<tableModel.constraintList.length;index++){
    								var constraintField=tableModel.constraintList[index];
    								var field=constraintField.field;
+   								/* var showSelect=false;
+   								if(constraintField.value!=null&&constraintField.value!=''){
+   									showSelect=true;
+   								} */
+   								//tableDiv.constraintFieldList.push({"type":constraintField.type,"applyType":constraintField.applyType,"fieldName":field.name,"showSelect":showSelect,"value":constraintField.value});
    								tableDiv.constraintFieldList.push({"type":constraintField.type,"applyType":constraintField.applyType,"fieldName":field.name});
    							}
    						}
@@ -640,7 +693,7 @@
 	    		for(var i=0;i<tableDiv.constraintFieldList.length;i++){
 	    			var constraintField=tableDiv.constraintFieldList[i];
 	    			var field={"name":constraintField.fieldName,"applyType":constraintField.applyType};
-	    			constraintList.push({"type":constraintField.type,"applyType":constraintField.applyType,"field":field});
+	    			constraintList.push({"type":constraintField.type,"applyType":constraintField.applyType,"field":field,"value":constraintField.value});
 	    		}
 	    	}
 	    	

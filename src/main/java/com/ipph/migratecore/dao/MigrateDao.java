@@ -267,7 +267,7 @@ public class MigrateDao {
 				if(!isExists) {
 					throw new DataNotFoundException("主记录不存在！");
 				}
-				//判断子表记录是否已经出来过，通过外键判断
+				//判断子表记录是否已经存在，通过外键判断
 				String subTargetSelectgSql=sqlBuilder.getTargetSelectSql(table,true);
 				if(null!=subTargetSelectgSql) {
 					if(sqlOperation.isDestExists(subTargetSelectgSql, migrateRowDataHandler.handleTargetConstraintCondtion(row,table))) {
